@@ -12,6 +12,6 @@ interface PyrexiaApi {
         "Content-Type: application/json",
         "Platform: android")
     @GET("/programs")
-    fun getPrograms(@Url baseUrl: String): Single<GetProgramsDto>
+    fun getPrograms(): Single<GetProgramsDto>
 
 }

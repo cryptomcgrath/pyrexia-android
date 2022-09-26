@@ -2,6 +2,7 @@ package com.cryptomcgrath.pyrexia
 
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
+import com.cryptomcgrath.pyrexia.thermostat.ThermostatFragment
 
 class MainActivity: FragmentActivity() {
 
@@ -14,7 +15,6 @@ class MainActivity: FragmentActivity() {
     }
 
     private fun goToThermostatFragment() {
-        supportFragmentManager.beginTransaction().add(R.id.fragment_container, ThermostatFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container, ThermostatFragment()).commit()
     }
-
 }
