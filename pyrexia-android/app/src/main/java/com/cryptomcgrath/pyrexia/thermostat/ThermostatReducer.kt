@@ -6,10 +6,10 @@ internal val thermostatReducerFun: ReducerFun<ThermostatState> = { inState, even
     val state = inState ?: ThermostatState()
 
     when(event) {
-        is ThermostatEvent.NewPrograms -> {
+        is ThermostatEvent.NewProgramsRun -> {
             state.copy(
-                programs = event.programs,
-                selectedProgramId = event.programs.firstOrNull()?.id
+                programsRun = event.programsRun,
+                selectedProgramId = event.programsRun.firstOrNull()?.program?.id
             )
         }
 

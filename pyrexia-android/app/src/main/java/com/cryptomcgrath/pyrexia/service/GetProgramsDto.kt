@@ -1,6 +1,6 @@
 package com.cryptomcgrath.pyrexia.service
 
-data class GetProgramsDto(
+internal data class GetProgramsDto(
     val message: String,
     val data: List<ProgramDto>
 ) {

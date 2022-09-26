@@ -2,7 +2,7 @@ package com.cryptomcgrath.pyrexia.model
 
 import java.util.Locale
 
-data class Program(
+internal data class Program(
     val id: Int,
     val name: String,
     val setPoint: Float,

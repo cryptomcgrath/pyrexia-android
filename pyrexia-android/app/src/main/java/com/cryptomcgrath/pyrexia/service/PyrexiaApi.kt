@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Url
 
-interface PyrexiaApi {
+internal interface PyrexiaApi {
 
     @Headers(
         "Accept: application/json",
@@ -13,5 +13,12 @@ interface PyrexiaApi {
         "Platform: android")
     @GET("/programs")
     fun getPrograms(): Single<GetProgramsDto>
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json",
+        "Platform: android")
+    @GET("/programs/run")
+    fun getProgramsRun(): Single<GetProgramsRunDto>
 
 }

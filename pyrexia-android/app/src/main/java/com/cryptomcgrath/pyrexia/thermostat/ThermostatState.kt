@@ -1,13 +1,13 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
-import com.cryptomcgrath.pyrexia.model.Program
+import com.cryptomcgrath.pyrexia.model.ProgramRun
 import com.edwardmcgrath.blueflux.core.State
 
 internal data class ThermostatState(
-    val programs: List<Program> = emptyList(),
+    val programsRun: List<ProgramRun> = emptyList(),
     val selectedProgramId: Int? = null
 ): State {
-    val program = programs.firstOrNull {
-        it.id == selectedProgramId
+    val program = programsRun.firstOrNull {
+        it.program.id == selectedProgramId
     }
 }

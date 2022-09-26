@@ -1,7 +1,9 @@
 package com.cryptomcgrath.pyrexia.service
 
 import com.cryptomcgrath.pyrexia.model.Program
+import com.cryptomcgrath.pyrexia.model.ProgramRun
 import com.cryptomcgrath.pyrexia.model.toProgramList
+import com.cryptomcgrath.pyrexia.model.toProgramRunList
 import com.cryptomcgrath.pyrexia.thermostat.BASE_URL
 import io.reactivex.Single
 import okhttp3.OkHttpClient
@@ -9,7 +11,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-class PyrexiaService() {
+internal class PyrexiaService() {
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
@@ -26,4 +28,10 @@ class PyrexiaService() {
             }
     }
 
+    fun getProgramsRunList(): Single<List<ProgramRun>> {
+        return client.getProgramsRun()
+            .map {
+                it.toProgramRunList()
+            }
+    }
 }

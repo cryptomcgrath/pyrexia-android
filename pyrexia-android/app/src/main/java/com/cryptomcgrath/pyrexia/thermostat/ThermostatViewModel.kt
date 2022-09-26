@@ -41,17 +41,17 @@ internal class ThermostatViewModel: ViewModel() {
 
     private fun updateUi(state: ThermostatState) {
         state.program?.let {
-            name.set(it.name)
+            name.set(it.program.name)
         }
     }
 
     private fun refreshData() {
-        pyrexiaService.getProgramsList(BASE_URL)
+        pyrexiaService.getProgramsRunList()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    dispatcher.post(ThermostatEvent.NewPrograms(it))
+                    dispatcher.post(ThermostatEvent.NewProgramsRun(it))
                 },
                 onError = {
                     eventQueue.post(UiEvent.ServiceError(it))
