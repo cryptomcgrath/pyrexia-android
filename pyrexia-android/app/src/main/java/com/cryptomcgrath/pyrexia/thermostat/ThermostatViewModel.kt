@@ -1,5 +1,6 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
+import android.util.Log
 import android.widget.CompoundButton
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
@@ -9,11 +10,13 @@ import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
 import com.edwardmcgrath.blueflux.core.RxStore
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 internal class ThermostatViewModel: ViewModel() {
     private val store = RxStore.create(thermostatReducerFun)
@@ -34,6 +37,7 @@ internal class ThermostatViewModel: ViewModel() {
     init {
         refreshData()
         subscribeToStateChanges()
+        setupAutoRefresh()
     }
 
     private fun subscribeToStateChanges() {
@@ -71,12 +75,28 @@ internal class ThermostatViewModel: ViewModel() {
             ).addTo(disposables)
     }
 
+    private fun setupAutoRefresh() {
+        Observable.interval(AUTO_REFRESH_INTERVAL, TimeUnit.SECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    Log.d(TAG, "refreshing data")
+                    refreshData()
+                },
+                onError = {
+                    // ignore
+                }
+            ).addTo(disposables)
+    }
+
     fun onEnabledChanged(buttonView: CompoundButton, isChecked: Boolean) {
+        isEnabled.set(isChecked)
         // POST /stat/:id/enable
     }
 
     fun onClickIncrease() {
-        store.state.current?.let {
+        current?.let {
             pyrexiaService.statIncrease(it.program.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -93,7 +113,7 @@ internal class ThermostatViewModel: ViewModel() {
     }
 
     fun onClickDecrease() {
-        store.state.current?.let {
+        current?.let {
             pyrexiaService.statDecrease(it.program.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -105,7 +125,6 @@ internal class ThermostatViewModel: ViewModel() {
                         eventQueue.post(UiEvent.ServiceError(it))
                     }
                 )
-
         }
     }
 
@@ -120,3 +139,5 @@ internal class ThermostatViewModel: ViewModel() {
 }
 
 const val BASE_URL = "http://bigred.ddns.net:8000/"
+const val AUTO_REFRESH_INTERVAL = 15L
+const val TAG="ThermostatViewModel"

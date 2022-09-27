@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:paddingTop="@dimen/top_padding"
         android:paddingBottom="@dimen/top_padding"
-        android:background="@color/light_blue">
+        android:background="@{model.isEnabled() ? @color/light_blue : @color/light_grey}">
 
         <TextView
             android:id="@+id/program_name"
@@ -33,6 +33,7 @@
             android:text="@{model.sensorValue}"
             android:textSize="100sp"
             android:textColor="@color/white"
+            android:enabled="@{model.isEnabled()}"
             tools:text="68°"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -46,6 +47,7 @@
             android:layout_marginEnd="@dimen/side_padding"
             android:src="@drawable/ic_arrow_up_48"
             android:onClick="@{()->model.onClickIncrease()}"
+            android:enabled="@{model.isEnabled()}"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -58,6 +60,7 @@
             android:textSize="30sp"
             android:gravity="center"
             android:textColor="@color/white"
+            android:enabled="@{model.isEnabled()}"
             tools:text="68°"
             app:layout_constraintTop_toBottomOf="@id/up_arrow"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -68,7 +71,8 @@
             android:layout_height="wrap_content"
             android:text="@string/set_to"
             android:textColor="@color/white"
-            android:textSize="18dp"
+            android:textSize="18sp"
+            android:enabled="@{model.isEnabled()}"
             app:layout_constraintTop_toTopOf="@id/set_point"
             app:layout_constraintBottom_toBottomOf="@id/set_point"
             app:layout_constraintEnd_toStartOf="@id/set_point" />
@@ -80,6 +84,7 @@
             android:layout_marginEnd="@dimen/side_padding"
             android:src="@drawable/ic_arrow_down_48"
             android:onClick="@{()->model.onClickDecrease()}"
+            android:enabled="@{model.isEnabled()}"
             app:layout_constraintTop_toBottomOf="@id/set_point"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -111,7 +116,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textColor="@color/white"
             tools:text="HEAT"
             app:layout_constraintStart_toEndOf="@id/enabled_switch"
