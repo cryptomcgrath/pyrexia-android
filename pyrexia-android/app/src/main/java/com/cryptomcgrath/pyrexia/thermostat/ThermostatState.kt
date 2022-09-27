@@ -4,10 +4,10 @@ import com.cryptomcgrath.pyrexia.model.ProgramRun
 import com.edwardmcgrath.blueflux.core.State
 
 internal data class ThermostatState(
-    val programsRun: List<ProgramRun> = emptyList(),
-    val selectedProgramId: Int? = null
+    val statList: List<ProgramRun> = emptyList(),
+    val selectedStatId: Int? = null
 ): State {
-    val program = programsRun.firstOrNull {
-        it.program.id == selectedProgramId
+    val current = statList.firstOrNull {
+        it.program.id == selectedStatId
     }
 }

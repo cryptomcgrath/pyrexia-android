@@ -5,6 +5,6 @@ import com.edwardmcgrath.blueflux.core.Event
 
 internal sealed class ThermostatEvent: Event {
 
-    data class NewProgramsRun(val programsRun: List<ProgramRun>): ThermostatEvent()
+    data class NewStatList(val statList: List<ProgramRun>): ThermostatEvent()
 
 }

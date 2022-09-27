@@ -1,10 +1,9 @@
 package com.cryptomcgrath.pyrexia.service
 
-import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.ProgramRun
-import com.cryptomcgrath.pyrexia.model.toProgramList
-import com.cryptomcgrath.pyrexia.model.toProgramRunList
+import com.cryptomcgrath.pyrexia.model.toStatList
 import com.cryptomcgrath.pyrexia.thermostat.BASE_URL
+import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -21,17 +20,18 @@ internal class PyrexiaService() {
             .build()
     private val client = retrofit.create(PyrexiaApi::class.java)
 
-    fun getProgramsList(baseUrl: String): Single<List<Program>> {
-        return client.getPrograms()
+    fun getStatList(): Single<List<ProgramRun>> {
+        return client.getStatList()
             .map {
-                it.toProgramList()
+                it.toStatList()
             }
     }
 
-    fun getProgramsRunList(): Single<List<ProgramRun>> {
-        return client.getProgramsRun()
-            .map {
-                it.toProgramRunList()
-            }
+    fun statIncrease(id: Int): Completable {
+        return client.statIncrease(id)
+    }
+
+    fun statDecrease(id: Int): Completable {
+        return client.statDecrease(id)
     }
 }

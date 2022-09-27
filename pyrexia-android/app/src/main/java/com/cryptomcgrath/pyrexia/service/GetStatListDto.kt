@@ -1,10 +1,10 @@
 package com.cryptomcgrath.pyrexia.service
 
-internal data class GetProgramsRunDto(
+internal data class GetStatListDto(
     val message: String,
-    val data: List<ProgramRunDto>
+    val data: List<StatListDto>
 ) {
-    data class ProgramRunDto(
+    data class StatListDto(
         val program_id: Int,
         val program_name: String,
         val sensor_id: Int,

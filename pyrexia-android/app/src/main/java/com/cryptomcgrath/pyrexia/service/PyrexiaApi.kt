@@ -1,9 +1,11 @@
 package com.cryptomcgrath.pyrexia.service
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Headers
-import retrofit2.http.Url
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 internal interface PyrexiaApi {
 
@@ -11,14 +13,20 @@ internal interface PyrexiaApi {
         "Accept: application/json",
         "Content-Type: application/json",
         "Platform: android")
-    @GET("/programs")
-    fun getPrograms(): Single<GetProgramsDto>
+    @GET("/stat/list")
+    fun getStatList(): Single<GetStatListDto>
 
     @Headers(
         "Accept: application/json",
         "Content-Type: application/json",
         "Platform: android")
-    @GET("/programs/run")
-    fun getProgramsRun(): Single<GetProgramsRunDto>
+    @POST("/stat/{id}/increase")
+    fun statIncrease(@Path("id") id: Int): Completable
 
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json",
+        "Platform: android")
+    @POST("/stat/id}/decrease")
+    fun statDecrease(@Path("id") id: Int): Completable
 }

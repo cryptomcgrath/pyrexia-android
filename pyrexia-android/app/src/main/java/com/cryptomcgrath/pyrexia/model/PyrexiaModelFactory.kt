@@ -1,7 +1,7 @@
 package com.cryptomcgrath.pyrexia.model
 
 import com.cryptomcgrath.pyrexia.service.GetProgramsDto
-import com.cryptomcgrath.pyrexia.service.GetProgramsRunDto
+import com.cryptomcgrath.pyrexia.service.GetStatListDto
 
 internal fun GetProgramsDto.toProgramList(): List<Program> {
     return this.data.map {
@@ -17,7 +17,7 @@ internal fun GetProgramsDto.toProgramList(): List<Program> {
     }
 }
 
-internal fun GetProgramsRunDto.toProgramRunList(): List<ProgramRun> {
+internal fun GetStatListDto.toStatList(): List<ProgramRun> {
     return this.data.map {
         val program = Program(
             id = it.program_id,

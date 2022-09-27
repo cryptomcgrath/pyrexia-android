@@ -29,6 +29,8 @@ internal class ThermostatViewModel: ViewModel() {
     val modeText = ObservableField<String>()
     val isEnabled = ObservableBoolean()
 
+    private val current get() = store.state.current
+
     init {
         refreshData()
         subscribeToStateChanges()
@@ -46,7 +48,7 @@ internal class ThermostatViewModel: ViewModel() {
     }
 
     private fun updateUi(state: ThermostatState) {
-        state.program?.let {
+        state.current?.let {
             name.set(it.program.name)
             setPointText.set(String.format("%3d°", it.program.setPoint.toInt()))
             sensorValue.set(String.format("%3d°", it.sensor.value.toInt()))
@@ -56,12 +58,12 @@ internal class ThermostatViewModel: ViewModel() {
     }
 
     private fun refreshData() {
-        pyrexiaService.getProgramsRunList()
+        pyrexiaService.getStatList()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    dispatcher.post(ThermostatEvent.NewProgramsRun(it))
+                    dispatcher.post(ThermostatEvent.NewStatList(it))
                 },
                 onError = {
                     eventQueue.post(UiEvent.ServiceError(it))
@@ -74,11 +76,37 @@ internal class ThermostatViewModel: ViewModel() {
     }
 
     fun onClickIncrease() {
-        // POST /stat/:id/increase
+        store.state.current?.let {
+            pyrexiaService.statIncrease(it.program.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = {
+                        refreshData()
+                    },
+                    onError = {
+                        eventQueue.post(UiEvent.ServiceError(it))
+                    }
+                )
+
+        }
     }
 
     fun onClickDecrease() {
-        // POST /stat/:id/decrease
+        store.state.current?.let {
+            pyrexiaService.statDecrease(it.program.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = {
+                        refreshData()
+                    },
+                    onError = {
+                        eventQueue.post(UiEvent.ServiceError(it))
+                    }
+                )
+
+        }
     }
 
     override fun onCleared() {
