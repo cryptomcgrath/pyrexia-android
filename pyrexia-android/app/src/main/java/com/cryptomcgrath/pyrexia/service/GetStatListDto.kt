@@ -17,6 +17,7 @@ internal data class GetStatListDto(
         val set_point: Float,
         val last_on_time: Long,
         val last_off_time: Long,
-        val min_run: Int
+        val min_run: Int,
+        val control_on: Int
     )
 }

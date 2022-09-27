@@ -4,7 +4,10 @@ import android.util.Log
 import android.widget.CompoundButton
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
+import androidx.databinding.ObservableInt
 import androidx.lifecycle.ViewModel
+import com.cryptomcgrath.pyrexia.R
+import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.Event
@@ -26,11 +29,13 @@ internal class ThermostatViewModel: ViewModel() {
     private val pyrexiaService = PyrexiaService()
     private val disposables = CompositeDisposable()
 
-    val name = ObservableField<String>()
-    val setPointText = ObservableField<String>()
-    val sensorValue = ObservableField<String>()
-    val modeText = ObservableField<String>()
+    val name = ObservableField<String>("----")
+    val setPointText = ObservableField<String>("---")
+    val sensorValue = ObservableField<String>("---")
+    val modeText = ObservableField<String>("----")
     val isEnabled = ObservableBoolean()
+    val isControlOn = ObservableBoolean()
+    val background = ObservableInt()
 
     private val current get() = store.state.current
 
@@ -58,6 +63,15 @@ internal class ThermostatViewModel: ViewModel() {
             sensorValue.set(String.format("%3d°", it.sensor.value.toInt()))
             modeText.set(it.program.mode.name)
             isEnabled.set(it.program.enabled)
+            isControlOn.set(it.control.controlOn)
+            background.set(
+                when {
+                    !it.program.enabled -> R.color.light_grey
+                    it.control.controlOn && it.program.mode == Program.Mode.HEAT -> R.color.heating
+                    it.control.controlOn && it.program.mode == Program.Mode.COOL -> R.color.cooling
+                    else -> R.color.light_blue
+                }
+            )
         }
     }
 
@@ -108,7 +122,6 @@ internal class ThermostatViewModel: ViewModel() {
                         eventQueue.post(UiEvent.ServiceError(it))
                     }
                 )
-
         }
     }
 

@@ -31,10 +31,10 @@ internal fun GetStatListDto.toStatList(): List<ProgramRun> {
         val control = Control(
             id = it.control_id,
             name = it.control_name,
-            running = false,
             lastOnTime = it.last_on_time,
             lastOffTime = it.last_off_time,
-            minRun = it.min_run
+            minRun = it.min_run,
+            controlOn = it.control_on == 1
         )
         val sensor = Sensor(
             id = it.sensor_id,
