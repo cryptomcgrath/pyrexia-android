@@ -1,5 +1,7 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
+import android.widget.CompoundButton
+import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
@@ -22,6 +24,10 @@ internal class ThermostatViewModel: ViewModel() {
     private val disposables = CompositeDisposable()
 
     val name = ObservableField<String>()
+    val setPointText = ObservableField<String>()
+    val sensorValue = ObservableField<String>()
+    val modeText = ObservableField<String>()
+    val isEnabled = ObservableBoolean()
 
     init {
         refreshData()
@@ -42,6 +48,10 @@ internal class ThermostatViewModel: ViewModel() {
     private fun updateUi(state: ThermostatState) {
         state.program?.let {
             name.set(it.program.name)
+            setPointText.set(String.format("%3d°", it.program.setPoint.toInt()))
+            sensorValue.set(String.format("%3d°", it.sensor.value.toInt()))
+            modeText.set(it.program.mode.name)
+            isEnabled.set(it.program.enabled)
         }
     }
 
@@ -57,6 +67,18 @@ internal class ThermostatViewModel: ViewModel() {
                     eventQueue.post(UiEvent.ServiceError(it))
                 }
             ).addTo(disposables)
+    }
+
+    fun onEnabledChanged(buttonView: CompoundButton, isChecked: Boolean) {
+        // POST /stat/:id/enable
+    }
+
+    fun onClickIncrease() {
+        // POST /stat/:id/increase
+    }
+
+    fun onClickDecrease() {
+        // POST /stat/:id/decrease
     }
 
     override fun onCleared() {

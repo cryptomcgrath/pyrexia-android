@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <dimen name="set_point_size">50dp</dimen>
+    <dimen name="side_padding">24dp</dimen>
+    <dimen name="top_padding">32dp</dimen>
+</resources>
