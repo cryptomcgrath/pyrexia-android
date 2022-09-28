@@ -5,7 +5,8 @@ import com.edwardmcgrath.blueflux.core.State
 
 internal data class ThermostatState(
     val statList: List<ProgramRun> = emptyList(),
-    val selectedStatId: Int? = null
+    val selectedStatId: Int? = null,
+    val connectionError: Throwable? = null
 ): State {
     val current = statList.firstOrNull {
         it.program.id == selectedStatId

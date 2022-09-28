@@ -27,6 +27,6 @@ internal interface PyrexiaApi {
         "Accept: application/json",
         "Content-Type: application/json",
         "Platform: android")
-    @POST("/stat/id}/decrease")
+    @POST("/stat/{id}/decrease")
     fun statDecrease(@Path("id") id: Int): Completable
 }

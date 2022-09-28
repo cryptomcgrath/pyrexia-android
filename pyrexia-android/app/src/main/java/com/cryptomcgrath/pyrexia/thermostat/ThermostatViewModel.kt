@@ -33,9 +33,10 @@ internal class ThermostatViewModel: ViewModel() {
     val setPointText = ObservableField<String>("---")
     val sensorValue = ObservableField<String>("---")
     val modeText = ObservableField<String>("----")
-    val isEnabled = ObservableBoolean()
-    val isControlOn = ObservableBoolean()
-    val background = ObservableInt()
+    val isEnabled = ObservableBoolean(false)
+
+    val background = ObservableInt(R.color.light_blue)
+    val showError = ObservableBoolean(false)
 
     private val current get() = store.state.current
 
@@ -57,13 +58,15 @@ internal class ThermostatViewModel: ViewModel() {
     }
 
     private fun updateUi(state: ThermostatState) {
+        showError.set(
+            state.connectionError != null
+        )
         state.current?.let {
             name.set(it.program.name)
             setPointText.set(String.format("%3d°", it.program.setPoint.toInt()))
             sensorValue.set(String.format("%3d°", it.sensor.value.toInt()))
             modeText.set(it.program.mode.name)
             isEnabled.set(it.program.enabled)
-            isControlOn.set(it.control.controlOn)
             background.set(
                 when {
                     !it.program.enabled -> R.color.light_grey
@@ -84,7 +87,7 @@ internal class ThermostatViewModel: ViewModel() {
                     dispatcher.post(ThermostatEvent.NewStatList(it))
                 },
                 onError = {
-                    eventQueue.post(UiEvent.ServiceError(it))
+                    dispatcher.post(ThermostatEvent.ConnectionError(it))
                 }
             ).addTo(disposables)
     }
@@ -119,7 +122,7 @@ internal class ThermostatViewModel: ViewModel() {
                         refreshData()
                     },
                     onError = {
-                        eventQueue.post(UiEvent.ServiceError(it))
+                        dispatcher.post(ThermostatEvent.ConnectionError(it))
                     }
                 )
         }
@@ -135,9 +138,15 @@ internal class ThermostatViewModel: ViewModel() {
                         refreshData()
                     },
                     onError = {
-                        eventQueue.post(UiEvent.ServiceError(it))
+                        dispatcher.post(ThermostatEvent.ConnectionError(it))
                     }
                 )
+        }
+    }
+
+    fun onClickConnectionError() {
+        store.state.connectionError?.let {
+            eventQueue.post(UiEvent.ServiceError(it))
         }
     }
 
@@ -151,6 +160,8 @@ internal class ThermostatViewModel: ViewModel() {
     }
 }
 
-const val BASE_URL = "http://bigred.ddns.net:8000/"
+//const val BASE_URL = "http://bigred.ddns.net:8000/"
+const val BASE_URL = "http://100.96.4.79:8000/"
+
 const val AUTO_REFRESH_INTERVAL = 15L
 const val TAG="ThermostatViewModel"

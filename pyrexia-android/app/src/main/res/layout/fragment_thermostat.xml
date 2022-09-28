@@ -6,25 +6,28 @@
         <variable
             name="model"
             type="com.cryptomcgrath.pyrexia.thermostat.ThermostatViewModel" />
+        <import type="android.view.View" />
+
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="@dimen/top_padding"
         android:paddingBottom="@dimen/top_padding"
-        android:background="@{model.isEnabled() ? @color/light_blue : @color/light_grey}">
+        android:background="@{context.getColor(model.background)}">
 
         <TextView
             android:id="@+id/program_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/side_padding"
+            android:layout_marginStart="8dp"
             android:text="@{model.name}"
             android:textSize="20sp"
             android:textColor="@color/white"
             tools:text="Valve Bay"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/sensor_value"
@@ -40,29 +43,20 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <ImageView
-            android:id="@+id/up_arrow"
-            android:layout_width="@dimen/set_point_size"
-            android:layout_height="@dimen/set_point_size"
-            android:layout_marginEnd="@dimen/side_padding"
-            android:src="@drawable/ic_arrow_up_48"
-            android:onClick="@{()->model.onClickIncrease()}"
-            android:enabled="@{model.isEnabled()}"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
         <TextView
-            android:id="@+id/set_point"
+            android:id="@+id/error_message"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/set_point_size"
-            android:layout_marginEnd="@dimen/side_padding"
-            android:text="@{model.setPointText}"
-            android:textSize="30sp"
-            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:padding="12sp"
+            android:text="@string/connecting_error"
+            android:textSize="16sp"
+            android:background="@color/red_error"
             android:textColor="@color/white"
-            android:enabled="@{model.isEnabled()}"
-            tools:text="68°"
-            app:layout_constraintTop_toBottomOf="@id/up_arrow"
+            android:visibility="@{model.showError ? View.VISIBLE : View.GONE}"
+            android:onClick="@{()->model.onClickConnectionError()}"
+            tools:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@id/sensor_value"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
@@ -73,19 +67,51 @@
             android:textColor="@color/white"
             android:textSize="18sp"
             android:enabled="@{model.isEnabled()}"
-            app:layout_constraintTop_toTopOf="@id/set_point"
-            app:layout_constraintBottom_toBottomOf="@id/set_point"
-            app:layout_constraintEnd_toStartOf="@id/set_point" />
+            app:layout_constraintTop_toBottomOf="@id/sensor_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <ImageView
             android:id="@+id/down_arrow"
             android:layout_width="@dimen/set_point_size"
-            android:layout_height="@dimen/set_point_size"
-            android:layout_marginEnd="@dimen/side_padding"
+            android:layout_height="wrap_content"
+            android:paddingEnd="24dp"
             android:src="@drawable/ic_arrow_down_48"
             android:onClick="@{()->model.onClickDecrease()}"
             android:enabled="@{model.isEnabled()}"
-            app:layout_constraintTop_toBottomOf="@id/set_point"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="@id/set_point"
+            app:layout_constraintBottom_toBottomOf="@id/set_point"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/set_point" />
+
+        <TextView
+            android:id="@+id/set_point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{model.setPointText}"
+            android:textSize="30sp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:enabled="@{model.isEnabled()}"
+            tools:text="68°"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintTop_toBottomOf="@id/set_to_text"
+            app:layout_constraintStart_toEndOf="@id/down_arrow"
+            app:layout_constraintEnd_toStartOf="@id/up_arrow" />
+
+        <ImageView
+            android:id="@+id/up_arrow"
+            android:layout_width="@dimen/set_point_size"
+            android:layout_height="wrap_content"
+            android:paddingStart="24dp"
+            android:src="@drawable/ic_arrow_up_48"
+            android:onClick="@{()->model.onClickIncrease()}"
+            android:enabled="@{model.isEnabled()}"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="@id/set_point"
+            app:layout_constraintBottom_toBottomOf="@id/set_point"
+            app:layout_constraintStart_toEndOf="@id/set_point"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView

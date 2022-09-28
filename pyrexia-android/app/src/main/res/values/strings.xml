@@ -3,4 +3,5 @@
     <string name="ok">Ok</string>
     <string name="set_to">Set to</string>
     <string name="off">OFF</string>
+    <string name="connecting_error">Problem Connecting</string>
 </resources>
