@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph.xml"
+    app:startDestination="@id/statListFragment">
+
+    <fragment
+        android:id="@+id/statListFragment"
+        android:name="com.cryptomcgrath.pyrexia.statlist.StatListFragment"
+        android:label="StatListFragment" >
+        <action
+            android:id="@+id/action_statListFragment_to_thermostatFragment2"
+            app:destination="@id/thermostatFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/thermostatFragment"
+        android:name="com.cryptomcgrath.pyrexia.thermostat.ThermostatFragment"
+        android:label="ThermostatFragment" >
+        <argument
+            android:name="id"
+            app:argType="integer" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_thermostatFragment2"
+        app:destination="@id/thermostatFragment" />
+    <action
+        android:id="@+id/action_global_statListFragment2"
+        app:destination="@id/statListFragment" />
+</navigation>

@@ -6,9 +6,11 @@ import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
+import com.cryptomcgrath.pyrexia.statlist.StatListViewModel
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
@@ -21,7 +23,15 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
-internal class ThermostatViewModel: ViewModel() {
+internal class ThermostatViewModel(private val id: Int): ViewModel() {
+
+    class Factory(private val id: Int) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return ThermostatViewModel(id) as T
+        }
+    }
+
     private val store = RxStore.create(thermostatReducerFun)
     private val dispatcher = Dispatcher.create(store)
     internal val eventQueue = EventQueue.create()
@@ -34,16 +44,27 @@ internal class ThermostatViewModel: ViewModel() {
     val sensorValue = ObservableField<String>("---")
     val modeText = ObservableField<String>("----")
     val isEnabled = ObservableBoolean(false)
-
     val background = ObservableInt(R.color.light_blue)
     val showError = ObservableBoolean(false)
 
     private val current get() = store.state.current
 
     init {
-        refreshData()
-        subscribeToStateChanges()
-        setupAutoRefresh()
+        dispatcher.getEventBus().subscribeBy(
+            onNext = {
+                when (it) {
+                    is ThermostatEvent.Init -> {
+                        refreshData()
+                        subscribeToStateChanges()
+                        setupAutoRefresh()
+                    }
+                }
+            },
+            onError = {
+                // ignore
+            }
+        ).addTo(disposables)
+        dispatcher.post(ThermostatEvent.Init(id))
     }
 
     private fun subscribeToStateChanges() {
