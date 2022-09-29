@@ -7,9 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentStatListBinding
-import com.cryptomcgrath.pyrexia.thermostat.ThermostatFragment
 import com.cryptomcgrath.pyrexia.thermostat.ThermostatFragmentDirections
 
 internal class StatListFragment: Fragment() {
