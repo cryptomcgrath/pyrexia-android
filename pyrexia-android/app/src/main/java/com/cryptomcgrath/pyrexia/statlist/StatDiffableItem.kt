@@ -24,7 +24,7 @@ internal class StatDiffableItem(private val stat: ProgramRun,
     }
 
     fun onClickStat() {
-        dispatcher.post(StatListEvent.OnStatSelected(stat.program.id))
+        dispatcher.post(StatListEvent.OnStatSelected(stat.program.id, stat.program.name))
     }
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {

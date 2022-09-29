@@ -19,7 +19,7 @@ internal class StatListFragment: Fragment() {
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
                 is StatListEvent.OnStatSelected -> {
-                    val action = ThermostatFragmentDirections.actionGlobalThermostatFragment2(event.id)
+                    val action = ThermostatFragmentDirections.actionGlobalThermostatFragment(event.id, event.name)
                     findNavController().navigate(action)
                 }
             }

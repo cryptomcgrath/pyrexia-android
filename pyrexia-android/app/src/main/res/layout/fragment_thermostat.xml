@@ -17,19 +17,6 @@
         android:background="@{context.getColor(model.background)}">
 
         <TextView
-            android:id="@+id/program_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@{model.name}"
-            android:textSize="20sp"
-            android:textColor="@color/white"
-            tools:text="Valve Bay"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <TextView
             android:id="@+id/sensor_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

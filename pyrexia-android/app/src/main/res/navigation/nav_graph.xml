@@ -7,23 +7,26 @@
     <fragment
         android:id="@+id/statListFragment"
         android:name="com.cryptomcgrath.pyrexia.statlist.StatListFragment"
-        android:label="StatListFragment" >
+        android:label="Pyrexia" >
         <action
-            android:id="@+id/action_statListFragment_to_thermostatFragment2"
+            android:id="@+id/action_statListFragment_to_thermostatFragment"
             app:destination="@id/thermostatFragment" />
     </fragment>
     <fragment
         android:id="@+id/thermostatFragment"
         android:name="com.cryptomcgrath.pyrexia.thermostat.ThermostatFragment"
-        android:label="ThermostatFragment" >
+        android:label="{name}" >
         <argument
             android:name="id"
             app:argType="integer" />
+        <argument
+            android:name="name"
+            app:argType="string" />
     </fragment>
     <action
-        android:id="@+id/action_global_thermostatFragment2"
+        android:id="@+id/action_global_thermostatFragment"
         app:destination="@id/thermostatFragment" />
     <action
-        android:id="@+id/action_global_statListFragment2"
+        android:id="@+id/action_global_statListFragment"
         app:destination="@id/statListFragment" />
 </navigation>
