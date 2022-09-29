@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ThermostatView">
+        <attr name="pieValues" format="string" />
+        <attr name="pieColors" format="string" />
+        <attr name="barWidth" format="dimension" />
+        <attr name="barGap" format="dimension" />
+        <attr name="centerDefaultColor" format="color" />
+        <attr name="centerHeatingColor" format="color" />
+        <attr name="centerCoolingColor" format="color" />
+        <attr name="minBarSizeDegrees" format="float" />
+        <attr name="startDegrees" format="float" />
+        <attr name="currentTemp" format="string" />
+        <attr name="setPoint" format="string" />
+    </declare-styleable>
+
+</resources>

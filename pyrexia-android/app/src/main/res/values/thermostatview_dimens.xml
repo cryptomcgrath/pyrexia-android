@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="thermostatview_default_bar_width">10dp</dimen>
+    <dimen name="thermostatview_default_bar_gap">5dp</dimen>
+
+</resources>
