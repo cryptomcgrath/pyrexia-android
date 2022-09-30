@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.cryptomcgrath.pyrexia.thermostat.AUTO_REFRESH_INTERVAL
 import com.cryptomcgrath.pyrexia.thermostat.TAG
+import com.cryptomcgrath.pyrexia.thermostat.ThermostatEvent
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.EventQueue
 import com.edwardmcgrath.blueflux.core.RxStore
@@ -35,8 +36,12 @@ internal class StatListViewModel(): ViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = {
-                    eventQueue.post(it)
+                onNext = { event ->
+                    when (event) {
+                        is StatListEvent.OnClickIncreaseTemp -> increaseTemp(event.id)
+                        is StatListEvent.OnClickDecreaseTemp -> decreaseTemp(event.id)
+                    }
+                    eventQueue.post(event)
                 },
                 onError = {
 
@@ -72,4 +77,34 @@ internal class StatListViewModel(): ViewModel() {
                 }
             ).addTo(disposables)
     }
+
+
+    private fun increaseTemp(id: Int) {
+        pyrexiaService.statIncrease(id)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    refreshData()
+                },
+                onError = {
+                    dispatcher.post(ThermostatEvent.ConnectionError(it))
+                }
+            ).addTo(disposables)
+    }
+
+    private fun decreaseTemp(id: Int) {
+        pyrexiaService.statDecrease(id)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    refreshData()
+                },
+                onError = {
+                    dispatcher.post(ThermostatEvent.ConnectionError(it))
+                }
+            ).addTo(disposables)
+    }
+
 }

@@ -14,17 +14,17 @@
         android:layout_height="match_parent"
         android:paddingTop="@dimen/top_padding"
         android:paddingBottom="@dimen/top_padding"
-        android:background="@{context.getColor(model.background)}">
+        android:background="@{context.getColor(model.backgroundColor)}">
 
-        <TextView
-            android:id="@+id/sensor_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{model.sensorValue}"
-            android:textSize="100sp"
-            android:textColor="@color/white"
-            android:enabled="@{model.isEnabled()}"
-            tools:text="68°"
+        <com.cryptomcgrath.pyrexia.thermostat.ThermostatView
+            android:id="@+id/thermostat_view"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            app:currentTemp="@{model.sensorValue}"
+            app:setPoint="@{model.setPointText}"
+            app:centerColor="@{model.backgroundColor}"
+            app:onClickDecrease="@{()->model.onClickDecrease()}"
+            app:onClickIncrease="@{()->model.onClickIncrease()}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -42,63 +42,8 @@
             android:visibility="@{model.showError ? View.VISIBLE : View.GONE}"
             android:onClick="@{()->model.onClickConnectionError()}"
             tools:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@id/sensor_value"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <TextView
-            android:id="@+id/set_to_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/set_to"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:enabled="@{model.isEnabled()}"
-            app:layout_constraintTop_toBottomOf="@id/sensor_value"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <ImageView
-            android:id="@+id/down_arrow"
-            android:layout_width="@dimen/set_point_size"
-            android:layout_height="wrap_content"
-            android:paddingEnd="24dp"
-            android:src="@drawable/ic_arrow_down_48"
-            android:onClick="@{()->model.onClickDecrease()}"
-            android:enabled="@{model.isEnabled()}"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintTop_toTopOf="@id/set_point"
-            app:layout_constraintBottom_toBottomOf="@id/set_point"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/set_point" />
-
-        <TextView
-            android:id="@+id/set_point"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{model.setPointText}"
-            android:textSize="30sp"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:enabled="@{model.isEnabled()}"
-            tools:text="68°"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintTop_toBottomOf="@id/set_to_text"
-            app:layout_constraintStart_toEndOf="@id/down_arrow"
-            app:layout_constraintEnd_toStartOf="@id/up_arrow" />
-
-        <ImageView
-            android:id="@+id/up_arrow"
-            android:layout_width="@dimen/set_point_size"
-            android:layout_height="wrap_content"
-            android:paddingStart="24dp"
-            android:src="@drawable/ic_arrow_up_48"
-            android:onClick="@{()->model.onClickIncrease()}"
-            android:enabled="@{model.isEnabled()}"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintTop_toTopOf="@id/set_point"
-            app:layout_constraintBottom_toBottomOf="@id/set_point"
-            app:layout_constraintStart_toEndOf="@id/set_point"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
@@ -120,7 +65,7 @@
             android:layout_marginStart="8dp"
             android:checked="@={model.isEnabled()}"
             android:onCheckedChanged="@{(v,e) -> model.onEnabledChanged(v,e)}"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/error_message"
             app:layout_constraintStart_toEndOf="@id/off_text" />
 
         <TextView

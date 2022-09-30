@@ -11,6 +11,7 @@ import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.cryptomcgrath.pyrexia.statlist.StatListViewModel
+import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
@@ -44,7 +45,7 @@ internal class ThermostatViewModel(private val id: Int): ViewModel() {
     val sensorValue = ObservableField<String>("---")
     val modeText = ObservableField<String>("----")
     val isEnabled = ObservableBoolean(false)
-    val background = ObservableInt(R.color.light_blue)
+    val backgroundColor = ObservableInt(R.color.light_blue)
     val showError = ObservableBoolean(false)
 
     private val current get() = store.state.current
@@ -84,16 +85,16 @@ internal class ThermostatViewModel(private val id: Int): ViewModel() {
         )
         state.current?.let {
             name.set(it.program.name)
-            setPointText.set(String.format("%3d°", it.program.setPoint.toInt()))
-            sensorValue.set(String.format("%3d°", it.sensor.value.toInt()))
+            setPointText.set(it.program.setPoint.toFormattedTemperatureString())
+            sensorValue.set(it.sensor.value.toFormattedTemperatureString())
             modeText.set(it.program.mode.name)
             isEnabled.set(it.program.enabled)
-            background.set(
+            backgroundColor.set(
                 when {
                     !it.program.enabled -> R.color.light_grey
                     it.control.controlOn && it.program.mode == Program.Mode.HEAT -> R.color.heating
                     it.control.controlOn && it.program.mode == Program.Mode.COOL -> R.color.cooling
-                    else -> R.color.light_blue
+                    else -> R.color.cobalt
                 }
             )
         }

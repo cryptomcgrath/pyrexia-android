@@ -1,9 +1,12 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.PointF
+import android.graphics.Rect
 import android.graphics.RectF
 import android.os.Parcelable
 import android.util.AttributeSet
@@ -14,7 +17,9 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.cryptomcgrath.pyrexia.R
 import kotlin.math.atan2
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 
@@ -30,15 +35,14 @@ class ThermostatView @JvmOverloads constructor(
     // radius around the center that we intercept touches
     private var centerRadius = 0f
     private var rimRadius = 0f
+    private var markLength = 0f
 
-    private val centerDefaultColor: Int
-    private val centerHeatingColor: Int
-    private val centerCoolingColor: Int
-
-    private var centerDefaultPaint: Paint
-    private var centerHeatingPaint: Paint
-    private var centerCoolingPaint: Paint
+    //private var centerColor: Int = R.color.black
+    private var centerPaint: Paint = Paint()
     private var rimPaint: Paint
+    private var tickPaint: Paint
+    private var tickLight: Paint
+    private var tickDark: Paint
 
     private var temperaturePaint: Paint
     private var setPointPaint: Paint
@@ -46,7 +50,7 @@ class ThermostatView @JvmOverloads constructor(
     private var setPointTextSize: Float
 
     // the width of the bar in pixels
-    private val barWidthPixels: Float
+    private val bezelWidthPixels: Float
 
     // the amount of spacing to separate each bar around the circle, in degrees
     private var barGapDegrees: Float = 0f
@@ -56,47 +60,56 @@ class ThermostatView @JvmOverloads constructor(
     var onClickIncreaseListener: OnClickIncreaseListener? = null
     var onClickDecreaseListener: OnClickDecreaseListener? = null
 
-    var currentTemp: String
-    var setPoint: String
+    private val setPointFloat: Float get() {
+        return setPoint.replace("°", "").toFloatOrNull() ?: 0f
+    }
 
-    private val pieBounds = RectF()
-    private val pieBoundsAnimatedOut = RectF()
-    private val centerFillBounds = RectF()
+    private val bounds = RectF()
+    private val centerBounds = RectF()
+    private val textBounds = Rect()
+
+    var centerColor: Int = ContextCompat.getColor(context, R.color.black)
+        @SuppressLint("ResourceAsColor")
+        set(value) {
+            field = value
+            centerPaint = Paint().apply {
+                color = ContextCompat.getColor(context, value)
+                isAntiAlias = true
+            }
+            invalidate()
+            requestLayout()
+        }
+
+    var currentTemp: String = ""
+        set(value) {
+            field = value
+            invalidate()
+            requestLayout()
+        }
+
+    var setPoint: String = ""
+        set(value) {
+            field = value
+            invalidate()
+            requestLayout()
+        }
 
     init {
+        setWillNotDraw(false)
         isSaveEnabled = true
 
         val typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ThermostatView)
 
-        barWidthPixels = typedArray.getDimensionPixelSize(
-            R.styleable.ThermostatView_barWidth,
+        bezelWidthPixels = typedArray.getDimensionPixelSize(
+            R.styleable.ThermostatView_bezelWidth,
             resources.getDimensionPixelSize(R.dimen.thermostatview_default_bar_width)).toFloat()
         barGapPixels = typedArray.getDimensionPixelSize(
             R.styleable.ThermostatView_barGap,
             resources.getDimensionPixelSize(R.dimen.thermostatview_default_bar_gap)).toFloat()
 
-        centerDefaultColor =  typedArray.getColor(R.styleable.ThermostatView_centerDefaultColor,
-            ContextCompat.getColor(getContext(), R.color.light_blue))
-        centerHeatingColor = typedArray.getColor(R.styleable.ThermostatView_centerHeatingColor,
-            ContextCompat.getColor(getContext(), R.color.heating))
-        centerCoolingColor = typedArray.getColor(R.styleable.ThermostatView_centerCoolingColor,
-            ContextCompat.getColor(getContext(), R.color.cooling))
-
+        centerColor = typedArray.getInteger(R.styleable.ThermostatView_centerColor, R.color.black)
         currentTemp = typedArray.getString(R.styleable.ThermostatView_currentTemp) ?: "---"
         setPoint = typedArray.getString(R.styleable.ThermostatView_setPoint) ?: "---"
-
-        centerDefaultPaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.light_grey)
-            isAntiAlias = true
-        }
-        centerHeatingPaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.heating)
-            isAntiAlias = true
-        }
-        centerCoolingPaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.cooling)
-            isAntiAlias = true
-        }
 
         // will be set in onLayout
         temperatureTextSize = 0f
@@ -104,35 +117,47 @@ class ThermostatView @JvmOverloads constructor(
         temperaturePaint = Paint()
         setPointPaint = Paint()
         rimPaint = Paint()
+        tickPaint = Paint().apply {
+            isAntiAlias = true
+            color = ContextCompat.getColor(context, R.color.white)
+            strokeWidth = convertDpToPixel(1f, context)
+        }
+        tickLight = Paint().apply {
+            isAntiAlias = true
+            color = ContextCompat.getColor(context, R.color.light_grey)
+            strokeWidth = convertDpToPixel(1f, context)
+        }
+        tickDark = Paint().apply {
+            isAntiAlias = true
+            color = ContextCompat.getColor(context, R.color.light_grey)
+            strokeWidth = convertDpToPixel(3f, context)
+        }
 
         typedArray.recycle()
     }
+
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         xCenter = (r-l)/2f
         yCenter = (b-t)/2f
 
-        centerRadius = xCenter-(barWidthPixels*2f)
+        centerRadius = xCenter-(bezelWidthPixels*2f)
         rimRadius = xCenter
+        markLength = (bezelWidthPixels*2f) / 8
 
-        val margin = (barWidthPixels * 2).toInt()
+        val margin = (bezelWidthPixels * 2).toInt()
         val marginHalf = margin / 2
 
-        pieBounds.set(
-            left.toFloat() + margin,
-            top.toFloat() + margin,
-            right.toFloat() - margin,
-            bottom.toFloat() - margin)
-        pieBoundsAnimatedOut.set(
-            left.toFloat() + marginHalf,
-            top.toFloat() + marginHalf,
-            right.toFloat() - marginHalf,
-            bottom.toFloat() - marginHalf)
-        centerFillBounds.set(
-            left.toFloat() + margin + barWidthPixels,
-            top.toFloat() + margin + barWidthPixels,
-            right.toFloat() - margin - barWidthPixels,
-            bottom.toFloat() - margin - barWidthPixels)
+        bounds.set(
+            l.toFloat(),
+            t.toFloat(),
+            r.toFloat(),
+            b.toFloat())
+        centerBounds.set(
+            l.toFloat() + margin + bezelWidthPixels,
+            t.toFloat() + margin + bezelWidthPixels,
+            r.toFloat() - margin - bezelWidthPixels,
+            b.toFloat() - margin - bezelWidthPixels)
 
         temperatureTextSize = xCenter / 2f
         setPointTextSize = temperatureTextSize * .4f
@@ -140,7 +165,6 @@ class ThermostatView @JvmOverloads constructor(
             color = ContextCompat.getColor(context, R.color.white)
             isAntiAlias = true
             textSize = temperatureTextSize
-            textAlign = Paint.Align.CENTER
         }
         setPointPaint = Paint().apply {
             color = ContextCompat.getColor(context, R.color.white)
@@ -152,6 +176,12 @@ class ThermostatView @JvmOverloads constructor(
             color = ContextCompat.getColor(context, R.color.silver)
             isAntiAlias = true
         }
+
+    }
+
+    private fun Rect.drawTextCentered(canvas: Canvas, paint: Paint, text: String, cx: Float, cy: Float) {
+        paint.getTextBounds(text, 0, text.length, this)
+        canvas.drawText(text, cx - this.exactCenterX(), cy - this.exactCenterY(), paint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -164,14 +194,95 @@ class ThermostatView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
+        canvas.drawCircle(xCenter, yCenter, rimRadius, centerPaint)
+
         // rim
-        canvas.drawCircle(xCenter, yCenter, rimRadius, rimPaint)
+        for (i in 1..360 step 5) {
+            val r1 = centerRadius
+            val t1 = Math.toRadians(i.toDouble())
+            val x1 = r1 * cos(t1) + xCenter
+            val y1 = r1 * sin(t1) + yCenter
+            val r2 = rimRadius
+            val x2 = r2 * cos(t1) + xCenter
+            val y2 = r2 * sin(t1) + yCenter
+
+            canvas.drawLine(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat(), tickLight)
+        }
+
+        // buttons
+        //canvas.drawArc(bounds, 90f, 35f, true, tickDark)
+        //canvas.drawCircle(xCenter, yCenter, rimRadius, rimPaint)
 
         // center
-        canvas.drawCircle(xCenter,yCenter,centerRadius,centerDefaultPaint)
+        canvas.drawCircle(xCenter, yCenter, centerRadius, centerPaint)
+
+        // draw set point tick
+        val setPointAngle = setPointFloat.temperatureToDegrees()
+        val p1 = computeDestPoint(xCenter, yCenter, setPointAngle, centerRadius - markLength)
+        val p2 = computeDestPoint(xCenter, yCenter, setPointAngle, rimRadius)
+        canvas.drawLine(p1.x, p1.y, p2.x, p2.y, tickDark)
 
         // current temp
-        canvas.drawText(currentTemp, xCenter, yCenter+(temperatureTextSize/2), temperaturePaint)
+        textBounds.drawTextCentered(canvas, temperaturePaint, currentTemp, xCenter, yCenter)
+        //canvas.drawText(currentTemp, xCenter, yCenter+(temperatureTextSize/2), temperaturePaint)
+
+        // set point
+        canvas.drawText(setPoint, xCenter, centerBounds.bottom - (setPointTextSize*2), setPointPaint)
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return handleTouchEvent(event)
+    }
+
+    private var touchTheta: Float = 0f
+    private var downEvent: MotionEvent? = null
+
+    private fun handleTouchEvent(event: MotionEvent?): Boolean {
+        when (event?.actionMasked) {
+            MotionEvent.ACTION_UP -> {
+                downEvent?.let {
+                    val dist = it.distanceFrom(xCenter.toInt(), yCenter.toInt())
+                    when {
+                        dist > centerRadius && dist < rimRadius -> {
+                            val touchTemperature = touchTheta.degreesToTemperature()
+                            if (touchTemperature > setPointFloat) {
+                                onClickIncreaseListener?.onClickIncrease()
+                            } else if (touchTemperature < setPointFloat) {
+                                onClickDecreaseListener?.onClickDecrease()
+                            } else {
+                                // equals
+                            }
+                        }
+
+                        dist < centerRadius -> {
+                            callOnClick()
+                        }
+
+                        else -> return false
+                    }
+                }
+                return true
+            }
+
+            MotionEvent.ACTION_CANCEL -> return true
+
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                val dist = event.distanceFrom(xCenter.toInt(), yCenter.toInt())
+
+                when {
+                    dist < rimRadius && dist > centerRadius -> {
+                        touchTheta = event.angleAroundCenter(xCenter.toInt(), yCenter.toInt()).toFloat()
+                        downEvent = event
+                    }
+                    dist < centerRadius -> {
+                        downEvent = event
+                        touchTheta = 0f
+                    }
+                    else -> return false
+                }
+            }
+        }
+        return true
     }
 
     override fun onSaveInstanceState(): Parcelable? {
@@ -190,7 +301,7 @@ class ThermostatView @JvmOverloads constructor(
      *      .
      *      . ME
      *      .   \
-     *  270 .     x,y       90
+     *  180 .     x,y       0
      *      .
      *      .------------
      *
@@ -202,7 +313,7 @@ class ThermostatView @JvmOverloads constructor(
     private fun MotionEvent.angleAroundCenter(x: Int, y: Int): Double {
         val dx = this.x - x
         val dy = this.y - y
-        var theta = Math.toDegrees(atan2(dy, dx).toDouble()) + 90
+        var theta = Math.toDegrees(atan2(dy, dx).toDouble())
         if (theta < 0) theta += 360
         if (theta > 360) theta -= 360
         return theta
@@ -226,6 +337,25 @@ class ThermostatView @JvmOverloads constructor(
     interface OnClickDecreaseListener {
         fun onClickDecrease()
     }
+}
+
+private const val startDial = -40f
+private const val endDial = 115f
+private const val dialFactor = (endDial - startDial) / 360f
+
+fun Float.degreesToTemperature(): Float {
+    return this * dialFactor + startDial
+}
+
+fun Float.temperatureToDegrees(): Float {
+    return (this - startDial) / dialFactor
+}
+
+fun computeDestPoint(startX: Float, startY: Float, angle: Float, r: Float): PointF {
+    val theta = Math.toRadians(angle.toDouble())
+    val x = r * cos(theta) + startX
+    val y = r * sin(theta) + startY
+    return PointF(x.toFloat(), y.toFloat())
 }
 
 @BindingAdapter("onClickIncrease")

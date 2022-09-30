@@ -1,6 +1,7 @@
 package com.cryptomcgrath.pyrexia.statlist
 
 
+import android.util.Log
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
@@ -16,15 +17,26 @@ internal class StatDiffableItem(private val stat: ProgramRun,
     val sensorValue = stat.sensor.value.toFormattedTemperatureString()
     val modeText = stat.program.mode.name
     val isEnabled = stat.program.enabled
-    val background = when {
+
+    val backgroundColor: Int = when {
         !stat.program.enabled -> R.color.light_grey
         stat.control.controlOn && stat.program.mode == Program.Mode.HEAT -> R.color.heating
         stat.control.controlOn && stat.program.mode == Program.Mode.COOL -> R.color.cooling
-        else -> R.color.light_blue
+        else -> R.color.black
     }
 
     fun onClickStat() {
         dispatcher.post(StatListEvent.OnStatSelected(stat.program.id, stat.program.name))
+    }
+
+    fun onClickIncrease() {
+        Log.d("StatDiffableItem", "onClickIncrease")
+        dispatcher.post(StatListEvent.OnClickIncreaseTemp(stat.program.id))
+    }
+
+    fun onClickDecrease() {
+        Log.d("StatDiffableItem", "onClickDecrease")
+        dispatcher.post(StatListEvent.OnClickDecreaseTemp(stat.program.id))
     }
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {
