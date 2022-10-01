@@ -20,7 +20,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-class DeviceListViewModel(application: Application) : AndroidViewModel(application) {
+internal class DeviceListViewModel(application: Application) : AndroidViewModel(application) {
     val store = RxStore.create(deviceListReducerFun)
     val dispatcher = Dispatcher.create(store)
     val eventQueue = EventQueue.create()

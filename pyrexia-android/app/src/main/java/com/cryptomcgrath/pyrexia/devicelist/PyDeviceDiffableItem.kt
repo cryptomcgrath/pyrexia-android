@@ -14,7 +14,7 @@ import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 
 
-class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
+internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
                            private val pyDevice: PyDevice,
                            val isEditMode: Boolean) : DiffableItem {
     var name = pyDevice.name

@@ -10,7 +10,7 @@ import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.RxStore
 
-class DeviceListAdapter(store: RxStore<DeviceListState>,
+internal class DeviceListAdapter(store: RxStore<DeviceListState>,
                         private val dispatcher: Dispatcher) : RxStoreAdapter<DeviceListState>(store) {
     override val viewTypes: List<Class<out DiffableItem>> =
         listOf(

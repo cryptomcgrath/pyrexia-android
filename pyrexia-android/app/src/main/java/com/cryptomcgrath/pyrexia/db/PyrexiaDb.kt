@@ -15,7 +15,7 @@ import io.reactivex.Single
 
 
 @Entity
-data class Device(
+internal data class Device(
     @PrimaryKey(autoGenerate = true) val uid: Int,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "base_url") val baseUrl: String,
@@ -25,7 +25,7 @@ data class Device(
 )
 
 @Database(entities = [Device::class], version = 1)
-abstract class PyrexiaDb : RoomDatabase() {
+internal abstract class PyrexiaDb : RoomDatabase() {
     abstract fun devicesDao(): DeviceDao
 
     companion object {
@@ -42,7 +42,7 @@ abstract class PyrexiaDb : RoomDatabase() {
 }
 
 @Dao
-interface DeviceDao {
+internal interface DeviceDao {
     @Query("select * from device")
     fun devicesList(): Single<List<Device>>
 
