@@ -25,8 +25,13 @@ internal val deviceListReducerFun: ReducerFun<DeviceListState> = { inState, even
         }
 
         is DeviceListEvent.NewDeviceList -> {
+            val newList = event.deviceList.toMutableList()
+            // if we do not have any devices setup, then add empty one
+            if (newList.isEmpty()) {
+                newList.add(PyDevice())
+            }
             state.copy(
-                deviceList = event.deviceList,
+                deviceList = newList,
                 connectionError = null
             )
         }

@@ -2,6 +2,7 @@ package com.cryptomcgrath.pyrexia.devicelist
 
 
 import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
 import android.widget.TextView
@@ -33,7 +34,7 @@ class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
             imm?.hideSoftInputFromWindow(view.windowToken, 0)
         }
 
-        if (event != null && event.action == KeyEvent.ACTION_DOWN) {
+        if (event?.action == KeyEvent.ACTION_DOWN || actionId == EditorInfo.IME_ACTION_DONE) {
             if (!checkErrors()) {
                 dispatcher.post(
                     DeviceListEvent.AddDevice(PyDevice(name = name, baseUrl = url))

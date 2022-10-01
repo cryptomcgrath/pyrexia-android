@@ -31,6 +31,7 @@ internal class DeviceListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val binding = FragmentDeviceListBinding.inflate(inflater, container, false)
+        binding.model = viewModel
         binding.recyclerView.adapter = DeviceListAdapter(viewModel.store, viewModel.dispatcher)
         binding.fab.setOnClickListener {
             viewModel.onClickAdd()

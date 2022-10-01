@@ -2,6 +2,7 @@ package com.cryptomcgrath.pyrexia.devicelist
 
 import android.app.Application
 import android.view.View
+import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.AndroidViewModel
 import com.cryptomcgrath.pyrexia.db.PyrexiaDb
 import com.cryptomcgrath.pyrexia.db.toDevice
@@ -27,6 +28,8 @@ class DeviceListViewModel(application: Application) : AndroidViewModel(applicati
     private val db = PyrexiaDb.getDatabase(application)
     private val disposables = CompositeDisposable()
 
+    val showAddButton = ObservableBoolean()
+
     init {
         relayEventsToFragment()
         refreshData()
@@ -43,14 +46,19 @@ class DeviceListViewModel(application: Application) : AndroidViewModel(applicati
                             addDevice(event.pyDevice)
                         }
                     }
-
-
+                    updateUi()
                     eventQueue.post(event)
                 },
                 onError = {
 
                 }
             ).addTo(disposables)
+    }
+
+    private fun updateUi() {
+        showAddButton.set(
+            !store.state.hasAddEmptyItem()
+        )
     }
 
     private fun refreshData() {
