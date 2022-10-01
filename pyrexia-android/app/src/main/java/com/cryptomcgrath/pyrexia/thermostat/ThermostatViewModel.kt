@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
-import com.cryptomcgrath.pyrexia.statlist.StatListViewModel
 import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.Event
@@ -24,12 +24,13 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
-internal class ThermostatViewModel(private val id: Int): ViewModel() {
+internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
 
-    class Factory(private val id: Int) : ViewModelProvider.Factory {
+    class Factory(private val pyDevice: PyDevice,
+                  private val id: Int) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ThermostatViewModel(id) as T
+            return ThermostatViewModel(pyDevice, id) as T
         }
     }
 
@@ -37,7 +38,7 @@ internal class ThermostatViewModel(private val id: Int): ViewModel() {
     private val dispatcher = Dispatcher.create(store)
     internal val eventQueue = EventQueue.create()
 
-    private val pyrexiaService = PyrexiaService()
+    private val pyrexiaService = PyrexiaService(pyDevice)
     private val disposables = CompositeDisposable()
 
     val name = ObservableField<String>("----")
@@ -131,7 +132,7 @@ internal class ThermostatViewModel(private val id: Int): ViewModel() {
 
     fun onEnabledChanged(buttonView: CompoundButton, isChecked: Boolean) {
         isEnabled.set(isChecked)
-        // POST /stat/:id/enable
+        // TODO: POST /stat/:id/enable
     }
 
     fun onClickIncrease() {
@@ -181,9 +182,6 @@ internal class ThermostatViewModel(private val id: Int): ViewModel() {
         data class ServiceError(val throwable: Throwable): UiEvent()
     }
 }
-
-//const val BASE_URL = "http://bigred.ddns.net:8000/"
-const val BASE_URL = "http://100.96.4.79:8000/"
 
 const val AUTO_REFRESH_INTERVAL = 15L
 const val TAG="ThermostatViewModel"

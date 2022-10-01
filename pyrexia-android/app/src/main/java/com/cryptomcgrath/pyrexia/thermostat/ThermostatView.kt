@@ -37,7 +37,6 @@ class ThermostatView @JvmOverloads constructor(
     private var rimRadius = 0f
     private var markLength = 0f
 
-    //private var centerColor: Int = R.color.black
     private var centerPaint: Paint = Paint()
     private var rimPaint: Paint
     private var tickPaint: Paint
@@ -51,9 +50,6 @@ class ThermostatView @JvmOverloads constructor(
 
     // the width of the bar in pixels
     private val bezelWidthPixels: Float
-
-    // the amount of spacing to separate each bar around the circle, in degrees
-    private var barGapDegrees: Float = 0f
 
     private val barGapPixels: Float
 
@@ -83,6 +79,7 @@ class ThermostatView @JvmOverloads constructor(
     var currentTemp: String = ""
         set(value) {
             field = value
+
             invalidate()
             requestLayout()
         }
@@ -90,6 +87,7 @@ class ThermostatView @JvmOverloads constructor(
     var setPoint: String = ""
         set(value) {
             field = value
+
             invalidate()
             requestLayout()
         }
@@ -161,22 +159,23 @@ class ThermostatView @JvmOverloads constructor(
 
         temperatureTextSize = xCenter / 2f
         setPointTextSize = temperatureTextSize * .4f
-        temperaturePaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.white)
-            isAntiAlias = true
-            textSize = temperatureTextSize
-        }
-        setPointPaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.white)
-            isAntiAlias = true
-            textSize = setPointTextSize
-            textAlign = Paint.Align.CENTER
-        }
+
+
         rimPaint = Paint().apply {
             color = ContextCompat.getColor(context, R.color.silver)
             isAntiAlias = true
         }
 
+        setPointPaint = Paint().apply {
+            color = ContextCompat.getColor(context, R.color.white)
+            isAntiAlias = true
+            textSize = setPointTextSize
+        }
+        temperaturePaint = Paint().apply {
+            color = ContextCompat.getColor(context, R.color.white)
+            isAntiAlias = true
+            textSize = temperatureTextSize
+        }
     }
 
     private fun Rect.drawTextCentered(canvas: Canvas, paint: Paint, text: String, cx: Float, cy: Float) {
@@ -227,7 +226,10 @@ class ThermostatView @JvmOverloads constructor(
         //canvas.drawText(currentTemp, xCenter, yCenter+(temperatureTextSize/2), temperaturePaint)
 
         // set point
-        canvas.drawText(setPoint, xCenter, centerBounds.bottom - (setPointTextSize*2), setPointPaint)
+        textBounds.drawTextCentered(canvas, setPointPaint, setPoint, xCenter, centerBounds.bottom - (setPointTextSize*2))
+        //canvas.drawText(setPoint, xCenter, centerBounds.bottom - (setPointTextSize*2), setPointPaint)
+
+        //super.onDraw(canvas)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -376,21 +378,6 @@ private fun measureDimension(desiredSize: Int, measureSpec: Int): Int {
         View.MeasureSpec.EXACTLY -> specSize
         View.MeasureSpec.AT_MOST -> min(desiredSize, specSize)
         else -> desiredSize
-    }
-}
-
-// parses a color string in the format #ffffff and returns the color int
-// or returns null if the color string is invalid
-fun parseColorOrNull(colorString: String?): Int? {
-    if (colorString.isNullOrBlank()) return null
-    var cleaned = colorString.trim()
-    if (cleaned.length == 6 && !cleaned.contains("#")) {
-        cleaned = "#$cleaned"
-    }
-    return try {
-        Color.parseColor(cleaned)
-    } catch (e: IllegalArgumentException) {
-        null
     }
 }
 

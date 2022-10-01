@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="model"
+            type="com.cryptomcgrath.pyrexia.devicelist.PyDeviceDiffableItem" />
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <ImageView
+            android:id="@+id/pi_image"
+            android:layout_width="250dp"
+            android:layout_height="125dp"
+            android:src="@drawable/pisnip2"
+            android:scaleType="centerInside"
+            android:onClick="@{()->model.onClickImage()}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:id="@+id/cancel"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_round_cancel_24"
+            android:visibility="@{model.isEditMode ? View.VISIBLE : View.GONE}"
+            android:onClick="@{()->model.onClickCancel()}"
+            app:layout_constraintEnd_toEndOf="@id/pi_image"
+            app:layout_constraintTop_toTopOf="@id/pi_image" />
+
+        <TextView
+            android:id="@+id/name_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.name}"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:visibility="@{model.isEditMode ? View.GONE : View.VISIBLE}"
+            tools:text="@string/device_name_hint"
+            app:layout_constraintTop_toBottomOf="@id/pi_image"
+            app:layout_constraintStart_toStartOf="@id/pi_image"
+            app:layout_constraintEnd_toEndOf="@id/pi_image" />
+
+        <EditText
+            android:id="@+id/name_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@={model.name}"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:hint="@string/device_name_hint"
+            android:visibility="@{model.isEditMode ? View.VISIBLE : View.GONE}"
+            android:singleLine="true"
+            android:error="@{model.nameError}"
+            tools:text="Big Red"
+            app:layout_constraintTop_toBottomOf="@id/pi_image"
+            app:layout_constraintStart_toStartOf="@id/pi_image"
+            app:layout_constraintEnd_toEndOf="@id/pi_image" />
+
+        <TextView
+            android:id="@+id/url_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.url}"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:visibility="@{model.isEditMode ? View.GONE : View.VISIBLE}"
+            tools:text="@string/device_url_hint"
+            app:layout_constraintTop_toBottomOf="@id/name_text"
+            app:layout_constraintStart_toStartOf="@id/pi_image"
+            app:layout_constraintEnd_toEndOf="@id/pi_image" />
+
+        <EditText
+            android:id="@+id/url_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@={model.url}"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:hint="@string/device_url_hint"
+            android:singleLine="true"
+            android:visibility="@{model.isEditMode ? View.VISIBLE : View.GONE}"
+            android:onEditorAction="@{(view,actionId,event) -> model.onEditorAction(view,actionId,event)}"
+            android:error="@{model.urlError}"
+            app:layout_constraintTop_toBottomOf="@id/name_edit"
+            app:layout_constraintStart_toStartOf="@id/pi_image"
+            app:layout_constraintEnd_toEndOf="@id/pi_image" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -3,5 +3,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">bigred.ddns.net</domain>
         <domain includeSubdomains="true">100.96.4.79</domain>
+        <domain includeSubdomains="true">192.168.0.119</domain>
     </domain-config>
 </network-security-config>

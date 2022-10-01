@@ -2,15 +2,21 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/statListFragment">
+    app:startDestination="@id/deviceListFragment">
 
     <fragment
         android:id="@+id/statListFragment"
         android:name="com.cryptomcgrath.pyrexia.statlist.StatListFragment"
-        android:label="Pyrexia" >
+        android:label="{name}" >
         <action
             android:id="@+id/action_statListFragment_to_thermostatFragment"
             app:destination="@id/thermostatFragment" />
+        <argument
+            android:name="pydevice"
+            app:argType="com.cryptomcgrath.pyrexia.model.PyDevice" />
+        <argument
+            android:name="name"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/thermostatFragment"
@@ -22,11 +28,19 @@
         <argument
             android:name="name"
             app:argType="string" />
+        <argument
+            android:name="pydevice"
+            app:argType="com.cryptomcgrath.pyrexia.model.PyDevice" />
     </fragment>
     <action
         android:id="@+id/action_global_thermostatFragment"
         app:destination="@id/thermostatFragment" />
-    <action
-        android:id="@+id/action_global_statListFragment"
-        app:destination="@id/statListFragment" />
+    <fragment
+        android:id="@+id/deviceListFragment"
+        android:name="com.cryptomcgrath.pyrexia.devicelist.DeviceListFragment"
+        android:label=" " >
+        <action
+            android:id="@+id/action_deviceListFragment_to_statListFragment"
+            app:destination="@id/statListFragment" />
+    </fragment>
 </navigation>

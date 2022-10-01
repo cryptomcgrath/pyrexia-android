@@ -2,6 +2,8 @@ package com.cryptomcgrath.pyrexia.statlist
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.cryptomcgrath.pyrexia.thermostat.AUTO_REFRESH_INTERVAL
 import com.cryptomcgrath.pyrexia.thermostat.TAG
@@ -17,12 +19,20 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
-internal class StatListViewModel(): ViewModel() {
+internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
+
+    class Factory(private val pyDevice: PyDevice) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return StatListViewModel(pyDevice) as T
+        }
+    }
+
     val store = RxStore.create(statListReducerFun)
     val dispatcher = Dispatcher.create(store)
     internal val eventQueue = EventQueue.create()
 
-    private val pyrexiaService = PyrexiaService()
+    private val pyrexiaService = PyrexiaService(pyDevice)
     private val disposables = CompositeDisposable()
 
     init {
@@ -106,5 +116,4 @@ internal class StatListViewModel(): ViewModel() {
                 }
             ).addTo(disposables)
     }
-
 }
