@@ -2,6 +2,7 @@ package com.cryptomcgrath.pyrexia.devicelist
 
 
 import android.view.KeyEvent
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
@@ -29,10 +30,7 @@ class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
     }
 
     fun onEditorAction(view: TextView?, @Suppress("UNUSED_PARAMETER") actionId: Int?, event: KeyEvent?): Boolean {
-        if (view != null) {
-            val imm = getSystemService(view.context, InputMethodManager::class.java)
-            imm?.hideSoftInputFromWindow(view.windowToken, 0)
-        }
+        view?.hideKeyboard()
 
         if (event?.action == KeyEvent.ACTION_DOWN || actionId == EditorInfo.IME_ACTION_DONE) {
             if (!checkErrors()) {
@@ -66,7 +64,8 @@ class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
         return error
     }
 
-    fun onClickCancel() {
+    fun onClickCancel(view: View?) {
+        view?.hideKeyboard()
         dispatcher.post(DeviceListEvent.CancelEmptyItem)
     }
 
@@ -80,4 +79,9 @@ class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
         return other is PyDeviceDiffableItem &&
                 other.pyDevice.uid == pyDevice.uid
     }
+}
+
+private fun View.hideKeyboard() {
+    val imm = getSystemService(this.context, InputMethodManager::class.java)
+    imm?.hideSoftInputFromWindow(this.windowToken, 0)
 }

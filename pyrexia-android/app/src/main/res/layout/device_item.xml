@@ -30,7 +30,7 @@
             android:layout_height="24dp"
             android:src="@drawable/ic_round_cancel_24"
             android:visibility="@{model.isEditMode ? View.VISIBLE : View.GONE}"
-            android:onClick="@{()->model.onClickCancel()}"
+            android:onClick="@{(v)->model.onClickCancel(v)}"
             app:layout_constraintEnd_toEndOf="@id/pi_image"
             app:layout_constraintTop_toTopOf="@id/pi_image" />
 
