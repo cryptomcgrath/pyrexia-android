@@ -193,6 +193,7 @@ class ThermostatView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
+        // paint bg
         canvas.drawCircle(xCenter, yCenter, rimRadius, centerPaint)
 
         // rim
@@ -208,10 +209,6 @@ class ThermostatView @JvmOverloads constructor(
             canvas.drawLine(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat(), tickLight)
         }
 
-        // buttons
-        //canvas.drawArc(bounds, 90f, 35f, true, tickDark)
-        //canvas.drawCircle(xCenter, yCenter, rimRadius, rimPaint)
-
         // center
         canvas.drawCircle(xCenter, yCenter, centerRadius, centerPaint)
 
@@ -219,17 +216,14 @@ class ThermostatView @JvmOverloads constructor(
         val setPointAngle = setPointFloat.temperatureToDegrees()
         val p1 = computeDestPoint(xCenter, yCenter, setPointAngle, centerRadius - markLength)
         val p2 = computeDestPoint(xCenter, yCenter, setPointAngle, rimRadius)
+        val p3 = computeDestPoint(xCenter, yCenter, setPointAngle, centerRadius - setPointTextSize)
         canvas.drawLine(p1.x, p1.y, p2.x, p2.y, tickDark)
 
         // current temp
         textBounds.drawTextCentered(canvas, temperaturePaint, currentTemp, xCenter, yCenter)
-        //canvas.drawText(currentTemp, xCenter, yCenter+(temperatureTextSize/2), temperaturePaint)
 
         // set point
-        textBounds.drawTextCentered(canvas, setPointPaint, setPoint, xCenter, centerBounds.bottom - (setPointTextSize*2))
-        //canvas.drawText(setPoint, xCenter, centerBounds.bottom - (setPointTextSize*2), setPointPaint)
-
-        //super.onDraw(canvas)
+        textBounds.drawTextCentered(canvas, setPointPaint, setPoint, p3.x, p3.y)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
