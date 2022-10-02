@@ -1,10 +1,13 @@
 <resources>
     <string name="app_name">pyrexia</string>
     <string name="ok">Ok</string>
-    <string name="set_to">Set to</string>
-    <string name="off">OFF</string>
     <string name="connecting_error">Problem Connecting</string>
 
     <string name="device_name_hint">Choose a name</string>
     <string name="device_url_hint">http://hostname:port</string>
+
+    <string name="set_to">Set to</string>
+    <string name="mode">Mode</string>
+    <string name="off">Off</string>
+
 </resources>

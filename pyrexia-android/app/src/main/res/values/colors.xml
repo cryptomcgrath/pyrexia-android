@@ -10,6 +10,7 @@
 
     <color name="light_blue">#add8ec</color>
     <color name="light_grey">#cccccc</color>
+    <color name="grey42">#424242</color>
     <color name="heating">#e25822</color>
     <color name="cooling">#2222e2</color>
     <color name="transparent">#ffffffff</color>

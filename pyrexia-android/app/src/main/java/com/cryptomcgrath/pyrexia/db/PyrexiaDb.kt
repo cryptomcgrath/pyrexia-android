@@ -38,7 +38,6 @@ internal abstract class PyrexiaDb : RoomDatabase() {
             return instance!!
         }
     }
-
 }
 
 @Dao

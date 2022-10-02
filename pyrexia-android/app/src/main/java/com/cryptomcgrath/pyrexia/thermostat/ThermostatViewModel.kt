@@ -22,6 +22,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
@@ -46,7 +47,7 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
     val sensorValue = ObservableField<String>("---")
     val modeText = ObservableField<String>("----")
     val isEnabled = ObservableBoolean(false)
-    val backgroundColor = ObservableInt(R.color.light_blue)
+    val backgroundColor = ObservableInt(R.color.black)
     val showError = ObservableBoolean(false)
 
     private val current get() = store.state.current
@@ -88,11 +89,11 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
             name.set(it.program.name)
             setPointText.set(it.program.setPoint.toFormattedTemperatureString())
             sensorValue.set(it.sensor.value.toFormattedTemperatureString())
-            modeText.set(it.program.mode.name)
+            modeText.set(it.program.mode.name.sentenceCase())
             isEnabled.set(it.program.enabled)
             backgroundColor.set(
                 when {
-                    !it.program.enabled -> R.color.light_grey
+                    !it.program.enabled -> R.color.grey42
                     it.control.controlOn && it.program.mode == Program.Mode.HEAT -> R.color.heating
                     it.control.controlOn && it.program.mode == Program.Mode.COOL -> R.color.cooling
                     else -> R.color.cobalt
@@ -131,39 +132,69 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
     }
 
     fun onEnabledChanged(buttonView: CompoundButton, isChecked: Boolean) {
-        isEnabled.set(isChecked)
-        // TODO: POST /stat/:id/enable
+        current?.let {
+            if (isChecked) {
+                pyrexiaService.statEnable(it.program.id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onComplete = {
+                            refreshData()
+                        },
+                        onError = {
+                            dispatcher.post(ThermostatEvent.ConnectionError(it))
+                        }
+                    )
+            } else {
+                pyrexiaService.statDisable(it.program.id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onComplete = {
+                            refreshData()
+                        },
+                        onError = {
+                            dispatcher.post(ThermostatEvent.ConnectionError(it))
+                        }
+                    )
+            }
+        }
     }
 
     fun onClickIncrease() {
         current?.let {
-            pyrexiaService.statIncrease(it.program.id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = {
-                        refreshData()
-                    },
-                    onError = {
-                        dispatcher.post(ThermostatEvent.ConnectionError(it))
-                    }
-                )
+            if (it.program.enabled) {
+                pyrexiaService.statIncrease(it.program.id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onComplete = {
+                            refreshData()
+                        },
+                        onError = {
+                            dispatcher.post(ThermostatEvent.ConnectionError(it))
+                        }
+                    ).addTo(disposables)
+            }
+
         }
     }
 
     fun onClickDecrease() {
         current?.let {
-            pyrexiaService.statDecrease(it.program.id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = {
-                        refreshData()
-                    },
-                    onError = {
-                        dispatcher.post(ThermostatEvent.ConnectionError(it))
-                    }
-                )
+            if (it.program.enabled) {
+                pyrexiaService.statDecrease(it.program.id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onComplete = {
+                            refreshData()
+                        },
+                        onError = {
+                            dispatcher.post(ThermostatEvent.ConnectionError(it))
+                        }
+                    ).addTo(disposables)
+            }
         }
     }
 
@@ -185,3 +216,11 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
 
 const val AUTO_REFRESH_INTERVAL = 15L
 const val TAG="ThermostatViewModel"
+
+fun String.sentenceCase(): String {
+    return this.lowercase(Locale.getDefault()).replaceFirstChar {
+        if (it.isLowerCase())
+            it.titlecase(Locale.getDefault())
+        else it.toString()
+    }
+}

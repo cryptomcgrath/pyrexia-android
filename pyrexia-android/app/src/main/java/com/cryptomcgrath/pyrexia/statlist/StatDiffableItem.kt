@@ -16,13 +16,13 @@ internal class StatDiffableItem(private val stat: ProgramRun,
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
     val sensorValue = stat.sensor.value.toFormattedTemperatureString()
     val modeText = stat.program.mode.name
-    val isEnabled = stat.program.enabled
+    private val isEnabled = stat.program.enabled
 
     val backgroundColor: Int = when {
-        !stat.program.enabled -> R.color.light_grey
+        !stat.program.enabled -> R.color.grey42
         stat.control.controlOn && stat.program.mode == Program.Mode.HEAT -> R.color.heating
         stat.control.controlOn && stat.program.mode == Program.Mode.COOL -> R.color.cooling
-        else -> R.color.black
+        else -> R.color.cobalt
     }
 
     fun onClickStat() {
@@ -31,12 +31,16 @@ internal class StatDiffableItem(private val stat: ProgramRun,
 
     fun onClickIncrease() {
         Log.d("StatDiffableItem", "onClickIncrease")
-        dispatcher.post(StatListEvent.OnClickIncreaseTemp(stat.program.id))
+        if (isEnabled) {
+            dispatcher.post(StatListEvent.OnClickIncreaseTemp(stat.program.id))
+        }
     }
 
     fun onClickDecrease() {
         Log.d("StatDiffableItem", "onClickDecrease")
-        dispatcher.post(StatListEvent.OnClickDecreaseTemp(stat.program.id))
+        if (isEnabled) {
+            dispatcher.post(StatListEvent.OnClickDecreaseTemp(stat.program.id))
+        }
     }
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {

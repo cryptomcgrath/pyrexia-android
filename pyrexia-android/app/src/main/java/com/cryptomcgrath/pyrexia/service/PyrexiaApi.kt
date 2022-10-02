@@ -11,22 +11,31 @@ internal interface PyrexiaApi {
 
     @Headers(
         "Accept: application/json",
-        "Content-Type: application/json",
-        "Platform: android")
+        "Content-Type: application/json")
     @GET("/stat/list")
     fun getStatList(): Single<GetStatListDto>
 
     @Headers(
         "Accept: application/json",
-        "Content-Type: application/json",
-        "Platform: android")
+        "Content-Type: application/json")
     @POST("/stat/{id}/increase")
     fun statIncrease(@Path("id") id: Int): Completable
 
     @Headers(
         "Accept: application/json",
-        "Content-Type: application/json",
-        "Platform: android")
+        "Content-Type: application/json")
     @POST("/stat/{id}/decrease")
     fun statDecrease(@Path("id") id: Int): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @POST("/stat/{id}/enable")
+    fun statEnable(@Path("id") id: Int): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @POST("/stat/{id}/disable")
+    fun statDisable(@Path("id") id: Int): Completable
 }
