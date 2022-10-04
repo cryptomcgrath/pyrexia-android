@@ -20,7 +20,7 @@
             android:paddingBottom="8dp"
             android:text="@{model.name}"
             android:textSize="14sp"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             tools:text="Valve Bay"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/thermostat_view"

@@ -1,6 +1,8 @@
 package com.cryptomcgrath.pyrexia.statlist
 
 import android.util.Log
+import androidx.databinding.ObservableBoolean
+import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.cryptomcgrath.pyrexia.model.PyDevice
@@ -35,6 +37,10 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
     private val pyrexiaService = PyrexiaService(pyDevice)
     private val disposables = CompositeDisposable()
 
+    val showError = ObservableBoolean(false)
+    val errorText = ObservableField<String>()
+    val loading = ObservableBoolean(false)
+
     init {
         relayEventsToFragment()
         refreshData()
@@ -51,16 +57,27 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
                         is StatListEvent.OnClickIncreaseTemp -> increaseTemp(event.id)
                         is StatListEvent.OnClickDecreaseTemp -> decreaseTemp(event.id)
                     }
+                    updateUi()
                     eventQueue.post(event)
                 },
                 onError = {
-
+                    // ignore
                 }
             ).addTo(disposables)
     }
 
+    private fun updateUi() {
+        showError.set(store.state.connectionError != null)
+        store.state.connectionError?.let {
+            errorText.set(it.message.orEmpty())
+        }
+    }
+
     private fun refreshData() {
         pyrexiaService.getStatList()
+            .doOnSubscribe {
+                dispatcher.post(StatListEvent.SetLoading(true))
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -83,7 +100,7 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
                     refreshData()
                 },
                 onError = {
-                    // ignore
+                    dispatcher.post(StatListEvent.ConnectionError(it))
                 }
             ).addTo(disposables)
     }

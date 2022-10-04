@@ -7,7 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentThermostatBinding
 
@@ -36,9 +39,13 @@ internal class ThermostatFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return FragmentThermostatBinding.inflate(inflater, container, false).apply {
+        val binding = FragmentThermostatBinding.inflate(inflater, container, false).apply {
             model = viewModel
-        }.root
+        }
+        val appBarConfiguration = AppBarConfiguration(findNavController().graph)
+        binding.toolbar
+            .setupWithNavController(findNavController(), appBarConfiguration)
+        return binding.root
     }
 
     private fun showServicesError(throwable: Throwable) {
