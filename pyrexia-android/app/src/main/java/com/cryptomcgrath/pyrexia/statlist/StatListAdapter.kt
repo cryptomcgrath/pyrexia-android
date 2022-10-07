@@ -30,7 +30,7 @@ internal class StatListAdapter(store: RxStore<StatListState>,
         state.statList.forEach {
             items += StatDiffableItem(it, dispatcher)
         }
-        if (state.isLoading) {
+        if (state.statList.isEmpty() && state.isLoading) {
             items += StatLoadingDiffableItem()
         }
 
