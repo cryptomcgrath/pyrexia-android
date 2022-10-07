@@ -24,7 +24,7 @@ internal val statListReducerFun: ReducerFun<StatListState> = { inState, event ->
 
         is StatListEvent.SetLoading -> {
             state.copy(
-                connectionError = null,
+                //connectionError = null,
                 isLoading = event.isLoading
             )
         }

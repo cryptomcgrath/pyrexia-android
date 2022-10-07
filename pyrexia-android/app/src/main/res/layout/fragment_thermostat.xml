@@ -26,8 +26,10 @@
 
         <com.cryptomcgrath.pyrexia.thermostat.ThermostatView
             android:id="@+id/thermostat_view"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/side_padding"
+            android:layout_marginEnd="@dimen/side_padding"
             android:layout_marginTop="16dp"
             app:currentTemp="@{model.sensorValue}"
             app:setPoint="@{model.setPointText}"
@@ -37,22 +39,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
-
-        <TextView
-            android:id="@+id/error_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="12sp"
-            android:text="@string/connecting_error"
-            android:textSize="16sp"
-            android:background="@color/red_error"
-            android:textColor="@color/white"
-            android:visibility="@{model.showError ? View.VISIBLE : View.GONE}"
-            android:onClick="@{()->model.onClickConnectionError()}"
-            tools:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
 
         <View
             android:id="@+id/separator"
@@ -77,7 +63,7 @@
             android:text="@{model.modeText}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
             android:textSize="18sp"
             android:textColor="@color/white"
             tools:text="Heat"
@@ -106,6 +92,22 @@
             app:layout_constraintTop_toTopOf="@id/enabled_text"
             app:layout_constraintBottom_toBottomOf="@id/enabled_text"
             app:layout_constraintStart_toEndOf="@id/enabled_text" />
+
+        <TextView
+            android:id="@+id/error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12sp"
+            android:text="@string/connecting_error"
+            android:textSize="16sp"
+            android:background="@color/red_error"
+            android:textColor="@color/white"
+            android:visibility="@{model.showError ? View.VISIBLE : View.GONE}"
+            android:onClick="@{()->model.onClickConnectionError()}"
+            tools:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
