@@ -13,5 +13,6 @@
     <string name="mode">Mode:</string>
     <string name="off">Off</string>
     <string name="enabled">Enabled:</string>
+    <string name="unknown_temp">---</string>
 
 </resources>

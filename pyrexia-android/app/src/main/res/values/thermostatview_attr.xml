@@ -3,10 +3,10 @@
 
     <declare-styleable name="ThermostatView">
         <attr name="bezelWidth" format="dimension" />
-        <attr name="barGap" format="dimension" />
         <attr name="currentTemp" format="string" />
         <attr name="centerColor" format="integer" />
         <attr name="setPoint" format="string" />
+        <attr name="tickGapDegrees" format="integer"/>
     </declare-styleable>
 
 </resources>

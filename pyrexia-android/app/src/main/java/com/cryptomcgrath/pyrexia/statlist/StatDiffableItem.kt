@@ -15,7 +15,6 @@ internal class StatDiffableItem(private val stat: ProgramRun,
     val name = stat.program.name
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
     val sensorValue = stat.sensor.value.toFormattedTemperatureString()
-    val modeText = stat.program.mode.name
     private val isEnabled = stat.program.enabled
 
     val backgroundColor: Int = when {

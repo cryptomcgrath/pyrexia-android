@@ -61,7 +61,7 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
                     eventQueue.post(event)
                 },
                 onError = {
-                    // ignore
+                    Log.e(TAG, "error relaying event to fragment ${it.message}")
                 }
             ).addTo(disposables)
     }

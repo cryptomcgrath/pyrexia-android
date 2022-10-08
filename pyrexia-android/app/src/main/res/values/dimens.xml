@@ -3,5 +3,5 @@
     <dimen name="set_point_size">50dp</dimen>
     <dimen name="side_padding">24dp</dimen>
     <dimen name="top_padding">32dp</dimen>
-    <dimen name="loading_size">48dp</dimen>
+    <dimen name="section_separation">16dp</dimen>
 </resources>

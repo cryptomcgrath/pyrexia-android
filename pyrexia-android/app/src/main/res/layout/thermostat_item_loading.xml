@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="model"
+            type="com.cryptomcgrath.pyrexia.statlist.StatLoadingDiffableItem" />
+        <import type="android.view.View" />
+
+    </data>
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/side_padding"
+            android:layout_marginEnd="@dimen/side_padding">
+
+            <com.cryptomcgrath.pyrexia.thermostat.ThermostatView
+                android:id="@+id/thermostat_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:currentTemp="@string/unknown_temp"
+                app:setPoint="@string/unknown_temp"
+                app:centerColor="@color/grey42"
+                app:bezelWidth="15dp"
+                app:tickGapDegrees="3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+</layout>

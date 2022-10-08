@@ -30,6 +30,13 @@ internal class ThermostatFragment: Fragment() {
                 is ThermostatViewModel.UiEvent.ServiceError -> {
                     showServicesError(event.throwable)
                 }
+                is ThermostatViewModel.UiEvent.StatEnable -> {
+                    if (event.enable) {
+                        viewModel.enableStat(event.id)
+                    } else {
+                        viewModel.disableStat(event.id)
+                    }
+                }
             }
         }
     }
@@ -41,6 +48,10 @@ internal class ThermostatFragment: Fragment() {
     ): View {
         val binding = FragmentThermostatBinding.inflate(inflater, container, false).apply {
             model = viewModel
+            recyclerView.adapter = ThermostatAdapter(
+                dispatcher = viewModel.dispatcher,
+                store = viewModel.store
+            )
         }
         val appBarConfiguration = AppBarConfiguration(findNavController().graph)
         binding.toolbar

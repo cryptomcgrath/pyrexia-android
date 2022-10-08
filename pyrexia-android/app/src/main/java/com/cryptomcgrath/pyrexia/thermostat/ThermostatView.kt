@@ -3,7 +3,6 @@ package com.cryptomcgrath.pyrexia.thermostat
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
@@ -48,11 +47,6 @@ class ThermostatView @JvmOverloads constructor(
     private var temperatureTextSize: Float
     private var setPointTextSize: Float
 
-    // the width of the bar in pixels
-    private val bezelWidthPixels: Float
-
-    private val barGapPixels: Float
-
     var onClickIncreaseListener: OnClickIncreaseListener? = null
     var onClickDecreaseListener: OnClickDecreaseListener? = null
 
@@ -92,18 +86,33 @@ class ThermostatView @JvmOverloads constructor(
             requestLayout()
         }
 
+    var bezelWidth: Float = resources.getDimension(R.dimen.thermostatview_default_bezel_width)
+        set(value) {
+            field = value
+
+            invalidate()
+            requestLayout()
+        }
+
+    var tickGapDegrees: Int = resources.getInteger(R.integer.thermostatview_default_tick_gap)
+        set(value) {
+            field = value
+
+            invalidate()
+            requestLayout()
+        }
+
     init {
         setWillNotDraw(false)
         isSaveEnabled = true
 
         val typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ThermostatView)
 
-        bezelWidthPixels = typedArray.getDimensionPixelSize(
-            R.styleable.ThermostatView_bezelWidth,
-            resources.getDimensionPixelSize(R.dimen.thermostatview_default_bar_width)).toFloat()
-        barGapPixels = typedArray.getDimensionPixelSize(
-            R.styleable.ThermostatView_barGap,
-            resources.getDimensionPixelSize(R.dimen.thermostatview_default_bar_gap)).toFloat()
+        bezelWidth = typedArray.getDimension(R.styleable.ThermostatView_bezelWidth, resources.getDimension(R.dimen.thermostatview_default_bezel_width))
+
+        tickGapDegrees = typedArray.getInteger(
+            R.styleable.ThermostatView_tickGapDegrees,
+            resources.getInteger(R.integer.thermostatview_default_tick_gap))
 
         centerColor = typedArray.getInteger(R.styleable.ThermostatView_centerColor, R.color.black)
         currentTemp = typedArray.getString(R.styleable.ThermostatView_currentTemp) ?: "---"
@@ -134,16 +143,15 @@ class ThermostatView @JvmOverloads constructor(
         typedArray.recycle()
     }
 
-
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         xCenter = (r-l)/2f
         yCenter = (b-t)/2f
 
-        centerRadius = xCenter-(bezelWidthPixels*2f)
+        centerRadius = xCenter-(bezelWidth*2f)
         rimRadius = xCenter
-        markLength = (bezelWidthPixels*2f) / 8
+        markLength = (bezelWidth*2f) / 8
 
-        val margin = (bezelWidthPixels * 2).toInt()
+        val margin = (bezelWidth * 2f).toInt()
         val marginHalf = margin / 2
 
         bounds.set(
@@ -152,10 +160,10 @@ class ThermostatView @JvmOverloads constructor(
             r.toFloat(),
             b.toFloat())
         centerBounds.set(
-            l.toFloat() + margin + bezelWidthPixels,
-            t.toFloat() + margin + bezelWidthPixels,
-            r.toFloat() - margin - bezelWidthPixels,
-            b.toFloat() - margin - bezelWidthPixels)
+            l.toFloat() + margin + bezelWidth,
+            t.toFloat() + margin + bezelWidth,
+            r.toFloat() - margin - bezelWidth,
+            b.toFloat() - margin - bezelWidth)
 
         temperatureTextSize = xCenter / 2f
         setPointTextSize = temperatureTextSize * .4f
@@ -197,7 +205,7 @@ class ThermostatView @JvmOverloads constructor(
         canvas.drawCircle(xCenter, yCenter, rimRadius, centerPaint)
 
         // rim
-        for (i in 1..360 step 5) {
+        for (i in 1..360 step tickGapDegrees) {
             val r1 = centerRadius
             val t1 = Math.toRadians(i.toDouble())
             val x1 = r1 * cos(t1) + xCenter

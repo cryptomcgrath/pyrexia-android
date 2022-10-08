@@ -25,6 +25,12 @@ internal val thermostatReducerFun: ReducerFun<ThermostatState> = { inState, even
             )
         }
 
+        is ThermostatEvent.SetLoading -> {
+            state.copy(
+                isLoading = event.isLoading
+            )
+        }
+
         else -> state
     }
 }
