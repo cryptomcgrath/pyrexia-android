@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PointsChart">
+        <attr name="points" format="string" />
+        <attr name="bgColor" format="integer" />
+        <attr name="lineWidth" format="dimension" />
+    </declare-styleable>
+</resources>

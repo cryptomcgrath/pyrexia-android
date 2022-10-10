@@ -1,10 +1,12 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
 import com.cryptomcgrath.pyrexia.RxStoreAdapter
+import com.cryptomcgrath.pyrexia.databinding.HistoryChartItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatEnabledItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatModeItemBinding
@@ -16,7 +18,8 @@ import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.RxStore
 
-internal class ThermostatAdapter(store: RxStore<ThermostatState>,
+internal class ThermostatAdapter(private val context: Context,
+                                 store: RxStore<ThermostatState>,
                                  private val dispatcher: Dispatcher
 ): RxStoreAdapter<ThermostatState>(store) {
     override val viewTypes: List<Class<out DiffableItem>> =
@@ -24,7 +27,8 @@ internal class ThermostatAdapter(store: RxStore<ThermostatState>,
             StatDiffableItem::class.java,
             StatModeDiffableItem::class.java,
             StatEnabledDiffableItem::class.java,
-            StatLoadingDiffableItem::class.java
+            StatLoadingDiffableItem::class.java,
+            HistoryChartDiffableItem::class.java
         )
 
     override val differ: AsyncListDiffer<DiffableItem> = AsyncListDiffer(this, DIFF_CALLBACK)
@@ -38,6 +42,7 @@ internal class ThermostatAdapter(store: RxStore<ThermostatState>,
                 items += StatDiffableItem(state.current, dispatcher)
                 items += StatModeDiffableItem(state.current.program.mode)
                 items += StatEnabledDiffableItem(dispatcher, state.current.program.enabled, state.current.program.id)
+                items += HistoryChartDiffableItem(store)
             }
         }
         return items
@@ -71,6 +76,15 @@ internal class ThermostatAdapter(store: RxStore<ThermostatState>,
                 val binding = ThermostatItemLoadingBinding.inflate(inflater, parent, false)
                 BindFunViewHolder(binding) {
                     binding.model = it as StatLoadingDiffableItem
+                }
+            }
+
+            HistoryChartDiffableItem::class.java -> {
+                val binding = HistoryChartItemBinding.inflate(inflater, parent, false)
+                BindFunViewHolder(binding) {
+                    val model = it as HistoryChartDiffableItem
+                    binding.model = model
+                    //binding.historyRecyclerView.adapter = model.adapter
                 }
             }
 

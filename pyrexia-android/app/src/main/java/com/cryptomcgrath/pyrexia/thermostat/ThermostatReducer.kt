@@ -31,6 +31,16 @@ internal val thermostatReducerFun: ReducerFun<ThermostatState> = { inState, even
             )
         }
 
+        is ThermostatEvent.NewHistory -> {
+            val newHistory = state.history.toMutableMap()
+            event.historyList.forEach {
+                newHistory[it.id] = it
+            }
+            state.copy(
+                history = newHistory
+            )
+        }
+
         else -> state
     }
 }

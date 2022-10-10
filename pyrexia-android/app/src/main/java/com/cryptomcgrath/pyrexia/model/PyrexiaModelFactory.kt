@@ -1,5 +1,6 @@
 package com.cryptomcgrath.pyrexia.model
 
+import com.cryptomcgrath.pyrexia.service.GetHistoryDto
 import com.cryptomcgrath.pyrexia.service.GetProgramsDto
 import com.cryptomcgrath.pyrexia.service.GetStatListDto
 
@@ -45,6 +46,23 @@ internal fun GetStatListDto.toStatList(): List<ProgramRun> {
             program = program,
             control = control,
             sensor = sensor
+        )
+    }
+}
+
+internal fun GetHistoryDto.toHistoryList(): List<History> {
+    return this.data.map {
+        History(
+            id = it.id,
+            programId = it.program_id,
+            setPoint = it.set_point,
+            actionTs = it.action_ts,
+            sensorId = it.sensor_id,
+            sensorValue = it.sensor_value,
+            controlId = it.control_id,
+            controlOn = it.control_on == 1,
+            programAction = History.Action.parse(it.program_action),
+            controlAction = History.Action.parse(it.control_action)
         )
     }
 }

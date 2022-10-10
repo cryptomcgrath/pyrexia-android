@@ -49,6 +49,7 @@ internal class ThermostatFragment: Fragment() {
         val binding = FragmentThermostatBinding.inflate(inflater, container, false).apply {
             model = viewModel
             recyclerView.adapter = ThermostatAdapter(
+                context = requireContext(),
                 dispatcher = viewModel.dispatcher,
                 store = viewModel.store
             )

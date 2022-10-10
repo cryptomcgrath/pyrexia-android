@@ -6,6 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 internal interface PyrexiaApi {
 
@@ -38,4 +39,12 @@ internal interface PyrexiaApi {
         "Content-Type: application/json")
     @POST("/stat/{id}/disable")
     fun statDisable(@Path("id") id: Int): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @GET("/history")
+    fun getHistory(@Query("offset") offset: Int,
+                   @Query("limit") limit: Int,
+                   @Query("program_id") program_id: Int?): Single<GetHistoryDto>
 }

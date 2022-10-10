@@ -1,7 +1,9 @@
 package com.cryptomcgrath.pyrexia.service
 
+import com.cryptomcgrath.pyrexia.model.History
 import com.cryptomcgrath.pyrexia.model.ProgramRun
 import com.cryptomcgrath.pyrexia.model.PyDevice
+import com.cryptomcgrath.pyrexia.model.toHistoryList
 import com.cryptomcgrath.pyrexia.model.toStatList
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -54,6 +56,13 @@ internal class PyrexiaService(pyDevice: PyDevice) {
 
     fun statDisable(id: Int): Completable {
         return client.statDisable(id)
+    }
+
+    fun getHistory(offset: Int, limit: Int, programId: Int?): Single<List<History>> {
+        return client.getHistory(offset, limit, programId)
+            .map {
+                it.toHistoryList()
+            }
     }
 }
 

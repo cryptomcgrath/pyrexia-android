@@ -53,6 +53,7 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
                         refreshData()
                         subscribeToStateChanges()
                         setupAutoRefresh()
+                        fetchHistory()
                     }
                     is StatListEvent.OnClickIncreaseTemp -> {
                         increaseTemp()
@@ -67,6 +68,7 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
                 // ignore
             }
         ).addTo(disposables)
+
         dispatcher.post(ThermostatEvent.Init(id))
     }
 
@@ -124,6 +126,21 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
                     // ignore
                 }
             ).addTo(disposables)
+    }
+
+    private fun fetchHistory() {
+        pyrexiaService.getHistory(
+            offset = store.state.historyOffset,
+            limit = HISTORY_FETCH_LIMIT,
+            programId = store.state.selectedStatId
+        ).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+            onSuccess = {
+                dispatcher.post(ThermostatEvent.NewHistory(store.state.historyOffset, it))
+            }, onError = {
+
+            }
+        ).addTo(disposables)
     }
 
     fun enableStat(id: Int) {
@@ -210,6 +227,7 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
 
 const val AUTO_REFRESH_INTERVAL = 15L
 const val TAG="ThermostatViewModel"
+const val HISTORY_FETCH_LIMIT = 250
 
 fun String.sentenceCase(): String {
     return this.lowercase(Locale.getDefault()).replaceFirstChar {
