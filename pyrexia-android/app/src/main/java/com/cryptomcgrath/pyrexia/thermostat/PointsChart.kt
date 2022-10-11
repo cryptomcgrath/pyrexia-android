@@ -3,14 +3,12 @@ package com.cryptomcgrath.pyrexia.thermostat
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.cryptomcgrath.pyrexia.R
+import kotlin.math.abs
 
 class PointsChart @JvmOverloads constructor(
     context: Context,
@@ -22,33 +20,40 @@ class PointsChart @JvmOverloads constructor(
     private val plotBounds = RectF()
     private val margin=20f
 
-    private var dataPoints = ArrayList<Pair<Float,Float>>(MAX_POINTS)
-    private val drawPoints = ArrayList<PointF>(MAX_POINTS)
-    private var drawPointsPacked = FloatArray(MAX_POINTS)
-
-    private var numPoints = 0
-
     private var bgPaint = Paint()
-    private var plotPaint = Paint()
 
-    var points: String = ""
-        set(value) {
-            val ps = value.split(",")
-            if (ps.size > 1) {
-                dataPoints.clear()
-                for (i in ps.indices step 2) {
-                    val x = ps[i].toLongOrNull()
-                    val y = ps[i+1].toFloatOrNull()
-                    if (x != null && y != null) {
-                        dataPoints.add(Pair(x.toFloat(),y))
-                        Log.d(TAG, "datapoint i=$i $x,$y")
+    private val xLabels: MutableList<Label> = mutableListOf()
+    private val yLabels: MutableList<Label> = mutableListOf()
+    private val data: MutableList<DrawSeries> = mutableListOf()
+
+    private val dataBounds = RectD()
+
+    fun addLabelX(label: Label) {
+        xLabels.add(label)
+    }
+
+    fun addLabelY(label: Label) {
+        yLabels.add(label)
+    }
+
+    fun addSeries(seriesList: List<Series>) {
+        data.addAll(
+            seriesList.map { series ->
+                DrawSeries(
+                    series = series,
+                    plotPaint = Paint().apply {
+                        color = ContextCompat.getColor(context, series.color)
+                        isAntiAlias = true
+                        strokeWidth = series.lineWidth //resources.getDimension(R.dimen.pointschart_default_line_width)
+                        style = Paint.Style.STROKE
                     }
-                }
-                computePoints()
+                )
             }
-
-            field = value
-        }
+        )
+        computePoints()
+        invalidate()
+        requestLayout()
+    }
 
     var bgColor: Int = R.color.white
         set(value) {
@@ -61,28 +66,13 @@ class PointsChart @JvmOverloads constructor(
             requestLayout()
         }
 
-    var lineWidth: Float = resources.getDimension(R.dimen.pointschart_default_line_width)
-        set(value) {
-            plotPaint = Paint().apply {
-                color = ContextCompat.getColor(context, R.color.red_error)
-                isAntiAlias = true
-                strokeWidth = value
-                style = Paint.Style.STROKE
-            }
-            field = value
-            invalidate()
-            requestLayout()
-        }
-
     init {
         setWillNotDraw(false)
         isSaveEnabled = true
 
         val typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.PointsChart)
 
-        points = typedArray.getString(R.styleable.PointsChart_points).orEmpty()
         bgColor = typedArray.getInteger(R.styleable.PointsChart_bgColor, R.color.white)
-        lineWidth = typedArray.getDimension(R.styleable.PointsChart_lineWidth, resources.getDimension(R.dimen.pointschart_default_line_width))
 
         typedArray.recycle()
     }
@@ -103,68 +93,112 @@ class PointsChart @JvmOverloads constructor(
         computePoints()
     }
 
-    private fun computePoints() {
-        val minX = dataPoints.minByOrNull {
-            it.first
-        }?.first
-        val maxX = dataPoints.maxByOrNull {
-            it.first
-        }?.first
-        val minY = dataPoints.minByOrNull {
-            it.second
-        }?.second
-        val maxY = dataPoints.maxByOrNull {
-            it.second
-        }?.second
+    private fun autoScale() {
+        val minX = data.map {
+            it.series.points
+        }.flatten().minByOrNull {
+            it.x
+        }?.x
+
+        val maxX = data.map {
+            it.series.points
+        }.flatten().maxByOrNull {
+            it.x
+        }?.x
+
+        val minY = data.map {
+            it.series.points
+        }.flatten().minByOrNull {
+            it.y
+        }?.y
+
+        val maxY = data.map {
+            it.series.points
+        }.flatten().maxByOrNull {
+            it.y
+        }?.y
 
         if (minX != null && maxX != null && minY != null && maxY != null) {
+            dataBounds.set(
+                minX,
+                minY,
+                maxX,
+                maxY
+            )
+        }
+    }
+
+    private fun computePoints() {
+        autoScale()
+
+        data.forEach {
             var j=0
             var xPrev = 0f
             var yPrev = 0f
-            drawPointsPacked = FloatArray(dataPoints.size*4)
-            dataPoints.forEachIndexed { idx, it ->
-                val x = (it.first - minX) / (maxX - minX) * plotBounds.width() + margin
-                val y = (it.second - minY) / (maxY - minY) * plotBounds.height() + margin
-                Log.d(TAG, "drawpoint $x,$y")
-                drawPoints.add(PointF(x,y))
+            it.packedPoints = FloatArray(it.series.points.size * 4)
+            it.series.points.forEachIndexed { idx, p ->
+                val x = ((p.x - dataBounds.left) / dataBounds.width() * plotBounds.width() + margin).toFloat()
+                val y = ((plotBounds.height() - ((p.y - dataBounds.top) / dataBounds.height() * plotBounds.height())) + margin).toFloat()
                 if (idx == 0) {
-                    drawPointsPacked[j++] = x
-                    drawPointsPacked[j++] = y
+                    it.packedPoints[j++] = x
+                    it.packedPoints[j++] = y
                 } else {
-                    drawPointsPacked[j++] = xPrev
-                    drawPointsPacked[j++] = yPrev
+                    it.packedPoints[j++] = xPrev
+                    it.packedPoints[j++] = yPrev
                 }
-                drawPointsPacked[j++] = x
+                it.packedPoints[j++] = x
                 xPrev = x
-                drawPointsPacked[j++] = y
+                it.packedPoints[j++] = y
                 yPrev = y
             }
-            numPoints = dataPoints.size
         }
     }
 
     override fun onDraw(canvas: Canvas) {
         canvas.drawRect(bounds, bgPaint)
-        canvas.drawLines(drawPointsPacked, plotPaint)
+
+        data.forEach {
+            canvas.drawLines(it.packedPoints, it.plotPaint)
+        }
     }
 
-    interface Point {
-        val x: Float
-        val y: Float
-        val name: String
-    }
+    data class Point(
+        val x: Double,
+        val y: Double,
+        val name: String)
 
-    interface Series {
-        val points: List<Point>
-        val label: String
-        val color: Int
-    }
+    data class Series(
+        val points: List<Point>,
+        val label: String,
+        val color: Int,
+        val lineWidth: Float
+    )
 
-    interface Label {
-        val position: Float
-        val name: String
-    }
+    data class Label(
+        val position: Float,
+        val name: String)
+
+    private data class DrawSeries(
+        val series: Series,
+        var packedPoints: FloatArray = floatArrayOf(),
+        val plotPaint: Paint = Paint()
+    )
 }
 
-private const val MAX_POINTS = 200
+class RectD {
+    var bottom: Double = 0.0
+    var left: Double = 0.0
+    var right: Double = 0.0
+    var top: Double = 0.0
 
+    fun width(): Double = abs(right - left)
+
+    fun height(): Double = abs(top - bottom)
+
+    fun set(l: Double, t: Double, r: Double, b: Double) {
+        left = l
+        top = t
+        right = r
+        bottom = b
+    }
+}

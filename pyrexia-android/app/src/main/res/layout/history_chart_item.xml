@@ -14,9 +14,9 @@
         android:layout_marginTop="@dimen/section_separation">
 
         <com.cryptomcgrath.pyrexia.thermostat.PointsChart
+            android:id="@+id/points_chart"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            app:points="@{model.points}"
             app:bgColor="@{model.bgColor}"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

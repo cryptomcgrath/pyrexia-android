@@ -5,10 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
+import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.RxStoreAdapter
 import com.cryptomcgrath.pyrexia.databinding.HistoryChartItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatEnabledItemBinding
-import com.cryptomcgrath.pyrexia.databinding.StatItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatModeItemBinding
 import com.cryptomcgrath.pyrexia.databinding.ThermostatItemBinding
 import com.cryptomcgrath.pyrexia.databinding.ThermostatItemLoadingBinding
@@ -42,7 +42,7 @@ internal class ThermostatAdapter(private val context: Context,
                 items += StatDiffableItem(state.current, dispatcher)
                 items += StatModeDiffableItem(state.current.program.mode)
                 items += StatEnabledDiffableItem(dispatcher, state.current.program.enabled, state.current.program.id)
-                items += HistoryChartDiffableItem(store)
+                items += HistoryChartDiffableItem(context, store)
             }
         }
         return items
@@ -84,7 +84,10 @@ internal class ThermostatAdapter(private val context: Context,
                 BindFunViewHolder(binding) {
                     val model = it as HistoryChartDiffableItem
                     binding.model = model
-                    //binding.historyRecyclerView.adapter = model.adapter
+
+                    binding.pointsChart.addSeries(
+                        model.series
+                    )
                 }
             }
 
