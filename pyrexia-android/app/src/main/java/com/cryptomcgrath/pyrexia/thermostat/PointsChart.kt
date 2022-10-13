@@ -18,22 +18,40 @@ class PointsChart @JvmOverloads constructor(
 
     private val bounds = RectF()
     private val plotBounds = RectF()
-    private val margin=20f
+    private val margin=resources.getDimension(R.dimen.pointschart_default_margin)
 
     private var bgPaint = Paint()
 
-    private val xLabels: MutableList<Label> = mutableListOf()
-    private val yLabels: MutableList<Label> = mutableListOf()
+    private val xLabels: MutableList<DrawLabel> = mutableListOf()
+    private val yLabels: MutableList<DrawLabel> = mutableListOf()
     private val data: MutableList<DrawSeries> = mutableListOf()
 
     private val dataBounds = RectD()
 
     fun addLabelX(label: Label) {
-        xLabels.add(label)
+        xLabels.add(
+            DrawLabel(
+                label = label,
+                plotPaint = Paint().apply {
+                    color = ContextCompat.getColor(context, R.color.grey42)
+                    isAntiAlias = true
+                    strokeWidth = resources.getDimension(R.dimen.pointschart_thin_line_width)
+                    style = Paint.Style.STROKE
+                }
+            ))
     }
 
     fun addLabelY(label: Label) {
-        yLabels.add(label)
+        yLabels.add(
+            DrawLabel(
+                label = label,
+                plotPaint = Paint().apply {
+                    color = ContextCompat.getColor(context, R.color.grey42)
+                    isAntiAlias = true
+                    strokeWidth = resources.getDimension(R.dimen.pointschart_thin_line_width)
+                    style = Paint.Style.STROKE
+                }
+            ))
     }
 
     fun addSeries(seriesList: List<Series>) {
@@ -44,7 +62,7 @@ class PointsChart @JvmOverloads constructor(
                     plotPaint = Paint().apply {
                         color = ContextCompat.getColor(context, series.color)
                         isAntiAlias = true
-                        strokeWidth = series.lineWidth //resources.getDimension(R.dimen.pointschart_default_line_width)
+                        strokeWidth = series.lineWidth
                         style = Paint.Style.STROKE
                     }
                 )
@@ -85,9 +103,9 @@ class PointsChart @JvmOverloads constructor(
             bottom.toFloat())
 
         plotBounds.set(
-            left.toFloat() + margin,
+            left.toFloat(),
             top.toFloat() + margin,
-            right.toFloat() - margin,
+            right.toFloat(),
             bottom.toFloat() - margin
         )
         computePoints()
@@ -137,8 +155,8 @@ class PointsChart @JvmOverloads constructor(
             var yPrev = 0f
             it.packedPoints = FloatArray(it.series.points.size * 4)
             it.series.points.forEachIndexed { idx, p ->
-                val x = ((p.x - dataBounds.left) / dataBounds.width() * plotBounds.width() + margin).toFloat()
-                val y = ((plotBounds.height() - ((p.y - dataBounds.top) / dataBounds.height() * plotBounds.height())) + margin).toFloat()
+                val x = p.x.scaleX()
+                val y = p.y.scaleY()
                 if (idx == 0) {
                     it.packedPoints[j++] = x
                     it.packedPoints[j++] = y
@@ -152,6 +170,36 @@ class PointsChart @JvmOverloads constructor(
                 yPrev = y
             }
         }
+
+        yLabels.clear()
+        yLabels.add(
+            DrawLabel(
+                label = Label(position = dataBounds.top.toFloat(), name = String.format("%3.2f", dataBounds.top)),
+                packedPoints = floatArrayOf(
+                    dataBounds.left.scaleX(),
+                    dataBounds.top.scaleY(),
+                    dataBounds.right.scaleX(),
+                    dataBounds.top.scaleY()
+                )
+            ))
+        yLabels.add(
+            DrawLabel(
+                label = Label(position = dataBounds.bottom.toFloat(), name = String.format("%3.2f", dataBounds.bottom)),
+                packedPoints = floatArrayOf(
+                    dataBounds.left.scaleX(),
+                    dataBounds.bottom.scaleY(),
+                    dataBounds.right.scaleX(),
+                    dataBounds.bottom.scaleY()
+                )
+            ))
+    }
+
+    private fun Double.scaleY(): Float {
+        return ((plotBounds.height() - ((this - dataBounds.top) / dataBounds.height() * plotBounds.height() - margin))).toFloat()
+    }
+
+    private fun Double.scaleX(): Float {
+        return ((this - dataBounds.left) / dataBounds.width() * plotBounds.width()).toFloat()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -160,6 +208,12 @@ class PointsChart @JvmOverloads constructor(
         data.forEach {
             canvas.drawLines(it.packedPoints, it.plotPaint)
         }
+
+        // y labels
+        yLabels.forEach {
+            canvas.drawLines(it.packedPoints, it.plotPaint)
+        }
+
     }
 
     data class Point(
@@ -177,6 +231,11 @@ class PointsChart @JvmOverloads constructor(
     data class Label(
         val position: Float,
         val name: String)
+
+    data class DrawLabel(
+        val label: Label,
+        val packedPoints: FloatArray = floatArrayOf(),
+        val plotPaint: Paint = Paint())
 
     private data class DrawSeries(
         val series: Series,

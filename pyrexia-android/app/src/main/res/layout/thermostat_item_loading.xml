@@ -25,7 +25,6 @@
                 android:layout_height="wrap_content"
                 app:currentTemp="@string/unknown_temp"
                 app:setPoint="@string/unknown_temp"
-                app:centerColor="@color/grey42"
                 app:bezelWidth="15dp"
                 app:tickGapDegrees="3"
                 app:layout_constraintStart_toStartOf="parent"

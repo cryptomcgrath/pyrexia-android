@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="pointschart_thin_line_width">.5dp</dimen>
     <dimen name="pointschart_default_line_width">1dp</dimen>
     <dimen name="pointschart_commandon_line_width">3dp</dimen>
+    <dimen name="pointschart_default_margin">15dp</dimen>
 </resources>

@@ -9,13 +9,15 @@ internal val thermostatReducerFun: ReducerFun<ThermostatState> = { inState, even
         is ThermostatEvent.NewStatList -> {
             state.copy(
                 statList = event.statList,
-                connectionError = null
+                connectionError = null,
+                isLoading = false
             )
         }
 
         is ThermostatEvent.ConnectionError -> {
             state.copy(
-                connectionError = event.throwable
+                connectionError = event.throwable,
+                isLoading = false
             )
         }
 

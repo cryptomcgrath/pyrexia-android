@@ -11,8 +11,9 @@ internal class HistoryChartDiffableItem(context: Context,
     private val history = store.state.historyOldtoNew
 
     val series = mutableListOf<PointsChart.Series>()
+    val yLabels = mutableListOf<PointsChart.Label>()
 
-    val bgColor = R.color.cobalt
+    val bgColor = R.color.white
 
     init {
         var onPoints = mutableListOf<PointsChart.Point>()
@@ -50,7 +51,7 @@ internal class HistoryChartDiffableItem(context: Context,
         series.add(PointsChart.Series(
             points = points,
             label = "",
-            color = R.color.white,
+            color = R.color.grey42,
             lineWidth = context.resources.getDimension(R.dimen.pointschart_default_line_width)
         ))
     }

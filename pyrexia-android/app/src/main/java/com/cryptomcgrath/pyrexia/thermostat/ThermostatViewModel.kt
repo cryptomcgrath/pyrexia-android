@@ -103,6 +103,9 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
         pyrexiaService.getStatList()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                dispatcher.post(ThermostatEvent.SetLoading(true))
+            }
             .subscribeBy(
                 onSuccess = {
                     dispatcher.post(ThermostatEvent.NewStatList(it))
