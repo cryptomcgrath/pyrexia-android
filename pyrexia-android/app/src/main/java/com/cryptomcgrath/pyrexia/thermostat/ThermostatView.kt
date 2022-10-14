@@ -186,10 +186,7 @@ class ThermostatView @JvmOverloads constructor(
         }
     }
 
-    private fun Rect.drawTextCentered(canvas: Canvas, paint: Paint, text: String, cx: Float, cy: Float) {
-        paint.getTextBounds(text, 0, text.length, this)
-        canvas.drawText(text, cx - this.exactCenterX(), cy - this.exactCenterY(), paint)
-    }
+
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         // use parent width for x and y desired sizes if not specified
@@ -385,4 +382,9 @@ private fun measureDimension(desiredSize: Int, measureSpec: Int): Int {
 
 fun convertDpToPixel(dp: Float, context: Context): Float {
     return dp * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+}
+
+fun Rect.drawTextCentered(canvas: Canvas, paint: Paint, text: String, cx: Float, cy: Float) {
+    paint.getTextBounds(text, 0, text.length, this)
+    canvas.drawText(text, cx - this.exactCenterX(), cy - this.exactCenterY(), paint)
 }

@@ -12,6 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="true"
         android:layout_marginStart="@dimen/side_padding"
         android:layout_marginEnd="@dimen/side_padding">
 

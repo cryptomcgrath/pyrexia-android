@@ -3,18 +3,28 @@ package com.cryptomcgrath.pyrexia.thermostat
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.PointF
+import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.Log
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.cryptomcgrath.pyrexia.R
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 class PointsChart @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
+) : View(context, attrs, defStyleAttr), GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
 
     private val bounds = RectF()
     private val plotBounds = RectF()
@@ -27,31 +37,20 @@ class PointsChart @JvmOverloads constructor(
     private val data: MutableList<DrawSeries> = mutableListOf()
 
     private val dataBounds = RectD()
+    private val textBounds = Rect()
 
-    fun addLabelX(label: Label) {
-        xLabels.add(
-            DrawLabel(
-                label = label,
-                plotPaint = Paint().apply {
-                    color = ContextCompat.getColor(context, R.color.grey42)
-                    isAntiAlias = true
-                    strokeWidth = resources.getDimension(R.dimen.pointschart_thin_line_width)
-                    style = Paint.Style.STROKE
-                }
-            ))
-    }
+    private val gesture = GestureDetector(context, this)
+    private val scaleGesture = ScaleGestureDetector(context, this)
+    private var originX = 0f
+    private var originY = 0f
+    private var scale = 1.0f
+    private var minScale = 0.5f
+    private var maxScale = 8.0f
 
-    fun addLabelY(label: Label) {
-        yLabels.add(
-            DrawLabel(
-                label = label,
-                plotPaint = Paint().apply {
-                    color = ContextCompat.getColor(context, R.color.grey42)
-                    isAntiAlias = true
-                    strokeWidth = resources.getDimension(R.dimen.pointschart_thin_line_width)
-                    style = Paint.Style.STROKE
-                }
-            ))
+    private val labelPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.grey42)
+        isAntiAlias = true
+        textSize = margin
     }
 
     fun addSeries(seriesList: List<Series>) {
@@ -175,23 +174,31 @@ class PointsChart @JvmOverloads constructor(
         yLabels.add(
             DrawLabel(
                 label = Label(position = dataBounds.top.toFloat(), name = String.format("%3.2f", dataBounds.top)),
-                packedPoints = floatArrayOf(
-                    dataBounds.left.scaleX(),
-                    dataBounds.top.scaleY(),
-                    dataBounds.right.scaleX(),
-                    dataBounds.top.scaleY()
-                )
+                startPoint = PointF(dataBounds.left.scaleNoPanX(), dataBounds.top.scaleY()),
+                endPoint = PointF(dataBounds.right.scaleNoPanX(), dataBounds.top.scaleY())
             ))
         yLabels.add(
             DrawLabel(
                 label = Label(position = dataBounds.bottom.toFloat(), name = String.format("%3.2f", dataBounds.bottom)),
-                packedPoints = floatArrayOf(
-                    dataBounds.left.scaleX(),
-                    dataBounds.bottom.scaleY(),
-                    dataBounds.right.scaleX(),
-                    dataBounds.bottom.scaleY()
-                )
+                startPoint = PointF(dataBounds.left.scaleNoPanX(), dataBounds.bottom.scaleY()),
+                endPoint = PointF(dataBounds.right.scaleNoPanX(), dataBounds.bottom.scaleY())
             ))
+
+        xLabels.clear()
+        xLabels.add(
+            DrawLabel(
+                label = Label(position = dataBounds.left.toFloat(), name = dataBounds.left.toLong().toTimeLabel()),
+                startPoint = PointF(dataBounds.left.scaleX(), dataBounds.bottom.scaleY()),
+                endPoint = PointF(dataBounds.left.scaleX(), dataBounds.bottom.scaleY()+margin)
+            )
+        )
+        xLabels.add(
+            DrawLabel(
+                label = Label(position = dataBounds.right.toFloat(), name = dataBounds.right.toLong().toTimeLabel()),
+                startPoint = PointF(dataBounds.right.scaleX(), dataBounds.bottom.scaleY()),
+                endPoint = PointF(dataBounds.right.scaleX(), dataBounds.bottom.scaleY()+margin)
+            )
+        )
     }
 
     private fun Double.scaleY(): Float {
@@ -199,10 +206,20 @@ class PointsChart @JvmOverloads constructor(
     }
 
     private fun Double.scaleX(): Float {
-        return ((this - dataBounds.left) / dataBounds.width() * plotBounds.width()).toFloat()
+        return ((this - dataBounds.left) / dataBounds.width() * plotBounds.width() * scale).toFloat() - originX
+    }
+
+    private fun Float.unScaleX(): Double {
+        return ((this + originX)/ (plotBounds.width() * scale)) * (dataBounds.right - dataBounds.left) + dataBounds.left
+    }
+
+    private fun Double.scaleNoPanX(): Float {
+        return ((this - dataBounds.left) / dataBounds.width() * plotBounds.width() * scale).toFloat()
     }
 
     override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+
         canvas.drawRect(bounds, bgPaint)
 
         data.forEach {
@@ -211,9 +228,23 @@ class PointsChart @JvmOverloads constructor(
 
         // y labels
         yLabels.forEach {
-            canvas.drawLines(it.packedPoints, it.plotPaint)
+            canvas.drawLine(it.startPoint.x, it.startPoint.y, it.endPoint.x, it.endPoint.y, it.plotPaint)
+            canvas.drawText(it.label.name, it.startPoint.x, it.startPoint.y, labelPaint)
         }
 
+        // x labels
+        labelPaint.getTextBounds("12:00p", 0, "12:00p".length, textBounds)
+        val spacing = (textBounds.right * 1.5).toInt()
+        for (x in plotBounds.left.toInt() until plotBounds.right.toInt() step spacing) {
+            textBounds.drawTextCentered(
+                canvas,
+                labelPaint,
+                x.toFloat().unScaleX().toLong().toTimeLabel(),
+                x.toFloat(),
+                plotBounds.bottom+margin/2,
+            )
+            canvas.drawLine(x.toFloat(), plotBounds.bottom - 10, x.toFloat(), plotBounds.bottom + 10, labelPaint)
+        }
     }
 
     data class Point(
@@ -234,7 +265,8 @@ class PointsChart @JvmOverloads constructor(
 
     data class DrawLabel(
         val label: Label,
-        val packedPoints: FloatArray = floatArrayOf(),
+        val startPoint: PointF,
+        val endPoint: PointF,
         val plotPaint: Paint = Paint())
 
     private data class DrawSeries(
@@ -242,6 +274,76 @@ class PointsChart @JvmOverloads constructor(
         var packedPoints: FloatArray = floatArrayOf(),
         val plotPaint: Paint = Paint()
     )
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                parent.requestDisallowInterceptTouchEvent(true)
+            }
+            MotionEvent.ACTION_UP -> {
+                parent.requestDisallowInterceptTouchEvent(false)
+            }
+        }
+        // try using the scroll/fling/tap/double-tap first
+        if (!gesture.onTouchEvent(event)) {
+            // if not handling, send it through to the zoom gesture
+            return scaleGesture.onTouchEvent(event)
+        }
+        return true
+    }
+
+    // ** gesture detector **
+    override fun onDown(p0: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onShowPress(p0: MotionEvent) {
+    }
+
+    override fun onSingleTapUp(p0: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onScroll(p0: MotionEvent, p1: MotionEvent, dx: Float, dy: Float): Boolean {
+        originX += dx / scale
+        originY += dy / scale
+        computePoints()
+        invalidate()
+        return true
+    }
+
+    override fun onLongPress(p0: MotionEvent) {
+    }
+
+    override fun onFling(p0: MotionEvent, p1: MotionEvent, p2: Float, p3: Float): Boolean {
+        return false
+    }
+
+    // ** scale detector **
+    override fun onScale(s: ScaleGestureDetector): Boolean {
+        if (s.scaleFactor < 0.01) return false // ignore small changes
+
+        scale = min(
+            max(scale * s.scaleFactor, minScale),
+            maxScale
+        )
+
+        Log.d(TAG, "onScale scale=${scale} originX=${originX} originY=${originY}")
+        computePoints()
+        invalidate()
+
+        return true
+    }
+
+    override fun onScaleBegin(p0: ScaleGestureDetector): Boolean {
+        return true
+    }
+
+    override fun onScaleEnd(s: ScaleGestureDetector) {
+        scale = min(max(scale*s.scaleFactor, minScale), maxScale)
+        computePoints()
+        invalidate();
+    }
 }
 
 class RectD {
@@ -260,4 +362,12 @@ class RectD {
         right = r
         bottom = b
     }
+}
+
+private val labelTimeFormatter by lazy {
+    SimpleDateFormat("h:mma", Locale.US)
+}
+
+private fun Long.toTimeLabel(): String {
+    return labelTimeFormatter.format(this*1000).replace("AM","a").replace("PM","p")
 }

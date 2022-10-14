@@ -104,7 +104,9 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
-                dispatcher.post(ThermostatEvent.SetLoading(true))
+                if (store.state.connectionError != null || store.state.statList.isEmpty()) {
+                    dispatcher.post(ThermostatEvent.SetLoading(true))
+                }
             }
             .subscribeBy(
                 onSuccess = {
