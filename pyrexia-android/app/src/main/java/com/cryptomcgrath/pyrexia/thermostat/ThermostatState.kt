@@ -19,4 +19,10 @@ internal data class ThermostatState(
     val historyOldtoNew get() = history.values.sortedBy {
         it.actionTs
     }
+
+    val minHistoryTs get() = history.values.minByOrNull {
+        it.actionTs
+    }?.actionTs
+
+    val nextHistoryOffset = history.values.size+1
 }

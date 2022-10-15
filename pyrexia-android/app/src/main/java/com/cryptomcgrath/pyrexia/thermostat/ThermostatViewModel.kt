@@ -15,6 +15,7 @@ import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
 import com.edwardmcgrath.blueflux.core.RxStore
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -60,6 +61,9 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
                     }
                     is StatListEvent.OnClickDecreaseTemp -> {
                         decreaseTemp()
+                    }
+                    is ThermostatEvent.RequestMoreHistory -> {
+                        fetchMoreHistoryIfNeeded(it.timeStamp)
                     }
                 }
                 eventQueue.post(it)
@@ -148,6 +152,33 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
         ).addTo(disposables)
     }
 
+    private fun fetchMoreHistoryIfNeeded(timeStamp: Long) {
+        Single.create {
+            it.onSuccess(timeStamp < (store.state.minHistoryTs ?: 0L))
+        }.flatMap {
+            if (it) {
+                Log.d(TAG, "fetchMoreHistory offset=${store.state.nextHistoryOffset}")
+                pyrexiaService.getHistory(
+                    offset = store.state.nextHistoryOffset,
+                    limit = HISTORY_FETCH_LIMIT,
+                    programId = store.state.selectedStatId
+                )
+            } else {
+                Single.just(emptyList())
+            }
+        }.subscribeOn(Schedulers.single()).observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it.isNotEmpty()) {
+                        dispatcher.post(ThermostatEvent.NewHistory(store.state.nextHistoryOffset, it))
+                    }
+                },
+                onError = {
+                    // TODO
+                }
+            ).addTo(disposables)
+    }
+
     fun enableStat(id: Int) {
         pyrexiaService.statEnable(id)
             .subscribeOn(Schedulers.io())
@@ -191,7 +222,6 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
                         }
                     ).addTo(disposables)
             }
-
         }
     }
 

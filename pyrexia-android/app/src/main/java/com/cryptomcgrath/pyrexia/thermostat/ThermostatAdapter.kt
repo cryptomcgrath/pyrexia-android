@@ -85,9 +85,14 @@ internal class ThermostatAdapter(private val context: Context,
                     val model = it as HistoryChartDiffableItem
                     binding.model = model
 
-                    binding.pointsChart.addSeries(
-                        model.series
-                    )
+                    binding.pointsChart.apply {
+                        addSeries(model.series)
+                        listener = object: PointsChart.Listener {
+                            override fun onMoreDataRequest(timeStamp: Long) {
+                                dispatcher.post(ThermostatEvent.RequestMoreHistory(timeStamp))
+                            }
+                        }
+                    }
                 }
             }
 

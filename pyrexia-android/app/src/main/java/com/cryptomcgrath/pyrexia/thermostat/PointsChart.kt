@@ -38,6 +38,7 @@ class PointsChart @JvmOverloads constructor(
     private val data: MutableList<DrawSeries> = mutableListOf()
 
     private val dataBounds = RectD()
+    private val allDataBounds = RectD()
     private val textBounds = Rect()
 
     private val gesture = GestureDetector(context, this)
@@ -48,6 +49,8 @@ class PointsChart @JvmOverloads constructor(
     private var minScale = 0.5f
     private var maxScale = 8.0f
     private var markLength = 20f
+
+    var listener: Listener? = null
 
     private val labelPaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.grey42)
@@ -145,12 +148,20 @@ class PointsChart @JvmOverloads constructor(
         }?.y
 
         if (minX != null && maxX != null && minY != null && maxY != null) {
-            dataBounds.set(
+            allDataBounds.set(
                 minX,
                 minY,
                 maxX,
                 maxY
             )
+            if (dataBounds.height() < 1) {
+                dataBounds.set(
+                    minX,
+                    minY,
+                    maxX,
+                    maxY
+                )
+            }
         }
     }
 
@@ -183,14 +194,14 @@ class PointsChart @JvmOverloads constructor(
         yLabels.add(
             DrawLabel(
                 label = Label(position = dataBounds.top.toFloat(), name = String.format("%3.2f", dataBounds.top)),
-                startPoint = PointF(dataBounds.left.scaleNoPanX(), dataBounds.top.scaleY()),
-                endPoint = PointF(dataBounds.right.scaleNoPanX(), dataBounds.top.scaleY())
+                startPoint = PointF(dataBounds.left.scaleNoPanX(), dataBounds.top.scaleYNoPan()),
+                endPoint = PointF(dataBounds.right.scaleNoPanX(), dataBounds.top.scaleYNoPan())
             ))
         yLabels.add(
             DrawLabel(
                 label = Label(position = dataBounds.bottom.toFloat(), name = String.format("%3.2f", dataBounds.bottom)),
-                startPoint = PointF(dataBounds.left.scaleNoPanX(), dataBounds.bottom.scaleY()),
-                endPoint = PointF(dataBounds.right.scaleNoPanX(), dataBounds.bottom.scaleY())
+                startPoint = PointF(dataBounds.left.scaleNoPanX(), dataBounds.bottom.scaleYNoPan()),
+                endPoint = PointF(dataBounds.right.scaleNoPanX(), dataBounds.bottom.scaleYNoPan())
             ))
 
         xLabels.clear()
@@ -211,15 +222,15 @@ class PointsChart @JvmOverloads constructor(
     }
 
     private fun Double.scaleY(): Float {
-        return ((plotBounds.height() - ((this - dataBounds.top) / dataBounds.height() * plotBounds.height() - margin))).toFloat()
+        return ((plotBounds.height()*scale - ((this - dataBounds.top) / dataBounds.height() * (plotBounds.height() * scale - margin))).toFloat() - originY)
     }
 
     private fun Double.scaleYNoPan(): Float {
-        return ((plotBounds.height() - ((this - dataBounds.top) / dataBounds.height() * plotBounds.height() - margin))).toFloat()
+        return ((plotBounds.height() *scale - ((this - dataBounds.top) / dataBounds.height() * scale * plotBounds.height() - margin))).toFloat()
     }
 
     private fun Float.unScaleY(): Double {
-        return (plotBounds.height() - (this + margin)) / plotBounds.height() * dataBounds.height() + dataBounds.top
+        return (plotBounds.height() * scale - (this + originY + margin)) / (plotBounds.height() * scale) * dataBounds.height() + dataBounds.top
     }
 
     private fun Double.scaleX(): Float {
@@ -335,8 +346,18 @@ class PointsChart @JvmOverloads constructor(
         originX += dx
         originY += dy
         computePoints()
+        checkForRequestMoreData()
         invalidate()
         return true
+    }
+
+    private fun checkForRequestMoreData() {
+        // check to request more data
+        val minTsInView = plotBounds.left.unScaleX().toLong()
+        Log.d(TAG, "checkForRequestMoreData minTsInView=${minTsInView} allDataBounds.left = ${allDataBounds.left}")
+        if (minTsInView < allDataBounds.left) {
+            listener?.onMoreDataRequest(minTsInView)
+        }
     }
 
     override fun onLongPress(p0: MotionEvent) {
@@ -370,6 +391,10 @@ class PointsChart @JvmOverloads constructor(
         scale = min(max(scale*s.scaleFactor, minScale), maxScale)
         computePoints()
         invalidate();
+    }
+
+    interface Listener {
+        fun onMoreDataRequest(timeStamp: Long)
     }
 }
 

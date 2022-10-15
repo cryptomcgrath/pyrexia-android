@@ -3,6 +3,7 @@ package com.cryptomcgrath.pyrexia.thermostat
 import android.content.Context
 import android.util.Log
 import com.cryptomcgrath.pyrexia.R
+import com.cryptomcgrath.pyrexia.model.History
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.RxStore
 

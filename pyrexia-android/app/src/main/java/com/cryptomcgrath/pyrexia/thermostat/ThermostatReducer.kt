@@ -39,7 +39,8 @@ internal val thermostatReducerFun: ReducerFun<ThermostatState> = { inState, even
                 newHistory[it.id] = it
             }
             state.copy(
-                history = newHistory
+                history = newHistory,
+                historyOffset = event.offset
             )
         }
 
