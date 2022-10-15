@@ -232,7 +232,7 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
 
 const val AUTO_REFRESH_INTERVAL = 15L
 const val TAG="ThermostatViewModel"
-const val HISTORY_FETCH_LIMIT = 250
+const val HISTORY_FETCH_LIMIT = 500
 
 fun String.sentenceCase(): String {
     return this.lowercase(Locale.getDefault()).replaceFirstChar {

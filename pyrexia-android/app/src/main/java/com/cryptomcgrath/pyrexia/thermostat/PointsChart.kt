@@ -2,6 +2,7 @@ package com.cryptomcgrath.pyrexia.thermostat
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.Rect
@@ -46,11 +47,19 @@ class PointsChart @JvmOverloads constructor(
     private var scale = 1.0f
     private var minScale = 0.5f
     private var maxScale = 8.0f
+    private var markLength = 20f
 
     private val labelPaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.grey42)
         isAntiAlias = true
         textSize = margin
+    }
+
+    private val dashPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.grey42)
+        isAntiAlias = true
+        style = Paint.Style.STROKE
+        pathEffect = DashPathEffect(floatArrayOf(10f, 40f), 0f)
     }
 
     fun addSeries(seriesList: List<Series>) {
@@ -205,6 +214,14 @@ class PointsChart @JvmOverloads constructor(
         return ((plotBounds.height() - ((this - dataBounds.top) / dataBounds.height() * plotBounds.height() - margin))).toFloat()
     }
 
+    private fun Double.scaleYNoPan(): Float {
+        return ((plotBounds.height() - ((this - dataBounds.top) / dataBounds.height() * plotBounds.height() - margin))).toFloat()
+    }
+
+    private fun Float.unScaleY(): Double {
+        return (plotBounds.height() - (this + margin)) / plotBounds.height() * dataBounds.height() + dataBounds.top
+    }
+
     private fun Double.scaleX(): Float {
         return ((this - dataBounds.left) / dataBounds.width() * plotBounds.width() * scale).toFloat() - originX
     }
@@ -227,15 +244,25 @@ class PointsChart @JvmOverloads constructor(
         }
 
         // y labels
-        yLabels.forEach {
-            canvas.drawLine(it.startPoint.x, it.startPoint.y, it.endPoint.x, it.endPoint.y, it.plotPaint)
-            canvas.drawText(it.label.name, it.startPoint.x, it.startPoint.y, labelPaint)
+        labelPaint.getTextBounds("12:00p", 0, "12:00p".length, textBounds)
+        val ySpacing = (abs(textBounds.top) * 5).toInt()
+        //yLabels.forEach {
+        //    canvas.drawLine(it.startPoint.x, it.startPoint.y, it.endPoint.x, it.endPoint.y, it.plotPaint)
+        //    canvas.drawText(it.label.name, it.startPoint.x, it.startPoint.y, labelPaint)
+        //}
+        for (y in plotBounds.top.toInt() until plotBounds.bottom.toInt() step ySpacing) {
+            canvas.drawText(
+                y.toFloat().unScaleY().toTempLabel(),
+                1f,
+                y.toFloat(),
+                labelPaint
+            )
+            canvas.drawLine(1f, y.toFloat(), plotBounds.right, y.toFloat(), dashPaint)
         }
 
         // x labels
-        labelPaint.getTextBounds("12:00p", 0, "12:00p".length, textBounds)
-        val spacing = (textBounds.right * 1.5).toInt()
-        for (x in plotBounds.left.toInt() until plotBounds.right.toInt() step spacing) {
+        val xSpacing = (textBounds.right * 1.5).toInt()
+        for (x in plotBounds.left.toInt() until plotBounds.right.toInt() step xSpacing) {
             textBounds.drawTextCentered(
                 canvas,
                 labelPaint,
@@ -243,7 +270,7 @@ class PointsChart @JvmOverloads constructor(
                 x.toFloat(),
                 plotBounds.bottom+margin/2,
             )
-            canvas.drawLine(x.toFloat(), plotBounds.bottom - 10, x.toFloat(), plotBounds.bottom + 10, labelPaint)
+            canvas.drawLine(x.toFloat(), plotBounds.bottom - markLength, x.toFloat(), plotBounds.bottom + markLength, labelPaint)
         }
     }
 
@@ -305,8 +332,8 @@ class PointsChart @JvmOverloads constructor(
     }
 
     override fun onScroll(p0: MotionEvent, p1: MotionEvent, dx: Float, dy: Float): Boolean {
-        originX += dx / scale
-        originY += dy / scale
+        originX += dx
+        originY += dy
         computePoints()
         invalidate()
         return true
@@ -370,4 +397,8 @@ private val labelTimeFormatter by lazy {
 
 private fun Long.toTimeLabel(): String {
     return labelTimeFormatter.format(this*1000).replace("AM","a").replace("PM","p")
+}
+
+private fun Double.toTempLabel(): String {
+    return "%3.2f".format(this)
 }
