@@ -41,6 +41,17 @@ internal class HistoryChartDiffableItem(context: Context,
                 }
             }
         }
+        // if currently on add points
+        if (onPoints.isNotEmpty()) {
+            series.add(
+                PointsChart.Series(
+                    points = onPoints,
+                    color = R.color.heating,
+                    lineWidth = context.resources.getDimension(R.dimen.pointschart_commandon_line_width),
+                    label = ""
+                )
+            )
+        }
         val points = history.map {
             Log.d(TAG, "point xstr=${it.actionTs} x=${it.actionTs.toDouble()} y=${it.sensorValue}")
             PointsChart.Point(

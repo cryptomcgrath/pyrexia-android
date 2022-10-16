@@ -65,6 +65,13 @@ class PointsChart @JvmOverloads constructor(
         pathEffect = DashPathEffect(floatArrayOf(10f, 40f), 0f)
     }
 
+    private val circlePaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.hilite)
+        isAntiAlias = true
+        strokeWidth = 4f
+        style = Paint.Style.STROKE
+    }
+
     fun addSeries(seriesList: List<Series>) {
         data.addAll(
             seriesList.map { series ->
@@ -249,6 +256,21 @@ class PointsChart @JvmOverloads constructor(
         super.onDraw(canvas)
 
         canvas.drawRect(bounds, bgPaint)
+
+        // hilite
+        val midX = plotBounds.width()/2
+        data.forEach {
+            if (it.series.color == R.color.heating && it.packedPoints.size >= 4) {
+                val x1 = it.packedPoints[0]
+                val x2 = it.packedPoints[it.packedPoints.size-2]
+                if (x1 < midX && x2 >= midX) {
+                    val y1 = it.packedPoints[1]
+                    val y2 = it.packedPoints[it.packedPoints.size-1]
+                    canvas.drawOval(x1-margin, y1+margin, x2+margin, y2-margin, circlePaint)
+                }
+            }
+
+        }
 
         data.forEach {
             canvas.drawLines(it.packedPoints, it.plotPaint)
