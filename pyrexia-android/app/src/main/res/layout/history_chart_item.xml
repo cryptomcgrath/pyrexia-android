@@ -11,7 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/section_separation">
+        android:layout_marginTop="@dimen/section_spacing">
 
         <com.cryptomcgrath.pyrexia.thermostat.PointsChart
             android:id="@+id/points_chart"

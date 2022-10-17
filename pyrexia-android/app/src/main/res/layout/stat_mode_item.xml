@@ -10,9 +10,9 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/section_separation"
-        android:layout_marginStart="@dimen/side_padding"
-        android:layout_marginEnd="@dimen/side_padding">
+        android:layout_marginTop="@dimen/section_spacing"
+        android:layout_marginStart="@dimen/side_margin"
+        android:layout_marginEnd="@dimen/side_margin">
 
         <TextView
             android:id="@+id/mode_text"

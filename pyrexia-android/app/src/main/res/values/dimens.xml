@@ -3,5 +3,7 @@
     <dimen name="set_point_size">50dp</dimen>
     <dimen name="side_padding">24dp</dimen>
     <dimen name="top_padding">32dp</dimen>
-    <dimen name="section_separation">16dp</dimen>
+    <dimen name="section_spacing">16dp</dimen>
+    <dimen name="section_half">8dp</dimen>
+    <dimen name="side_margin">16dp</dimen>
 </resources>

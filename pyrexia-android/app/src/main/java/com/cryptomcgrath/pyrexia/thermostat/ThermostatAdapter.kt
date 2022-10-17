@@ -8,6 +8,7 @@ import com.cryptomcgrath.pyrexia.BindFunViewHolder
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.RxStoreAdapter
 import com.cryptomcgrath.pyrexia.databinding.HistoryChartItemBinding
+import com.cryptomcgrath.pyrexia.databinding.HistoryInfoItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatEnabledItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatModeItemBinding
 import com.cryptomcgrath.pyrexia.databinding.ThermostatItemBinding
@@ -28,7 +29,8 @@ internal class ThermostatAdapter(private val context: Context,
             StatModeDiffableItem::class.java,
             StatEnabledDiffableItem::class.java,
             StatLoadingDiffableItem::class.java,
-            HistoryChartDiffableItem::class.java
+            HistoryChartDiffableItem::class.java,
+            HistoryInfoDiffableItem::class.java
         )
 
     override val differ: AsyncListDiffer<DiffableItem> = AsyncListDiffer(this, DIFF_CALLBACK)
@@ -43,6 +45,7 @@ internal class ThermostatAdapter(private val context: Context,
                 items += StatModeDiffableItem(state.current.program.mode)
                 items += StatEnabledDiffableItem(dispatcher, state.current.program.enabled, state.current.program.id)
                 items += HistoryChartDiffableItem(context, store)
+                items += HistoryInfoDiffableItem(state.historyOldtoNew)
             }
         }
         return items
@@ -93,6 +96,13 @@ internal class ThermostatAdapter(private val context: Context,
                             }
                         }
                     }
+                }
+            }
+
+            HistoryInfoDiffableItem::class.java -> {
+                val binding = HistoryInfoItemBinding.inflate(inflater, parent, false)
+                BindFunViewHolder(binding) {
+                    binding.model = it as HistoryInfoDiffableItem
                 }
             }
 
