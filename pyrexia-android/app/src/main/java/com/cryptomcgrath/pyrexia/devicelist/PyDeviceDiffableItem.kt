@@ -7,16 +7,18 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.ObservableField
+import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 
 
 internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
-                           private val pyDevice: PyDevice,
-                           val isEditMode: Boolean) : DiffableItem {
+                                    private val pyDevice: PyDevice,
+                                    val isEditMode: Boolean) : DiffableItem {
     var name = pyDevice.name
     var url = pyDevice.baseUrl
 
@@ -40,7 +42,6 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
                 return true
             }
         }
-
         return false
     }
 
@@ -67,6 +68,31 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
     fun onClickCancel(view: View?) {
         view?.hideKeyboard()
         dispatcher.post(DeviceListEvent.CancelEmptyItem)
+    }
+
+    fun onClickOverflow(view: View?) {
+        view?.hideKeyboard()
+        view?.let { showPopupMenu(it) }
+    }
+
+    private fun showPopupMenu(view: View) {
+        val popupMenu = PopupMenu(view.context, view)
+        popupMenu.menuInflater.inflate(R.menu.pydevice_overflow, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.remove -> {
+                    true
+                }
+
+                R.id.configure -> {
+                    true
+                }
+
+                else -> false
+            }
+        }
+        popupMenu.setForceShowIcon(true)
+        popupMenu.show()
     }
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {
