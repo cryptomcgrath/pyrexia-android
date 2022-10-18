@@ -105,7 +105,6 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
             ).addTo(disposables)
     }
 
-
     private fun increaseTemp(id: Int) {
         pyrexiaService.statIncrease(id)
             .subscribeOn(Schedulers.io())

@@ -45,6 +45,9 @@ internal class DeviceListViewModel(application: Application) : AndroidViewModel(
                         is DeviceListEvent.AddDevice -> {
                             addDevice(event.pyDevice)
                         }
+                        is DeviceListEvent.ForgetDevice -> {
+                            forgetDevice(event.pyDevice)
+                        }
                     }
                     updateUi()
                     eventQueue.post(event)
@@ -82,6 +85,20 @@ internal class DeviceListViewModel(application: Application) : AndroidViewModel(
             }
     }
 
+    private fun forgetDevice(pyDevice: PyDevice) {
+        removeDeviceCompletable(pyDevice)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    refreshData()
+                },
+                onError = {
+                    dispatcher.post(DeviceListEvent.DatabaseError(it))
+                }
+            ).addTo(disposables)
+    }
+
     private fun addDevice(pyDevice: PyDevice) {
         addDeviceCompletable(pyDevice)
             .subscribeOn(Schedulers.io())
@@ -98,6 +115,10 @@ internal class DeviceListViewModel(application: Application) : AndroidViewModel(
 
     private fun addDeviceCompletable(pyDevice: PyDevice): Completable {
         return db.devicesDao().addDevice(pyDevice.toDevice())
+    }
+
+    private fun removeDeviceCompletable(pyDevice: PyDevice): Completable {
+        return db.devicesDao().deleteDevice(pyDevice.toDevice())
     }
 
     override fun onCleared() {

@@ -7,6 +7,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.ObservableField
@@ -80,7 +81,12 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
         popupMenu.menuInflater.inflate(R.menu.pydevice_overflow, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.remove -> {
+                R.id.forget -> {
+                    AlertDialog.Builder(view.context)
+                        .setMessage(view.context.getString(R.string.forget_are_you_sure, pyDevice.name))
+                        .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceListEvent.ForgetDevice(pyDevice)) }
+                        .setNegativeButton(R.string.no) { _, _ -> }
+                        .show()
                     true
                 }
 

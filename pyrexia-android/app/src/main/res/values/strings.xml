@@ -15,7 +15,10 @@
     <string name="unknown_temp">---</string>
 
     <!-- pydevice overflow menu -->
-    <string name="remove">Remove</string>
+    <string name="forget">Forget</string>
     <string name="configure">Configure</string>
+    <string name="forget_are_you_sure">Are you sure you want to forget %s?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>

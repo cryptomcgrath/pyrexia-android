@@ -31,7 +31,7 @@ internal class HistoryInfoDiffableItem(val history: List<History>) : DiffableIte
         it.deltaT
     }.average()
 
-    val cyclesSummaryText = "Cycles %d, avg ΔT %3.1f°F, avg time %ds".format(numCycles, averageDeltaT, averageCycleTime)
+    val cyclesSummaryText = "Cycles %d, avg ΔT %3.2f°F, avg run %s".format(numCycles, averageDeltaT, averageCycleTime.secondsToWords())
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {
         return other is HistoryInfoDiffableItem &&
@@ -61,5 +61,23 @@ private fun Long?.toTimeString(): String {
             .replace("AM", "a")
             .replace("PM", "p")
     else ""
+}
+
+private fun Int.secondsToWords(): String {
+    return when {
+        this < 60 -> "%ds".format(this)
+        this < 3600 -> {
+            val m = this / 60
+            "%dm".format(m) + (this - m * 60).secondsToWords()
+        }
+        this < 86400 -> {
+            val h = this / 3600
+            "%dh".format(h) + (this - (h * 3600)).secondsToWords()
+        }
+        else -> {
+            val d = this / 86400
+            "%dd".format(d) + (this - (d * 86400)).secondsToWords()
+        }
+    }
 }
 

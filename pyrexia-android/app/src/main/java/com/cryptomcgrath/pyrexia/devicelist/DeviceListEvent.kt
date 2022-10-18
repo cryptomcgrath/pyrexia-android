@@ -1,6 +1,7 @@
 package com.cryptomcgrath.pyrexia.devicelist
 
 import com.cryptomcgrath.pyrexia.model.PyDevice
+import com.cryptomcgrath.pyrexia.statlist.StatListEvent
 import com.edwardmcgrath.blueflux.core.Event
 
 internal sealed class DeviceListEvent : Event {
@@ -10,4 +11,6 @@ internal sealed class DeviceListEvent : Event {
     data class AddDevice(val pyDevice: PyDevice) : DeviceListEvent()
     object AddEmptyItem : DeviceListEvent()
     object CancelEmptyItem : DeviceListEvent()
+    data class ForgetDevice(val pyDevice: PyDevice) : DeviceListEvent()
+
 }
