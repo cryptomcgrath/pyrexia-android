@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="model"
+            type="com.cryptomcgrath.pyrexia.thermostat.CycleInfoDiffableItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@{model.title ? @color/light_blue : @color/transparent}">
+
+        <TextView
+            android:id="@+id/n_text"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.n}"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/run_time"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.runTime}"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/n_text" />
+
+        <TextView
+            android:id="@+id/delta_t"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.deltaT}"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/run_time" />
+
+        <TextView
+            android:id="@+id/delta_tail"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.deltaTail}"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/delta_t" />
+
+        <TextView
+            android:id="@+id/wait_time"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.waitTime}"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/delta_tail" />
+
+        <TextView
+            android:id="@+id/q_text"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.q}"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/wait_time" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+

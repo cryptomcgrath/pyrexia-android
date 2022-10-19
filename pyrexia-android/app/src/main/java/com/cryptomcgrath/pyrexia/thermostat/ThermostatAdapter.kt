@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
-import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.RxStoreAdapter
+import com.cryptomcgrath.pyrexia.databinding.CycleInfoItemBinding
 import com.cryptomcgrath.pyrexia.databinding.HistoryChartItemBinding
 import com.cryptomcgrath.pyrexia.databinding.HistoryInfoItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatEnabledItemBinding
@@ -30,7 +30,8 @@ internal class ThermostatAdapter(private val context: Context,
             StatEnabledDiffableItem::class.java,
             StatLoadingDiffableItem::class.java,
             HistoryChartDiffableItem::class.java,
-            HistoryInfoDiffableItem::class.java
+            HistoryInfoDiffableItem::class.java,
+            CycleInfoDiffableItem::class.java
         )
 
     override val differ: AsyncListDiffer<DiffableItem> = AsyncListDiffer(this, DIFF_CALLBACK)
@@ -46,6 +47,11 @@ internal class ThermostatAdapter(private val context: Context,
                 items += StatEnabledDiffableItem(dispatcher, state.current.program.enabled, state.current.program.id)
                 items += HistoryChartDiffableItem(context, store)
                 items += HistoryInfoDiffableItem(state.historyOldtoNew)
+
+                items += createCycleInfoItems(
+                    context = context,
+                    history = state.historyOldtoNew,
+                    mode = it.program.mode)
             }
         }
         return items
@@ -103,6 +109,13 @@ internal class ThermostatAdapter(private val context: Context,
                 val binding = HistoryInfoItemBinding.inflate(inflater, parent, false)
                 BindFunViewHolder(binding) {
                     binding.model = it as HistoryInfoDiffableItem
+                }
+            }
+
+            CycleInfoDiffableItem::class.java -> {
+                val binding = CycleInfoItemBinding.inflate(inflater, parent, false)
+                BindFunViewHolder(binding) {
+                    binding.model = it as CycleInfoDiffableItem
                 }
             }
 

@@ -9,7 +9,7 @@ internal class HistoryInfoDiffableItem(val history: List<History>) : DiffableIte
     private val historySorted = history.sortedBy {
         it.actionTs
     }
-    val numPoints = "%d points".format(history.size)
+    private val numPoints = "(%d points)".format(history.size)
 
     private val firstTime = historySorted.firstOrNull()?.actionTs?.toTimeString()
     private val firstDay = historySorted.firstOrNull()?.actionTs?.toDayString()
@@ -19,19 +19,7 @@ internal class HistoryInfoDiffableItem(val history: List<History>) : DiffableIte
     val timeSpan = when {
         firstDay == lastDay -> "$firstDay $firstTime to $lastTime"
         else -> "$firstDay $firstTime to $lastDay $lastTime"
-    }
-
-    private val cycles = history.toCycles()
-
-    private val numCycles = cycles.size
-    private val averageCycleTime = cycles.map {
-        it.durationSeconds
-    }.average().toInt()
-    private val averageDeltaT = cycles.map {
-        it.deltaT
-    }.average()
-
-    val cyclesSummaryText = "Cycles %d, avg ΔT %3.2f°F, avg run %s".format(numCycles, averageDeltaT, averageCycleTime.secondsToWords())
+    } + numPoints
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {
         return other is HistoryInfoDiffableItem &&
@@ -63,7 +51,7 @@ private fun Long?.toTimeString(): String {
     else ""
 }
 
-private fun Int.secondsToWords(): String {
+internal fun Int.secondsToWords(): String {
     return when {
         this < 60 -> "%ds".format(this)
         this < 3600 -> {
