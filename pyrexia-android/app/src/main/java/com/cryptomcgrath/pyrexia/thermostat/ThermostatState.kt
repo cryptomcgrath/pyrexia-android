@@ -60,6 +60,29 @@ internal fun List<History>.toCycles(mode: Program.Mode): List<Cycle> {
     var tailStartTs: Long = 0L
     var cnt = 0
     this.forEach {
+
+        when (it.programAction) {
+            History.Action.COMMAND_ON -> {
+                state = Cycle.State.RUN
+                cycle = mutableListOf()
+                tailTemp?.let { tt ->
+                    cycles[cnt-1] = cycles[cnt-1].copy(
+                        tailTemp = tt
+                    )
+                }
+            }
+            History.Action.COMMAND_OFF -> {
+                state = Cycle.State.WAIT
+                if (cycle.isNotEmpty()) {
+                    cycle.add(it)
+                    cycles.add(Cycle(data = cycle, tailTemp = it.sensorValue))
+                    tailTemp = it.sensorValue
+                    tailStartTs = it.actionTs
+                    cnt++
+                }
+            }
+            else -> Unit
+        }
         when (state) {
             Cycle.State.RUN -> {
                 cycle.add(it)
@@ -77,25 +100,6 @@ internal fun List<History>.toCycles(mode: Program.Mode): List<Cycle> {
                 }
             }
 
-            else -> Unit
-        }
-        when (it.programAction) {
-            History.Action.COMMAND_ON -> {
-                state = Cycle.State.RUN
-                cycle = mutableListOf()
-                tailTemp?.let { tt ->
-                    cycles[cnt-1] = cycles[cnt-1].copy(
-                        tailTemp = tt
-                    )
-                }
-            }
-            History.Action.COMMAND_OFF -> {
-                state = Cycle.State.WAIT
-                cycles.add(Cycle(data = cycle, tailTemp = it.sensorValue))
-                tailTemp = it.sensorValue
-                tailStartTs = it.actionTs
-                cnt++
-            }
             else -> Unit
         }
     }

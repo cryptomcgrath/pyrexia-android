@@ -60,6 +60,16 @@ internal class ThermostatFragment: Fragment() {
         return binding.root
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.cancelAutoRefresh()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.setupAutoRefresh()
+    }
+
     private fun showServicesError(throwable: Throwable) {
         AlertDialog.Builder(requireActivity())
             .setPositiveButton(R.string.ok, null)

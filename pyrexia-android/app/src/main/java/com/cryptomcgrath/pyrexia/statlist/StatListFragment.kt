@@ -57,5 +57,15 @@ internal class StatListFragment: Fragment() {
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.hide()
         super.onViewCreated(view, savedInstanceState)
     }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.cancelAutoRefresh()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.setupAutoRefresh()
+    }
 }
 

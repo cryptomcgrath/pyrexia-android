@@ -18,6 +18,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -40,6 +41,7 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
 
     private val pyrexiaService = PyrexiaService(pyDevice)
     private val disposables = CompositeDisposable()
+    private var autoRefreshDisposable: Disposable? = null
 
     val backgroundColor = ObservableInt(R.color.black)
     val showError = ObservableBoolean(false)
@@ -51,9 +53,7 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
             onNext = {
                 when (it) {
                     is ThermostatEvent.Init -> {
-                        refreshData()
                         subscribeToStateChanges()
-                        setupAutoRefresh()
                         fetchHistory()
                     }
                     is StatListEvent.OnClickIncreaseTemp -> {
@@ -122,8 +122,9 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
             ).addTo(disposables)
     }
 
-    private fun setupAutoRefresh() {
-        Observable.interval(AUTO_REFRESH_INTERVAL, TimeUnit.SECONDS)
+    fun setupAutoRefresh() {
+        refreshData()
+        autoRefreshDisposable = Observable.interval(AUTO_REFRESH_INTERVAL, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -134,7 +135,11 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
                 onError = {
                     // ignore
                 }
-            ).addTo(disposables)
+            )
+    }
+
+    fun cancelAutoRefresh() {
+        autoRefreshDisposable?.dispose()
     }
 
     private fun fetchHistory() {
@@ -252,6 +257,7 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+        autoRefreshDisposable?.dispose()
     }
 
     sealed class UiEvent: Event {

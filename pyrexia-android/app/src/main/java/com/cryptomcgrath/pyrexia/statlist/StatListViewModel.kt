@@ -16,6 +16,7 @@ import com.edwardmcgrath.blueflux.core.RxStore
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -36,6 +37,7 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
 
     private val pyrexiaService = PyrexiaService(pyDevice)
     private val disposables = CompositeDisposable()
+    private var autoRefreshDisposable: Disposable? = null
 
     val showError = ObservableBoolean(false)
     val errorText = ObservableField<String>()
@@ -43,8 +45,6 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
 
     init {
         relayEventsToFragment()
-        refreshData()
-        setupAutoRefresh()
     }
 
     private fun relayEventsToFragment() {
@@ -90,8 +90,9 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
             ).addTo(disposables)
     }
 
-    private fun setupAutoRefresh() {
-        Observable.interval(AUTO_REFRESH_INTERVAL, TimeUnit.SECONDS)
+    fun setupAutoRefresh() {
+        refreshData()
+        autoRefreshDisposable = Observable.interval(AUTO_REFRESH_INTERVAL, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -102,7 +103,11 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
                 onError = {
                     dispatcher.post(StatListEvent.ConnectionError(it))
                 }
-            ).addTo(disposables)
+            )
+    }
+
+    fun cancelAutoRefresh() {
+        autoRefreshDisposable?.dispose()
     }
 
     private fun increaseTemp(id: Int) {
@@ -131,5 +136,11 @@ internal class StatListViewModel(pyDevice: PyDevice): ViewModel() {
                     dispatcher.post(ThermostatEvent.ConnectionError(it))
                 }
             ).addTo(disposables)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        disposables.clear()
+        autoRefreshDisposable?.dispose()
     }
 }
