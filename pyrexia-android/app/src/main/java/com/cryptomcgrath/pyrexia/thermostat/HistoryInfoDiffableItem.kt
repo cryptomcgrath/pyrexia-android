@@ -9,7 +9,7 @@ internal class HistoryInfoDiffableItem(val history: List<History>) : DiffableIte
     private val historySorted = history.sortedBy {
         it.actionTs
     }
-    private val numPoints = "(%d points)".format(history.size)
+    private val numPoints = " (%d points)".format(history.size)
 
     private val firstTime = historySorted.firstOrNull()?.actionTs?.toTimeString()
     private val firstDay = historySorted.firstOrNull()?.actionTs?.toDayString()

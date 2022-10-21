@@ -57,7 +57,8 @@ internal fun createCycleInfoItems(context: Context,
         deltaT = "%3.2f°F".format(cycles.map { it.deltaT }.average()),
         deltaTail = "%3.2f°F".format(cycles.map { it.deltaTail }.average()),
         waitTime = waitTimes.average().toInt().secondsToWords(),
-        q = "%3.2f".format(cycles.map { it.q }.average())
+        q = "%3.2f".format(cycles.map { it.q }.average()),
+        isTitle = true
     )
     items.addAll(cycles.mapIndexed { idx, it ->
         CycleInfoDiffableItem(

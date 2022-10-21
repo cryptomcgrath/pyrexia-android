@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@{model.title ? @color/light_blue : @color/transparent}">
+        android:background="@{model.title ? @drawable/bg_outline : @drawable/bg_none}">
 
         <TextView
             android:id="@+id/n_text"
