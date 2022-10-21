@@ -22,6 +22,16 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
+            android:id="@+id/wait_time"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.waitTime}"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/n_text" />
+
+        <TextView
             android:id="@+id/run_time"
             android:layout_width="70dp"
             android:layout_height="wrap_content"
@@ -29,17 +39,7 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/n_text" />
-
-        <TextView
-            android:id="@+id/delta_t"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:text="@{model.deltaT}"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/run_time" />
+            app:layout_constraintStart_toEndOf="@id/wait_time" />
 
         <TextView
             android:id="@+id/delta_tail"
@@ -49,17 +49,9 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/delta_t" />
+            app:layout_constraintStart_toEndOf="@id/run_time" />
 
-        <TextView
-            android:id="@+id/wait_time"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:text="@{model.waitTime}"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/delta_tail" />
+
 
         <TextView
             android:id="@+id/q_text"
@@ -69,7 +61,7 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/wait_time" />
+            app:layout_constraintStart_toEndOf="@id/delta_tail" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

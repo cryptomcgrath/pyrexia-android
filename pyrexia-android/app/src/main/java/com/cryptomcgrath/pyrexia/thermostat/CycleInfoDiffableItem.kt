@@ -63,7 +63,7 @@ internal fun createCycleInfoItems(context: Context,
     items.addAll(cycles.mapIndexed { idx, it ->
         CycleInfoDiffableItem(
             context = context,
-            n = (idx + 1).toString(),
+            n = it.startTs.toTimeLabel(),
             runTime = it.runTime.toInt().secondsToWords(),
             deltaT = "%3.2f°F".format(it.deltaT),
             deltaTail = "%3.2f°F".format(it.deltaTail),

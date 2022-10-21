@@ -442,8 +442,10 @@ private val labelTimeFormatter by lazy {
     SimpleDateFormat("h:mma", Locale.US)
 }
 
-private fun Long.toTimeLabel(): String {
-    return labelTimeFormatter.format(this*1000).replace("AM","a").replace("PM","p")
+internal fun Long.toTimeLabel(): String {
+    return labelTimeFormatter.format(this*1000)
+        .replace("AM","a")
+        .replace("PM","p")
 }
 
 private fun Double.toTempLabel(): String {
