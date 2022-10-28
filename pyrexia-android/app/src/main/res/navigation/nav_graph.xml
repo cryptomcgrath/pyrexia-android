@@ -42,5 +42,19 @@
         <action
             android:id="@+id/action_deviceListFragment_to_statListFragment"
             app:destination="@id/statListFragment" />
+        <action
+            android:id="@+id/action_deviceListFragment_to_deviceConfigFragment"
+            app:destination="@id/deviceConfigFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/deviceConfigFragment"
+        android:name="com.cryptomcgrath.pyrexia.deviceconfig.DeviceConfigFragment"
+        android:label="{name}" >
+        <argument
+            android:name="pyDevice"
+            app:argType="com.cryptomcgrath.pyrexia.model.PyDevice" />
+        <argument
+            android:name="name"
+            app:argType="string" />
     </fragment>
 </navigation>

@@ -21,6 +21,9 @@ internal class DeviceListFragment : Fragment() {
                 is DeviceListEvent.GoToStatList -> {
                     goToStatListFragment(event.pyDevice)
                 }
+                is DeviceListEvent.GoToDeviceConfig -> {
+                    gotoDeviceConfigFragment(event.pyDevice)
+                }
             }
         }
     }
@@ -41,6 +44,11 @@ internal class DeviceListFragment : Fragment() {
 
     private fun goToStatListFragment(pyDevice: PyDevice) {
         val action = DeviceListFragmentDirections.actionDeviceListFragmentToStatListFragment(pyDevice, pyDevice.name)
+        findNavController().navigate(action)
+    }
+
+    private fun gotoDeviceConfigFragment(pyDevice: PyDevice) {
+        val action = DeviceListFragmentDirections.actionDeviceListFragmentToDeviceConfigFragment(pyDevice, pyDevice.name)
         findNavController().navigate(action)
     }
 }

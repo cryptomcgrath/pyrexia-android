@@ -33,7 +33,6 @@ internal class DeviceListAdapter(store: RxStore<DeviceListState>,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindFunViewHolder {
-
         val inflater = LayoutInflater.from(parent.context)
         return when (viewTypes[viewType]) {
             PyDeviceDiffableItem::class.java -> {

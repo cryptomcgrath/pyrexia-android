@@ -91,6 +91,7 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
                 }
 
                 R.id.configure -> {
+                    dispatcher.post(DeviceListEvent.GoToDeviceConfig(pyDevice))
                     true
                 }
 

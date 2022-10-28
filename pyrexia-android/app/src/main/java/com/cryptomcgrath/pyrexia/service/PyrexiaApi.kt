@@ -47,4 +47,10 @@ internal interface PyrexiaApi {
     fun getHistory(@Query("offset") offset: Int,
                    @Query("limit") limit: Int,
                    @Query("program_id") program_id: Int?): Single<GetHistoryDto>
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @GET("/sensors")
+    fun getSensors(): Single<GetSensorsDto>
 }

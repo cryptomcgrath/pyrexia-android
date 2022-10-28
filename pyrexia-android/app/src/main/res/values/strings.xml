@@ -21,4 +21,9 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
+    <!-- DeviceConfigFragment -->
+    <string name="sensor_addr_hint_dht22">Gpio board pin #</string>
+    <string name="sensor_addr_hint_sp">Sensorpush Mac Address</string>
+    <string name="sensor_addr_hint_generic">Sensor address</string>
+
 </resources>

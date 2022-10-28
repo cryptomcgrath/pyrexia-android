@@ -12,5 +12,6 @@ internal sealed class DeviceListEvent : Event {
     object AddEmptyItem : DeviceListEvent()
     object CancelEmptyItem : DeviceListEvent()
     data class ForgetDevice(val pyDevice: PyDevice) : DeviceListEvent()
+    data class GoToDeviceConfig(val pyDevice: PyDevice): DeviceListEvent()
 
 }

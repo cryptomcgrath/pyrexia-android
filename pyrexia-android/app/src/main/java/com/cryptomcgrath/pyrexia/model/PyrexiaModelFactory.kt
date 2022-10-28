@@ -2,7 +2,9 @@ package com.cryptomcgrath.pyrexia.model
 
 import com.cryptomcgrath.pyrexia.service.GetHistoryDto
 import com.cryptomcgrath.pyrexia.service.GetProgramsDto
+import com.cryptomcgrath.pyrexia.service.GetSensorsDto
 import com.cryptomcgrath.pyrexia.service.GetStatListDto
+import java.util.*
 
 internal fun GetProgramsDto.toProgramList(): List<Program> {
     return this.data.map {
@@ -64,5 +66,27 @@ internal fun GetHistoryDto.toHistoryList(): List<History> {
             programAction = History.Action.parse(it.program_action),
             controlAction = History.Action.parse(it.control_action)
         )
+    }
+}
+
+internal fun GetSensorsDto.toSensorList(): List<Sensor> {
+    return this.data.map {
+        Sensor(
+            id = it.id,
+            name = it.name,
+            value = it.value,
+            sensorType = it.sensor_type.toSensorType(),
+            updateInterval = it.update_interval,
+            lastUpdatedTs = it.update_time,
+            addr = it.addr
+        )
+    }
+}
+
+private fun String?.toSensorType(): Sensor.SensorType? {
+    return when (this?.uppercase(Locale.US)) {
+        "SP" -> Sensor.SensorType.SENSORPUSH
+        "DHT22" -> Sensor.SensorType.DHT22
+        else -> null
     }
 }

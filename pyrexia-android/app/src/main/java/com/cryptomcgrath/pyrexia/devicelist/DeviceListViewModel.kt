@@ -131,10 +131,4 @@ internal class DeviceListViewModel(application: Application) : AndroidViewModel(
             dispatcher.post(DeviceListEvent.AddEmptyItem)
         }
     }
-
-    val fabClickListener = View.OnClickListener {
-        if (!store.state.hasAddEmptyItem()) {
-            dispatcher.post(DeviceListEvent.AddEmptyItem)
-        }
-    }
 }
