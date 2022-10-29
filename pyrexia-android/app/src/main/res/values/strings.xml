@@ -25,5 +25,8 @@
     <string name="sensor_addr_hint_dht22">Gpio board pin #</string>
     <string name="sensor_addr_hint_sp">Sensorpush Mac Address</string>
     <string name="sensor_addr_hint_generic">Sensor address</string>
+    <string name="high">high</string>
+    <string name="low">low</string>
+    <string name="gpio_text">gpio %d on %s</string>
 
 </resources>

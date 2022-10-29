@@ -39,12 +39,28 @@ internal class DeviceConfigViewModel(pyDevice: PyDevice) : ViewModel() {
                 onNext = { event ->
                     when(event) {
                         is DeviceConfigEvent.Init -> {
+                            fetchStats()
                             fetchSensors()
+                            fetchControls()
                         }
                     }
                 },
                 onError = {
 
+                }
+            ).addTo(disposables)
+    }
+
+    private fun fetchStats() {
+        pyrexiaService.getStatList()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    dispatcher.post(DeviceConfigEvent.NewStats(it))
+                },
+                onError = {
+                    Log.d(TAG, "error fetching stats ${it.stackTraceToString()}")
                 }
             ).addTo(disposables)
     }
@@ -60,6 +76,20 @@ internal class DeviceConfigViewModel(pyDevice: PyDevice) : ViewModel() {
                 onError = {
                     Log.d(TAG, "error fetching sensors ${it.stackTraceToString()}")
                     // todo: handle error
+                }
+            ).addTo(disposables)
+    }
+
+    private fun fetchControls() {
+        pyrexiaService.getControls()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    dispatcher.post(DeviceConfigEvent.NewControls(it))
+                },
+                onError = {
+                    Log.d(TAG, "error fetching controls ${it.stackTraceToString()}")
                 }
             ).addTo(disposables)
     }

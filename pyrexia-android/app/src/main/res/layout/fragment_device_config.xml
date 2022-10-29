@@ -29,13 +29,12 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/side_margin"
-                android:paddingEnd="@dimen/side_margin"
+                android:layout_height="0dp"
                 android:paddingTop="@dimen/top_padding"
                 app:layout_constraintTop_toBottomOf="@id/toolbar"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -27,6 +27,7 @@ internal class DeviceConfigFragment: Fragment() {
         val binding = FragmentDeviceConfigBinding.inflate(inflater, container, false)
         binding.model = viewModel
         binding.recyclerView.adapter = DeviceConfigAdapter(
+            context = requireContext(),
             store = viewModel.store,
             dispatcher = viewModel.dispatcher
         )

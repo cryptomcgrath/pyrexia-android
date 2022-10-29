@@ -4,21 +4,22 @@
     <data>
         <variable
             name="model"
-            type="com.cryptomcgrath.pyrexia.deviceconfig.SensorDiffableItem" />
+            type="com.cryptomcgrath.pyrexia.deviceconfig.ControlDiffableItem" />
         <import type="android.view.View" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
 
         <ImageView
             android:id="@+id/sensor_image"
             android:layout_width="60dp"
             android:layout_height="30dp"
             android:paddingStart="16dp"
-            android:src="@{model.sensorDrawableInt}"
+            android:src="@drawable/relay_snip1"
             android:scaleType="centerInside"
             app:layout_constraintTop_toTopOf="@id/name_text"
             app:layout_constraintStart_toStartOf="parent" />
@@ -42,7 +43,7 @@
             android:onClick="@{(v)->model.onClickOverflow(v)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/name_text"
-            app:layout_constraintBottom_toBottomOf="@id/addr_text" />
+            app:layout_constraintBottom_toBottomOf="@id/gpio_text" />
 
         <View
             android:id="@+id/top_spacer"
@@ -65,14 +66,12 @@
             app:layout_constraintStart_toEndOf="@id/sensor_image" />
 
         <EditText
-            style="@style/TextMedium18Grey42"
+            style="@style/TextMedium18Grey61"
             android:id="@+id/name_edit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@={model.name}"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="18sp"
             android:gravity="center"
             android:hint="@string/device_name_hint"
             android:visibility="@{model.isEditMode ? View.VISIBLE : View.GONE}"
@@ -84,35 +83,15 @@
 
         <TextView
             style="@style/TextMedium18Grey61"
-            android:id="@+id/addr_text"
+            android:id="@+id/gpio_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="@{model.addr}"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="18sp"
+            android:text="@{model.gpioText}"
             android:gravity="center"
             android:visibility="@{model.isEditMode ? View.GONE : View.VISIBLE}"
-            tools:text="@string/sensor_addr_hint_generic"
+            tools:text="gpio 5 on high"
             app:layout_constraintTop_toBottomOf="@id/name_text"
-            app:layout_constraintStart_toEndOf="@id/sensor_image" />
-
-        <EditText
-            style="@style/TextMedium18Grey61"
-            android:id="@+id/addr_edit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@={model.addr}"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="18sp"
-            android:gravity="center"
-            android:hint="@{model.addrHintResId}"
-            android:visibility="@{model.isEditMode ? View.VISIBLE : View.GONE}"
-            android:singleLine="true"
-            android:error="@{model.nameError}"
-            tools:text="5"
-            app:layout_constraintTop_toBottomOf="@id/name_edit"
             app:layout_constraintStart_toEndOf="@id/sensor_image" />
 
         <View
@@ -121,7 +100,7 @@
             android:layout_height="1dp"
             android:layout_marginTop="16dp"
             android:background="@color/grey75"
-            app:layout_constraintTop_toBottomOf="@id/addr_text"
+            app:layout_constraintTop_toBottomOf="@id/gpio_text"
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

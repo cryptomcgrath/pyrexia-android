@@ -1,5 +1,6 @@
 package com.cryptomcgrath.pyrexia.model
 
+import com.cryptomcgrath.pyrexia.service.GetControlsDto
 import com.cryptomcgrath.pyrexia.service.GetHistoryDto
 import com.cryptomcgrath.pyrexia.service.GetProgramsDto
 import com.cryptomcgrath.pyrexia.service.GetSensorsDto
@@ -37,6 +38,9 @@ internal fun GetStatListDto.toStatList(): List<ProgramRun> {
             lastOnTime = it.last_on_time,
             lastOffTime = it.last_off_time,
             minRun = it.min_run,
+            minRest = it.min_rest,
+            gpio = it.gpio,
+            gpioOnHigh = it.gpio_on_high == 1,
             controlOn = it.control_on == 1
         )
         val sensor = Sensor(
@@ -88,5 +92,21 @@ private fun String?.toSensorType(): Sensor.SensorType? {
         "SP" -> Sensor.SensorType.SENSORPUSH
         "DHT22" -> Sensor.SensorType.DHT22
         else -> null
+    }
+}
+
+internal fun GetControlsDto.toControlsList(): List<Control> {
+    return this.data.map {
+        Control(
+            id = it.id,
+            name = it.name,
+            gpio = it.gpio,
+            gpioOnHigh = it.gpio_on_high == 1,
+            minRest = it.min_rest,
+            minRun = it.min_run,
+            controlOn = it.control_on == 1,
+            lastOnTime = it.last_on_time,
+            lastOffTime = it.last_off_time
+        )
     }
 }

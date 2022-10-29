@@ -1,9 +1,11 @@
 package com.cryptomcgrath.pyrexia.service
 
+import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.History
 import com.cryptomcgrath.pyrexia.model.ProgramRun
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
+import com.cryptomcgrath.pyrexia.model.toControlsList
 import com.cryptomcgrath.pyrexia.model.toHistoryList
 import com.cryptomcgrath.pyrexia.model.toSensorList
 import com.cryptomcgrath.pyrexia.model.toStatList
@@ -71,6 +73,13 @@ internal class PyrexiaService(pyDevice: PyDevice) {
         return client.getSensors()
             .map {
                 it.toSensorList()
+            }
+    }
+
+    fun getControls(): Single<List<Control>> {
+        return client.getControls()
+            .map {
+                it.toControlsList()
             }
     }
 }

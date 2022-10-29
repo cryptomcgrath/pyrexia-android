@@ -53,4 +53,10 @@ internal interface PyrexiaApi {
         "Content-Type: application/json")
     @GET("/sensors")
     fun getSensors(): Single<GetSensorsDto>
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @GET("/controls")
+    fun getControls(): Single<GetControlsDto>
 }

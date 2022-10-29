@@ -18,6 +18,9 @@ internal data class GetStatListDto(
         val last_on_time: Long,
         val last_off_time: Long,
         val min_run: Int,
+        val min_rest: Int,
+        val gpio: Int,
+        val gpio_on_high: Int,
         val control_on: Int
     )
 }

@@ -1,23 +1,32 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
+import android.content.Context
+import android.service.controls.Control
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
+import com.cryptomcgrath.pyrexia.BindFun
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
 import com.cryptomcgrath.pyrexia.RxStoreAdapter
+import com.cryptomcgrath.pyrexia.databinding.ControlItemBinding
 import com.cryptomcgrath.pyrexia.databinding.DeviceConfigItemBinding
 import com.cryptomcgrath.pyrexia.databinding.SensorItemBinding
+import com.cryptomcgrath.pyrexia.databinding.VstatItemBinding
 import com.cryptomcgrath.pyrexia.devicelist.PyDeviceDiffableItem
+import com.cryptomcgrath.pyrexia.statlist.StatDiffableItem
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.RxStore
 
-internal class DeviceConfigAdapter(store: RxStore<DeviceConfigState>,
+internal class DeviceConfigAdapter(private val context: Context,
+                                   store: RxStore<DeviceConfigState>,
                                    private val dispatcher: Dispatcher) : RxStoreAdapter<DeviceConfigState>(store) {
     override val viewTypes: List<Class<out DiffableItem>> =
         listOf(
             PyDeviceDiffableItem::class.java,
-            SensorDiffableItem::class.java
+            SensorDiffableItem::class.java,
+            ControlDiffableItem::class.java,
+            VStatDiffableItem::class.java
         )
 
     override val differ: AsyncListDiffer<DiffableItem> =
@@ -30,8 +39,20 @@ internal class DeviceConfigAdapter(store: RxStore<DeviceConfigState>,
                 pyDevice = state.pyDevice,
                 isEditMode = false)
 
+            state.stats.forEach {
+                items += VStatDiffableItem(it, dispatcher)
+            }
+
             state.sensors.forEach {
                 items += SensorDiffableItem(it, isEditMode = false)
+            }
+
+            state.controls.forEach {
+                items += ControlDiffableItem(
+                    context = context,
+                    isEditMode = false,
+                    control = it
+                )
             }
         }
         return items
@@ -47,10 +68,24 @@ internal class DeviceConfigAdapter(store: RxStore<DeviceConfigState>,
                 }
             }
 
+            VStatDiffableItem::class.java -> {
+                val binding = VstatItemBinding.inflate(inflater, parent, false)
+                BindFunViewHolder(binding) {
+                    binding.model = it as VStatDiffableItem
+                }
+            }
+
             SensorDiffableItem::class.java -> {
                 val binding = SensorItemBinding.inflate(inflater, parent, false)
                 BindFunViewHolder(binding) {
                     binding.model = it as SensorDiffableItem
+                }
+            }
+
+            ControlDiffableItem::class.java -> {
+                val binding = ControlItemBinding.inflate(inflater, parent, false)
+                BindFunViewHolder(binding) {
+                    binding.model = it as ControlDiffableItem
                 }
             }
 

@@ -18,6 +18,18 @@ internal val deviceConfigReducerFun: ReducerFun<DeviceConfigState> = { inState, 
             )
         }
 
+        is DeviceConfigEvent.NewControls -> {
+            state.copy(
+                controls = event.controls
+            )
+        }
+
+        is DeviceConfigEvent.NewStats -> {
+            state.copy(
+                stats = event.stats
+            )
+        }
+
         else -> state
     }
 }
