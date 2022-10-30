@@ -17,7 +17,7 @@
             android:id="@+id/thermostat_view"
             android:layout_width="45dp"
             android:layout_height="45dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/side_margin"
             app:bezelWidth="3dp"
             app:currentTemp="@{model.sensorValue}"
             app:setPoint="@{model.setPointText}"
@@ -28,17 +28,17 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="16dp"
+            android:paddingEnd="@dimen/side_margin"
             android:src="@drawable/ic_overflow_32"
             android:onClick="@{(v)->model.onClickOverflow(v)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/name_text"
-            app:layout_constraintBottom_toBottomOf="@id/addr_text" />
+            app:layout_constraintBottom_toBottomOf="@id/mode_text" />
 
         <View
             android:id="@+id/top_spacer"
             android:layout_width="match_parent"
-            android:layout_height="16dp"
+            android:layout_height="@dimen/section_spacing"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
@@ -50,21 +50,19 @@
             android:layout_marginStart="8dp"
             android:text="@{model.name}"
             android:gravity="center"
-            tools:text="@string/device_name_hint"
+            tools:text="Device Name"
             app:layout_constraintTop_toBottomOf="@id/top_spacer"
             app:layout_constraintStart_toEndOf="@id/thermostat_view" />
 
         <TextView
             style="@style/TextMedium18Grey61"
-            android:id="@+id/addr_text"
+            android:id="@+id/mode_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text=""
-            android:fontFamily="sans-serif-medium"
-            android:textSize="18sp"
+            android:text="@{model.modeText}"
             android:gravity="center"
-            tools:text="@string/sensor_addr_hint_generic"
+            tools:text="Heat"
             app:layout_constraintTop_toBottomOf="@id/name_text"
             app:layout_constraintStart_toEndOf="@id/thermostat_view" />
 
@@ -72,9 +70,9 @@
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/section_spacing"
             android:background="@color/grey75"
-            app:layout_constraintTop_toBottomOf="@id/addr_text"
+            app:layout_constraintTop_toBottomOf="@id/mode_text"
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

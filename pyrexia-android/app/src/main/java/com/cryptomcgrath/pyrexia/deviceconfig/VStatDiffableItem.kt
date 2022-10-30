@@ -4,6 +4,7 @@ import android.view.View
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.ProgramRun
+import com.cryptomcgrath.pyrexia.thermostat.sentenceCase
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Dispatcher
@@ -12,6 +13,7 @@ internal class VStatDiffableItem(val stat: ProgramRun, dispatcher: Dispatcher): 
     val name = stat.program.name
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
     val sensorValue = stat.sensor.value.toFormattedTemperatureString()
+    val modeText = stat.program.mode.name.sentenceCase()
     private val isEnabled = stat.program.enabled
 
     val backgroundColor: Int = when {
