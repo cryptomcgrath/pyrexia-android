@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="model"
+            type="com.cryptomcgrath.pyrexia.deviceconfig.SensorEditViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/side_margin">
+
+        <ImageView
+            android:id="@+id/sensor_image"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:src="@{model.sensorDrawableInt}"
+            android:scaleType="centerInside"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/name_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:boxBackgroundColor="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/sensor_image"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                style="@style/TextMedium18Grey61"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={model.name}"
+                android:hint="Sensor name"
+                android:singleLine="true"
+                tools:text="Big Red" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/addr_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:boxBackgroundColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/name_edit"
+            app:layout_constraintStart_toStartOf="@id/name_edit"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                style="@style/TextMedium18Grey61"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={model.addr}"
+                android:hint="@{model.addressHintResId}"
+                android:singleLine="true" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/update_interval"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:boxBackgroundColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/addr_edit"
+            app:layout_constraintStart_toStartOf="@id/name_edit"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                style="@style/TextMedium18Grey61"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={model.updateInterval}"
+                android:hint="Update interval (seconds)"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

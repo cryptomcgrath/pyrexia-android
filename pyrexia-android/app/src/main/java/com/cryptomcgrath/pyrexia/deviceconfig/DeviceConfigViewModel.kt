@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.edwardmcgrath.blueflux.core.Dispatcher
+import com.edwardmcgrath.blueflux.core.EventQueue
 import com.edwardmcgrath.blueflux.core.RxStore
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -25,6 +27,7 @@ internal class DeviceConfigViewModel(pyDevice: PyDevice) : ViewModel() {
     private val disposables = CompositeDisposable()
     val store = RxStore.create(deviceConfigReducerFun)
     val dispatcher = Dispatcher.create(store)
+    val eventQueue = EventQueue.create()
 
     private val pyrexiaService = PyrexiaService(pyDevice)
 
@@ -35,63 +38,41 @@ internal class DeviceConfigViewModel(pyDevice: PyDevice) : ViewModel() {
 
     private fun reactToEvents() {
         dispatcher.getEventBus()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { event ->
                     when(event) {
                         is DeviceConfigEvent.Init -> {
-                            fetchStats()
-                            fetchSensors()
-                            fetchControls()
+                            fetchDeviceConfig()
                         }
                     }
+                    // relay event to fragment
+                    eventQueue.post(event)
                 },
                 onError = {
-
+                    Log.e(TAG, "error reacting to event "+it.stackTraceToString())
                 }
             ).addTo(disposables)
     }
 
-    private fun fetchStats() {
-        pyrexiaService.getStatList()
-            .subscribeOn(Schedulers.io())
+    private fun fetchDeviceConfig() {
+        Singles.zip(
+            pyrexiaService.getStatList(),
+            pyrexiaService.getSensors(),
+            pyrexiaService.getControls()
+        ).doOnSubscribe {
+            dispatcher.post(DeviceConfigEvent.SetLoading(true))
+        }.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = {
-                    dispatcher.post(DeviceConfigEvent.NewStats(it))
+                onSuccess = { (stats, sensors, controls) ->
+                    dispatcher.post(DeviceConfigEvent.NewDeviceConfig(stats, sensors, controls))
                 },
                 onError = {
-                    Log.d(TAG, "error fetching stats ${it.stackTraceToString()}")
+                    dispatcher.post(DeviceConfigEvent.ServicesError(it))
                 }
-            ).addTo(disposables)
-    }
-
-    private fun fetchSensors() {
-        pyrexiaService.getSensors()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    dispatcher.post(DeviceConfigEvent.NewSensors(it))
-                },
-                onError = {
-                    Log.d(TAG, "error fetching sensors ${it.stackTraceToString()}")
-                    // todo: handle error
-                }
-            ).addTo(disposables)
-    }
-
-    private fun fetchControls() {
-        pyrexiaService.getControls()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    dispatcher.post(DeviceConfigEvent.NewControls(it))
-                },
-                onError = {
-                    Log.d(TAG, "error fetching controls ${it.stackTraceToString()}")
-                }
-            ).addTo(disposables)
+        ).addTo(disposables)
     }
 
     override fun onCleared() {

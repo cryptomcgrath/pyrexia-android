@@ -9,7 +9,11 @@ import com.edwardmcgrath.blueflux.core.Event
 internal sealed class DeviceConfigEvent: Event {
 
     data class Init(val pyDevice: PyDevice): DeviceConfigEvent()
-    data class NewSensors(val sensors: List<Sensor>): DeviceConfigEvent()
-    data class NewControls(val controls: List<Control>): DeviceConfigEvent()
-    data class NewStats(val stats: List<ProgramRun>): DeviceConfigEvent()
+    data class ServicesError(val throwable: Throwable) : DeviceConfigEvent()
+
+    data class NewDeviceConfig(val stats: List<ProgramRun>,
+                               val sensors: List<Sensor>,
+                               val controls: List<Control>): DeviceConfigEvent()
+    data class GoToSensorEdit(val sensor: Sensor): DeviceConfigEvent()
+    data class SetLoading(val loading: Boolean): DeviceConfigEvent()
 }

@@ -10,5 +10,6 @@ internal data class DeviceConfigState(
     val pyDevice: PyDevice? = null,
     val sensors: List<Sensor> = emptyList(),
     val controls: List<Control> = emptyList(),
-    val stats: List<ProgramRun> = emptyList()
+    val stats: List<ProgramRun> = emptyList(),
+    val loading: Boolean = false
 ): State

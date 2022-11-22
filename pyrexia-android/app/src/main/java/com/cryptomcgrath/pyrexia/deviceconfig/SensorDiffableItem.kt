@@ -7,9 +7,11 @@ import androidx.databinding.ObservableField
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Sensor
 import com.cryptomcgrath.pyrexia.util.DiffableItem
+import com.edwardmcgrath.blueflux.core.Dispatcher
 
 
-internal class SensorDiffableItem(val sensor: Sensor,
+internal class SensorDiffableItem(val dispatcher: Dispatcher,
+                                  val sensor: Sensor,
                                   val isEditMode: Boolean): DiffableItem {
 
     var name = sensor.name
@@ -24,7 +26,7 @@ internal class SensorDiffableItem(val sensor: Sensor,
     }
 
     fun onClickOverflow(view: View) {
-
+        dispatcher.post(DeviceConfigEvent.GoToSensorEdit(sensor))
     }
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {

@@ -56,5 +56,16 @@
         <argument
             android:name="name"
             app:argType="string" />
+        <action
+            android:id="@+id/action_deviceConfigFragment_to_sensorEditBottomSheetFragment"
+            app:destination="@id/sensorEditBottomSheetFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/sensorEditBottomSheetFragment"
+        android:name="com.cryptomcgrath.pyrexia.deviceconfig.SensorEditBottomSheetFragment"
+        android:label="SensorEditBottomSheetFragment" >
+        <argument
+            android:name="sensor"
+            app:argType="com.cryptomcgrath.pyrexia.model.Sensor" />
+    </dialog>
 </navigation>

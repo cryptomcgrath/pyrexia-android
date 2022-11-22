@@ -12,21 +12,24 @@ internal val deviceConfigReducerFun: ReducerFun<DeviceConfigState> = { inState, 
             )
         }
 
-        is DeviceConfigEvent.NewSensors -> {
+        is DeviceConfigEvent.NewDeviceConfig -> {
             state.copy(
-                sensors = event.sensors
-            )
-        }
-
-        is DeviceConfigEvent.NewControls -> {
-            state.copy(
+                loading = false,
+                stats = event.stats,
+                sensors = event.sensors,
                 controls = event.controls
             )
         }
 
-        is DeviceConfigEvent.NewStats -> {
+        is DeviceConfigEvent.ServicesError -> {
             state.copy(
-                stats = event.stats
+                loading = false
+            )
+        }
+
+        is DeviceConfigEvent.SetLoading -> {
+            state.copy(
+                loading = event.loading
             )
         }
 

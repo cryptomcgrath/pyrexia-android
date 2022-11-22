@@ -29,4 +29,8 @@
     <string name="low">low</string>
     <string name="gpio_text">gpio %d on %s</string>
 
+    <!-- SensorBottomSheetFragment -->
+    <string name="sensor_name">Name:</string>
+
+
 </resources>
