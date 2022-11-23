@@ -58,6 +58,7 @@ internal class DeviceConfigAdapter(private val context: Context,
 
             state.controls.forEach {
                 items += ControlDiffableItem(
+                    dispatcher = dispatcher,
                     context = context,
                     isEditMode = false,
                     control = it

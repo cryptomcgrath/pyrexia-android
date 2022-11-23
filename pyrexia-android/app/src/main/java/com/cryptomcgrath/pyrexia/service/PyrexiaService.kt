@@ -5,9 +5,11 @@ import com.cryptomcgrath.pyrexia.model.History
 import com.cryptomcgrath.pyrexia.model.ProgramRun
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
+import com.cryptomcgrath.pyrexia.model.toControlUpdateDto
 import com.cryptomcgrath.pyrexia.model.toControlsList
 import com.cryptomcgrath.pyrexia.model.toHistoryList
 import com.cryptomcgrath.pyrexia.model.toSensorList
+import com.cryptomcgrath.pyrexia.model.toSensorUpdateDto
 import com.cryptomcgrath.pyrexia.model.toStatList
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -84,11 +86,19 @@ internal class PyrexiaService(pyDevice: PyDevice) {
     }
 
     fun addSensor(sensor: Sensor): Completable {
-        return client.addSensor(sensor)
+        return client.addSensor(sensor.toSensorUpdateDto())
     }
 
     fun updateSensor(sensor: Sensor): Completable {
-        return client.updateSensor(sensor.id.toString(), sensor)
+        return client.updateSensor(sensor.id.toString(), sensor.toSensorUpdateDto())
+    }
+
+    fun addControl(control: Control): Completable {
+        return client.addControl(control.toControlUpdateDto())
+    }
+
+    fun updateControl(control: Control): Completable {
+        return client.updateControl(control.id.toString(), control.toControlUpdateDto())
     }
 }
 

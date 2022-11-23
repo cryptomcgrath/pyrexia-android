@@ -59,6 +59,9 @@
         <action
             android:id="@+id/action_deviceConfigFragment_to_sensorEditBottomSheetFragment"
             app:destination="@id/sensorEditBottomSheetFragment" />
+        <action
+            android:id="@+id/action_deviceConfigFragment_to_controlEditBottomSheetFragment"
+            app:destination="@id/controlEditBottomSheetFragment" />
     </fragment>
     <dialog
         android:id="@+id/sensorEditBottomSheetFragment"
@@ -70,5 +73,16 @@
         <argument
             android:name="sensor"
             app:argType="com.cryptomcgrath.pyrexia.model.Sensor" />
+    </dialog>
+    <dialog
+        android:id="@+id/controlEditBottomSheetFragment"
+        android:name="com.cryptomcgrath.pyrexia.deviceconfig.ControlEditBottomSheetFragment"
+        android:label="ControlEditBottomSheetFragment" >
+        <argument
+            android:name="pydevice"
+            app:argType="com.cryptomcgrath.pyrexia.model.PyDevice" />
+        <argument
+            android:name="control"
+            app:argType="com.cryptomcgrath.pyrexia.model.Control" />
     </dialog>
 </navigation>

@@ -15,5 +15,6 @@ internal sealed class DeviceConfigEvent: Event {
                                val sensors: List<Sensor>,
                                val controls: List<Control>): DeviceConfigEvent()
     data class GoToSensorEdit(val sensor: Sensor): DeviceConfigEvent()
+    data class GoToControlEdit(val control: Control): DeviceConfigEvent()
     data class SetLoading(val loading: Boolean): DeviceConfigEvent()
 }

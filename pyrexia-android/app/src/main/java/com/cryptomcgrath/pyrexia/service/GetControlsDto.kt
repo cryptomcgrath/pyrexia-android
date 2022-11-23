@@ -16,3 +16,12 @@ internal data class GetControlsDto(
         val control_on: Int
     )
 }
+
+internal data class ControlUpdateDto(
+    val id: Int,
+    val name: String,
+    val gpio: Int,
+    val gpio_on_high: Int,
+    val min_run: Int,
+    val min_rest: Int
+)

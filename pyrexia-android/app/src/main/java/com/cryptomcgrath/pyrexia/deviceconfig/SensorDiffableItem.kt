@@ -22,10 +22,9 @@ internal class SensorDiffableItem(val dispatcher: Dispatcher,
     val addrHintResId = sensor.sensorType?.addrHintResId ?: R.string.sensor_addr_hint_generic
 
     fun onClickCancel(view: View) {
-
     }
 
-    fun onClickOverflow(view: View) {
+    fun onClickOverflow(view: View?) {
         dispatcher.post(DeviceConfigEvent.GoToSensorEdit(sensor))
     }
 

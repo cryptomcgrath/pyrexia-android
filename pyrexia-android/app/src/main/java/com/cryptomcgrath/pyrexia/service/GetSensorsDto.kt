@@ -14,3 +14,11 @@ internal data class GetSensorsDto(
         val value: Float
     )
 }
+
+internal data class SensorUpdateDto(
+    val id: Int,
+    val name: String,
+    val sensor_type: String,
+    val addr: String,
+    val update_interval: Int
+)

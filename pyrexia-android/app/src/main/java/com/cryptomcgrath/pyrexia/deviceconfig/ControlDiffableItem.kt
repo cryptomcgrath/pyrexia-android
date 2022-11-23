@@ -6,18 +6,18 @@ import androidx.databinding.ObservableField
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.util.DiffableItem
+import com.edwardmcgrath.blueflux.core.Dispatcher
 
 internal class ControlDiffableItem(context: Context,
+                                   private val dispatcher: Dispatcher,
                                    val control: Control,
                                    val isEditMode: Boolean): DiffableItem {
     var name = control.name
     val gpioText = context.getString(R.string.gpio_text, control.gpio, control.gpioOnHigh.toHiLowText(context))
     val nameError = ObservableField<String>()
 
-    fun onClickOverflow(view: View) {
-    }
-
-    fun onClickCancel(view: View) {
+    fun onClickOverflow(view: View?) {
+        dispatcher.post(DeviceConfigEvent.GoToControlEdit(control))
     }
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {

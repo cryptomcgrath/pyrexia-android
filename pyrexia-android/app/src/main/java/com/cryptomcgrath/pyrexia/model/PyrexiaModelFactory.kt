@@ -1,10 +1,12 @@
 package com.cryptomcgrath.pyrexia.model
 
+import com.cryptomcgrath.pyrexia.service.ControlUpdateDto
 import com.cryptomcgrath.pyrexia.service.GetControlsDto
 import com.cryptomcgrath.pyrexia.service.GetHistoryDto
 import com.cryptomcgrath.pyrexia.service.GetProgramsDto
 import com.cryptomcgrath.pyrexia.service.GetSensorsDto
 import com.cryptomcgrath.pyrexia.service.GetStatListDto
+import com.cryptomcgrath.pyrexia.service.SensorUpdateDto
 import java.util.*
 
 internal fun GetProgramsDto.toProgramList(): List<Program> {
@@ -109,4 +111,33 @@ internal fun GetControlsDto.toControlsList(): List<Control> {
             lastOffTime = it.last_off_time
         )
     }
+}
+
+internal fun Sensor.toSensorUpdateDto(): SensorUpdateDto {
+    return SensorUpdateDto(
+        id = this.id,
+        name = this.name,
+        sensor_type = this.sensorType.toSensorTypeDtoString(),
+        addr = this.addr,
+        update_interval = this.updateInterval
+    )
+}
+
+private fun Sensor.SensorType?.toSensorTypeDtoString(): String {
+    return when(this) {
+        Sensor.SensorType.SENSORPUSH -> "sp"
+        Sensor.SensorType.DHT22 -> "dht22"
+        else -> ""
+    }
+}
+
+internal fun Control.toControlUpdateDto(): ControlUpdateDto {
+    return ControlUpdateDto(
+        id = this.id,
+        name = this.name,
+        gpio = this.gpio,
+        gpio_on_high = if (gpioOnHigh) 1 else 0,
+        min_run = this.minRun,
+        min_rest = this.minRest
+    )
 }

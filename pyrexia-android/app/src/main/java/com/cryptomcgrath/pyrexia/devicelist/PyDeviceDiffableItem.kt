@@ -12,6 +12,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.ObservableField
 import com.cryptomcgrath.pyrexia.R
+import com.cryptomcgrath.pyrexia.deviceconfig.hideKeyboard
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
@@ -114,7 +115,3 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
     }
 }
 
-internal fun View.hideKeyboard() {
-    val imm = getSystemService(this.context, InputMethodManager::class.java)
-    imm?.hideSoftInputFromWindow(this.windowToken, 0)
-}

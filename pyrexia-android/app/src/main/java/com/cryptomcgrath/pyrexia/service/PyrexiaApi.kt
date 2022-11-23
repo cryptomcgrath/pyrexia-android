@@ -1,5 +1,6 @@
 package com.cryptomcgrath.pyrexia.service
 
+import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.Sensor
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -68,11 +69,24 @@ internal interface PyrexiaApi {
         "Content-Type: application/json")
     @PATCH("/sensors/{id}")
     fun updateSensor(@Path("id") id: String,
-                     @Body sensor: Sensor): Completable
+                     @Body sensor: SensorUpdateDto): Completable
 
     @Headers(
         "Accept: application/json",
         "Content-Type: application/json")
     @POST("/sensors")
-    fun addSensor(@Body sensor: Sensor): Completable
+    fun addSensor(@Body sensor: SensorUpdateDto): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @PATCH("/controls/{id}")
+    fun updateControl(@Path("id") id: String,
+                      @Body control: ControlUpdateDto): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @POST("/controls")
+    fun addControl(@Body control: ControlUpdateDto): Completable
 }

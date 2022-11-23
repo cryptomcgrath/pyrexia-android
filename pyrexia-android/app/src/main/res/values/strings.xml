@@ -3,6 +3,7 @@
     <string name="ok">Ok</string>
     <string name="connecting_error">Connection error</string>
     <string name="connection_error">Connection error %s</string>
+    <string name="network_error_title">Network Error</string>
 
     <string name="device_name_hint">Choose a name</string>
     <string name="device_url_hint">http://hostname:port</string>
@@ -36,4 +37,15 @@
     <string name="button_save">Save</string>
     <string name="sensor_name_hint">Sensor Name</string>
     <string name="sensor_update_interval_hint">Update interval (seconds)</string>
+
+    <!-- ControlEdit -->
+    <string name="control_name_hint">Name for this control</string>
+    <string name="control_gpio_hint">Gpio board pin number</string>
+    <string name="control_gpio_on_high_hint">Gpio high is ON?</string>
+    <string name="control_min_run_hint">Minimum run time (seconds)</string>
+    <string name="control_min_rest_hint">Minimum rest time (seconds)</string>
+    <string name="control_name_error">Name cannot be blank</string>
+    <string name="control_min_run_error">Invalid minimum run time in seconds</string>
+    <string name="control_min_rest_error">Invalid minimum rest time in seconds</string>
+    <string name="control_gpio_error">Invalid gpio pin number</string>
 </resources>

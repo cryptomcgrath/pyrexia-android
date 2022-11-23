@@ -14,7 +14,6 @@ internal class VStatDiffableItem(val stat: ProgramRun, dispatcher: Dispatcher): 
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
     val sensorValue = stat.sensor.value.toFormattedTemperatureString()
     val modeText = stat.program.mode.name.sentenceCase()
-    private val isEnabled = stat.program.enabled
 
     val backgroundColor: Int = when {
         !stat.program.enabled -> R.color.grey42
@@ -23,7 +22,7 @@ internal class VStatDiffableItem(val stat: ProgramRun, dispatcher: Dispatcher): 
         else -> R.color.cobalt
     }
 
-    fun onClickOverflow(view: View) {
+    fun onClickOverflow(view: View?) {
 
     }
 

@@ -15,6 +15,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentDeviceConfigBinding
+import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
 
@@ -31,6 +32,10 @@ internal class DeviceConfigFragment: Fragment() {
             when (event) {
                 is DeviceConfigEvent.GoToSensorEdit -> {
                     goToSensorEditDialog(args.pyDevice, event.sensor)
+                }
+
+                is DeviceConfigEvent.GoToControlEdit -> {
+                    goToControlEditDialog(args.pyDevice, event.control)
                 }
 
                 is DeviceConfigEvent.ServicesError -> {
@@ -69,13 +74,19 @@ internal class DeviceConfigFragment: Fragment() {
         findNavController().navigate(action)
     }
 
+    private fun goToControlEditDialog(pyDevice: PyDevice,
+                                      control: Control) {
+        val action = DeviceConfigFragmentDirections.actionDeviceConfigFragmentToControlEditBottomSheetFragment(pyDevice, control)
+        findNavController().navigate(action)
+    }
+
     private fun showServicesError(throwable: Throwable) {
         AlertDialog.Builder(requireActivity())
             .setPositiveButton(R.string.ok) { di, _ ->
                 di.dismiss()
                 findNavController().popBackStack()
             }
-            .setTitle("Service Error")
+            .setTitle(getString(R.string.network_error_title))
             .setMessage(throwable.toString())
             .create().show()
     }
