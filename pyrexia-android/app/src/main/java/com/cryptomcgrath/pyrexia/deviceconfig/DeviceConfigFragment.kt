@@ -23,7 +23,9 @@ internal class DeviceConfigFragment: Fragment() {
     private val args: DeviceConfigFragmentArgs by navArgs()
 
     private val viewModel: DeviceConfigViewModel by activityViewModels {
-        DeviceConfigViewModel.Factory(pyDevice = args.pyDevice)
+        DeviceConfigViewModel.Factory(
+            application = requireActivity().application,
+            pyDevice = args.pyDevice)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

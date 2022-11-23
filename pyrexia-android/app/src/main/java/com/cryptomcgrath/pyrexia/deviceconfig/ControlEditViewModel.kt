@@ -36,7 +36,7 @@ internal class ControlEditViewModel(application: Application,
         }
     }
 
-    private val pyrexiaService = PyrexiaService(pyDevice)
+    private val pyrexiaService = PyrexiaService(application, pyDevice)
     private val store = RxStore.create(controlEditReducerFun)
     private val dispatcher = Dispatcher.create(store)
     val eventQueue = EventQueue.create()

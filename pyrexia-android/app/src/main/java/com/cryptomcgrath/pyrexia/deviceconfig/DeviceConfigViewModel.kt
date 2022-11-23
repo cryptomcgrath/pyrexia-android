@@ -1,6 +1,8 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.cryptomcgrath.pyrexia.model.PyDevice
@@ -15,12 +17,14 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-internal class DeviceConfigViewModel(pyDevice: PyDevice) : ViewModel() {
+internal class DeviceConfigViewModel(application: Application,
+                                     pyDevice: PyDevice) : AndroidViewModel(application) {
 
-    class Factory(private val pyDevice: PyDevice) : ViewModelProvider.Factory {
+    class Factory(private val application: Application,
+                  private val pyDevice: PyDevice) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return DeviceConfigViewModel(pyDevice) as T
+            return DeviceConfigViewModel(application, pyDevice) as T
         }
     }
 
@@ -29,7 +33,7 @@ internal class DeviceConfigViewModel(pyDevice: PyDevice) : ViewModel() {
     val dispatcher = Dispatcher.create(store)
     val eventQueue = EventQueue.create()
 
-    private val pyrexiaService = PyrexiaService(pyDevice)
+    private val pyrexiaService = PyrexiaService(application, pyDevice)
 
     init {
         reactToEvents()

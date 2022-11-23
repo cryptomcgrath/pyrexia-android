@@ -1,8 +1,10 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
+import android.app.Application
 import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableInt
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.cryptomcgrath.pyrexia.R
@@ -25,13 +27,16 @@ import io.reactivex.schedulers.Schedulers
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
+internal class ThermostatViewModel(application: Application,
+                                   pyDevice: PyDevice,
+                                   id: Int): AndroidViewModel(application) {
 
-    class Factory(private val pyDevice: PyDevice,
+    class Factory(private val application: Application,
+                  private val pyDevice: PyDevice,
                   private val id: Int) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ThermostatViewModel(pyDevice, id) as T
+            return ThermostatViewModel(application, pyDevice, id) as T
         }
     }
 
@@ -39,7 +44,7 @@ internal class ThermostatViewModel(pyDevice: PyDevice, id: Int): ViewModel() {
     internal val dispatcher = Dispatcher.create(store)
     internal val eventQueue = EventQueue.create()
 
-    private val pyrexiaService = PyrexiaService(pyDevice)
+    private val pyrexiaService = PyrexiaService(application, pyDevice)
     private val disposables = CompositeDisposable()
     private var autoRefreshDisposable: Disposable? = null
 

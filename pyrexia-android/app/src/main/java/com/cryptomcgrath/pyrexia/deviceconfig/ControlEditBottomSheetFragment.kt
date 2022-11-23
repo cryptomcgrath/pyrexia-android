@@ -23,7 +23,7 @@ internal class ControlEditBottomSheetFragment : BottomSheetDialogFragment() {
         )
     }
     private val deviceConfigViewModel: DeviceConfigViewModel by activityViewModels {
-        DeviceConfigViewModel.Factory(args.pydevice)
+        DeviceConfigViewModel.Factory(requireActivity().application, args.pydevice)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

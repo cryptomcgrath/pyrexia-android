@@ -19,7 +19,10 @@ internal class ThermostatFragment: Fragment() {
     private val args: ThermostatFragmentArgs by navArgs()
 
     private val viewModel: ThermostatViewModel by viewModels {
-        ThermostatViewModel.Factory(args.pydevice, args.id)
+        ThermostatViewModel.Factory(
+            application = requireActivity().application,
+            pyDevice = args.pydevice,
+            id = args.id)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

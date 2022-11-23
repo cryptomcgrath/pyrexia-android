@@ -1,5 +1,6 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
+import android.app.Application
 import android.view.View
 import androidx.annotation.StringRes
 import androidx.databinding.ObservableField
@@ -21,18 +22,20 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-internal class SensorEditViewModel(pyDevice: PyDevice,
+internal class SensorEditViewModel(application: Application,
+                                   pyDevice: PyDevice,
                                    private val sensor: Sensor): ViewModel() {
 
-    class Factory(private val pyDevice: PyDevice,
+    class Factory(private val application: Application,
+                  private val pyDevice: PyDevice,
                   private val sensor: Sensor) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return SensorEditViewModel(pyDevice, sensor) as T
+            return SensorEditViewModel(application, pyDevice, sensor) as T
         }
     }
 
-    private val pyrexiaService = PyrexiaService(pyDevice)
+    private val pyrexiaService = PyrexiaService(application, pyDevice)
 
     private val store = RxStore.create(sensorEditReducerFun)
     private val dispatcher = Dispatcher.create(store)

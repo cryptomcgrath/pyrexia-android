@@ -18,7 +18,7 @@ internal class StatListFragment: Fragment() {
     private val args: StatListFragmentArgs by navArgs()
 
     private val viewModel: StatListViewModel by viewModels {
-        StatListViewModel.Factory(args.pydevice)
+        StatListViewModel.Factory(requireActivity().application, args.pydevice)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

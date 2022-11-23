@@ -15,10 +15,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 internal class SensorEditBottomSheetFragment: BottomSheetDialogFragment() {
     private val args: SensorEditBottomSheetFragmentArgs by navArgs()
     private val viewModel: SensorEditViewModel by viewModels {
-        SensorEditViewModel.Factory(args.pydevice, args.sensor)
+        SensorEditViewModel.Factory(
+            application = requireActivity().application,
+            pyDevice = args.pydevice,
+            sensor = args.sensor)
     }
     private val deviceConfigViewModel: DeviceConfigViewModel by activityViewModels {
-        DeviceConfigViewModel.Factory(args.pydevice)
+        DeviceConfigViewModel.Factory(
+            application = requireActivity().application,
+            pyDevice = args.pydevice)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
