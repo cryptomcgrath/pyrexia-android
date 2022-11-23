@@ -114,7 +114,7 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
     }
 }
 
-private fun View.hideKeyboard() {
+internal fun View.hideKeyboard() {
     val imm = getSystemService(this.context, InputMethodManager::class.java)
     imm?.hideSoftInputFromWindow(this.windowToken, 0)
 }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
@@ -14,12 +15,13 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentDeviceConfigBinding
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
 
 internal class DeviceConfigFragment: Fragment() {
     private val args: DeviceConfigFragmentArgs by navArgs()
 
-    private val viewModel: DeviceConfigViewModel by viewModels {
+    private val viewModel: DeviceConfigViewModel by activityViewModels {
         DeviceConfigViewModel.Factory(pyDevice = args.pyDevice)
     }
 
@@ -28,7 +30,7 @@ internal class DeviceConfigFragment: Fragment() {
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
                 is DeviceConfigEvent.GoToSensorEdit -> {
-                    goToSensorEditDialog(event.sensor)
+                    goToSensorEditDialog(args.pyDevice, event.sensor)
                 }
 
                 is DeviceConfigEvent.ServicesError -> {
@@ -56,8 +58,14 @@ internal class DeviceConfigFragment: Fragment() {
         return binding.root
     }
 
-    private fun goToSensorEditDialog(sensor: Sensor) {
-        val action = DeviceConfigFragmentDirections.actionDeviceConfigFragmentToSensorEditBottomSheetFragment(sensor)
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshData()
+    }
+
+    private fun goToSensorEditDialog(pyDevice: PyDevice,
+                                     sensor: Sensor) {
+        val action = DeviceConfigFragmentDirections.actionDeviceConfigFragmentToSensorEditBottomSheetFragment(pyDevice, sensor)
         findNavController().navigate(action)
     }
 

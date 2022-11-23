@@ -42,11 +42,6 @@ internal class DeviceConfigViewModel(pyDevice: PyDevice) : ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { event ->
-                    when(event) {
-                        is DeviceConfigEvent.Init -> {
-                            fetchDeviceConfig()
-                        }
-                    }
                     // relay event to fragment
                     eventQueue.post(event)
                 },
@@ -54,6 +49,10 @@ internal class DeviceConfigViewModel(pyDevice: PyDevice) : ViewModel() {
                     Log.e(TAG, "error reacting to event "+it.stackTraceToString())
                 }
             ).addTo(disposables)
+    }
+
+    fun refreshData() {
+        fetchDeviceConfig()
     }
 
     private fun fetchDeviceConfig() {

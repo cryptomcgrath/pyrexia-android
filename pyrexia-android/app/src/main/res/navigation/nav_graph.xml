@@ -65,6 +65,9 @@
         android:name="com.cryptomcgrath.pyrexia.deviceconfig.SensorEditBottomSheetFragment"
         android:label="SensorEditBottomSheetFragment" >
         <argument
+            android:name="pydevice"
+            app:argType="com.cryptomcgrath.pyrexia.model.PyDevice" />
+        <argument
             android:name="sensor"
             app:argType="com.cryptomcgrath.pyrexia.model.Sensor" />
     </dialog>

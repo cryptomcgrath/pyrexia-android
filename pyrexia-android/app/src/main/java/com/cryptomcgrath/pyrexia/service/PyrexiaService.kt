@@ -82,6 +82,14 @@ internal class PyrexiaService(pyDevice: PyDevice) {
                 it.toControlsList()
             }
     }
+
+    fun addSensor(sensor: Sensor): Completable {
+        return client.addSensor(sensor)
+    }
+
+    fun updateSensor(sensor: Sensor): Completable {
+        return client.updateSensor(sensor.id.toString(), sensor)
+    }
 }
 
 private const val HEADER_TOKEN = "token"

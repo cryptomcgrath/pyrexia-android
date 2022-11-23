@@ -1,9 +1,12 @@
 package com.cryptomcgrath.pyrexia.service
 
+import com.cryptomcgrath.pyrexia.model.Sensor
 import io.reactivex.Completable
 import io.reactivex.Single
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -59,4 +62,17 @@ internal interface PyrexiaApi {
         "Content-Type: application/json")
     @GET("/controls")
     fun getControls(): Single<GetControlsDto>
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @PATCH("/sensors/{id}")
+    fun updateSensor(@Path("id") id: String,
+                     @Body sensor: Sensor): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @POST("/sensors")
+    fun addSensor(@Body sensor: Sensor): Completable
 }

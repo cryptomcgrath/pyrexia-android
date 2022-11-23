@@ -36,6 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@={model.name}"
+                android:error="@{model.nameError}"
                 android:hint="Sensor name"
                 android:singleLine="true"
                 tools:text="Big Red" />
@@ -56,6 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@={model.addr}"
+                android:error="@{model.addrError}"
                 android:hint="@{model.addressHintResId}"
                 android:singleLine="true" />
 
@@ -75,10 +77,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@={model.updateInterval}"
+                android:error="@{model.updateIntervalError}"
                 android:hint="Update interval (seconds)"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/button_save"
+            android:onClick="@{(v)->model.onClickSave(v)}"
+            app:layout_constraintTop_toBottomOf="@id/update_interval"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
