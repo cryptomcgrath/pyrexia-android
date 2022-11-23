@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="@={model.name}"
                 android:error="@{model.nameError}"
-                android:hint="Sensor name"
+                android:hint="@string/sensor_name_hint"
                 android:singleLine="true"
                 tools:text="Big Red" />
 
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:text="@={model.addr}"
                 android:error="@{model.addrError}"
-                android:hint="@{model.addressHintResId}"
+                android:hint="@{context.getString(model.addressHintResId)}"
                 android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:text="@={model.updateInterval}"
                 android:error="@{model.updateIntervalError}"
-                android:hint="Update interval (seconds)"
+                android:hint="@string/sensor_update_interval_hint"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 

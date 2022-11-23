@@ -32,5 +32,8 @@
     <!-- SensorBottomSheetFragment -->
     <string name="sensor_name">Name:</string>
 
+    <!-- SensorEditViewModel -->
     <string name="button_save">Save</string>
+    <string name="sensor_name_hint">Sensor Name</string>
+    <string name="sensor_update_interval_hint">Update interval (seconds)</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
 import android.view.View
+import androidx.annotation.StringRes
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +24,7 @@ import io.reactivex.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
 
-internal class SensorEditViewModel(private val pyDevice: PyDevice,
+internal class SensorEditViewModel(pyDevice: PyDevice,
                                    private val sensor: Sensor): ViewModel() {
 
     class Factory(private val pyDevice: PyDevice,
@@ -45,6 +46,7 @@ internal class SensorEditViewModel(private val pyDevice: PyDevice,
     val nameError = ObservableField<String>()
     var addr: String = sensor.addr
     val addrError = ObservableField<String>()
+    @StringRes
     val addressHintResId = sensor.sensorType?.addrHintResId ?: R.string.sensor_addr_hint_generic
     var updateInterval: String = sensor.updateInterval.toString()
     val updateIntervalError = ObservableField<String>()
