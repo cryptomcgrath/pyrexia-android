@@ -28,7 +28,8 @@
     <string name="sensor_addr_hint_generic">Sensor address</string>
     <string name="high">high</string>
     <string name="low">low</string>
-    <string name="gpio_text">gpio %d on %s</string>
+    <string name="control_gpio_text">gpio %d on %s</string>
+    <string name="sensor_gpio_text">gpio %s</string>
 
     <!-- SensorBottomSheetFragment -->
     <string name="sensor_name">Name:</string>

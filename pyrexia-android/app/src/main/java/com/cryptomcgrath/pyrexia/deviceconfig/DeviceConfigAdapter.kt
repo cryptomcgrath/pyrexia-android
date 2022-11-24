@@ -51,9 +51,9 @@ internal class DeviceConfigAdapter(private val context: Context,
 
             state.sensors.forEach {
                 items += SensorDiffableItem(
+                    context = context,
                     dispatcher = dispatcher,
-                    sensor = it,
-                    isEditMode = false)
+                    sensor = it)
             }
 
             state.controls.forEach {

@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:text="@={model.addr}"
                 android:error="@{model.addrError}"
-                android:hint="@{context.getString(model.addressHintResId)}"
+                android:hint="@{model.addressHint}"
                 android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>

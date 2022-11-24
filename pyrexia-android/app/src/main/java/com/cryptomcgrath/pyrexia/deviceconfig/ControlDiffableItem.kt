@@ -13,7 +13,7 @@ internal class ControlDiffableItem(context: Context,
                                    val control: Control,
                                    val isEditMode: Boolean): DiffableItem {
     var name = control.name
-    val gpioText = context.getString(R.string.gpio_text, control.gpio, control.gpioOnHigh.toHiLowText(context))
+    val gpioText = context.getString(R.string.control_gpio_text, control.gpio, control.gpioOnHigh.toHiLowText(context))
     val nameError = ObservableField<String>()
 
     fun onClickOverflow(view: View?) {

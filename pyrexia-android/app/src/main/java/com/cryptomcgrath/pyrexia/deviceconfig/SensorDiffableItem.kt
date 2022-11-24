@@ -1,5 +1,6 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
+import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
@@ -10,19 +11,19 @@ import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 
 
-internal class SensorDiffableItem(val dispatcher: Dispatcher,
-                                  val sensor: Sensor,
-                                  val isEditMode: Boolean): DiffableItem {
+internal class SensorDiffableItem(private val context: Context,
+                                  val dispatcher: Dispatcher,
+                                  val sensor: Sensor): DiffableItem {
 
-    var name = sensor.name
-    var addr = sensor.addr
+    val name = sensor.name
+    val addr = if (sensor.sensorType == Sensor.SensorType.DHT22) {
+        context.getString(R.string.sensor_gpio_text, sensor.addr.trim())
+    } else {
+        sensor.addr
+    }
     val nameError = ObservableField<String>()
 
     val sensorDrawableInt = sensor.sensorType?.imageResId ?: 0
-    val addrHintResId = sensor.sensorType?.addrHintResId ?: R.string.sensor_addr_hint_generic
-
-    fun onClickCancel(view: View) {
-    }
 
     fun onClickOverflow(view: View?) {
         dispatcher.post(DeviceConfigEvent.GoToSensorEdit(sensor))

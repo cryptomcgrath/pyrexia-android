@@ -24,21 +24,10 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
-            android:id="@+id/cancel"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_round_cancel_24"
-            android:visibility="@{model.isEditMode ? View.VISIBLE : View.GONE}"
-            android:onClick="@{(v)->model.onClickCancel(v)}"
-            app:layout_constraintEnd_toEndOf="@id/sensor_image"
-            app:layout_constraintTop_toTopOf="@id/sensor_image" />
-
-        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingEnd="16dp"
             android:src="@drawable/ic_overflow_32"
-            android:visibility="@{model.isEditMode ? View.GONE : View.VISIBLE}"
             android:onClick="@{(v)->model.onClickOverflow(v)}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/name_text"
@@ -59,26 +48,7 @@
             android:layout_marginStart="8dp"
             android:text="@{model.name}"
             android:gravity="center"
-            android:visibility="@{model.isEditMode ? View.GONE : View.VISIBLE}"
             tools:text="@string/device_name_hint"
-            app:layout_constraintTop_toBottomOf="@id/top_spacer"
-            app:layout_constraintStart_toEndOf="@id/sensor_image" />
-
-        <EditText
-            style="@style/TextMedium18Grey42"
-            android:id="@+id/name_edit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@={model.name}"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="18sp"
-            android:gravity="center"
-            android:hint="@string/device_name_hint"
-            android:visibility="@{model.isEditMode ? View.VISIBLE : View.GONE}"
-            android:singleLine="true"
-            android:error="@{model.nameError}"
-            tools:text="Living Room"
             app:layout_constraintTop_toBottomOf="@id/top_spacer"
             app:layout_constraintStart_toEndOf="@id/sensor_image" />
 
@@ -92,27 +62,8 @@
             android:fontFamily="sans-serif-medium"
             android:textSize="18sp"
             android:gravity="center"
-            android:visibility="@{model.isEditMode ? View.GONE : View.VISIBLE}"
             tools:text="@string/sensor_addr_hint_generic"
             app:layout_constraintTop_toBottomOf="@id/name_text"
-            app:layout_constraintStart_toEndOf="@id/sensor_image" />
-
-        <EditText
-            style="@style/TextMedium18Grey61"
-            android:id="@+id/addr_edit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@={model.addr}"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="18sp"
-            android:gravity="center"
-            android:hint="@{model.addrHintResId}"
-            android:visibility="@{model.isEditMode ? View.VISIBLE : View.GONE}"
-            android:singleLine="true"
-            android:error="@{model.nameError}"
-            tools:text="5"
-            app:layout_constraintTop_toBottomOf="@id/name_edit"
             app:layout_constraintStart_toEndOf="@id/sensor_image" />
 
         <View
