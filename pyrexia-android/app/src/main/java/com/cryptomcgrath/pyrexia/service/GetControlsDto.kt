@@ -18,7 +18,7 @@ internal data class GetControlsDto(
 }
 
 internal data class ControlUpdateDto(
-    val id: Int,
+    val id: Int?,
     val name: String,
     val gpio: Int,
     val gpio_on_high: Int,

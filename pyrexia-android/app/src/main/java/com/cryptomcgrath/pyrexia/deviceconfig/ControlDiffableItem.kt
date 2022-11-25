@@ -2,6 +2,8 @@ package com.cryptomcgrath.pyrexia.deviceconfig
 
 import android.content.Context
 import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.PopupMenu
 import androidx.databinding.ObservableField
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Control
@@ -17,7 +19,34 @@ internal class ControlDiffableItem(context: Context,
     val nameError = ObservableField<String>()
 
     fun onClickOverflow(view: View?) {
-        dispatcher.post(DeviceConfigEvent.GoToControlEdit(control))
+        view?.let { showPopupMenu(view) }
+    }
+
+    private fun showPopupMenu(view: View) {
+        PopupMenu(view.context, view).apply {
+            menuInflater.inflate(R.menu.deviceconfig_overflow, menu)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.component_delete -> {
+                        AlertDialog.Builder(view.context)
+                            .setMessage(view.context.getString(R.string.component_delete_confirm))
+                            .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.GoToControlDelete(control)) }
+                            .setNegativeButton(R.string.no) { _, _ -> }
+                            .show()
+                        true
+                    }
+
+                    R.id.component_edit -> {
+                        dispatcher.post(DeviceConfigEvent.GoToControlEdit(control))
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+            setForceShowIcon(true)
+            show()
+        }
     }
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {

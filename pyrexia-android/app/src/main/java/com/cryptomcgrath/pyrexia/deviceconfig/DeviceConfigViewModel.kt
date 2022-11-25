@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
@@ -49,6 +50,7 @@ internal class DeviceConfigViewModel(application: Application,
                 onNext = { event ->
                     when (event) {
                         is DeviceConfigEvent.GoToSensorDelete -> deleteSensor(event.sensor)
+                        is DeviceConfigEvent.GoToControlDelete -> deleteControl(event.control)
                     }
                     // relay event to fragment
                     eventQueue.post(event)
@@ -76,6 +78,26 @@ internal class DeviceConfigViewModel(application: Application,
                         dispatcher.post(DeviceConfigEvent.NetworkError(it, false))
                     }
                 ).addTo(disposables)
+        } else {
+            refreshData()
+        }
+    }
+
+    private fun deleteControl(control: Control) {
+        if (control.id > 0) {
+            pyrexiaService.deleteControl(control)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = {
+                        refreshData()
+                    },
+                    onError = {
+                        dispatcher.post(DeviceConfigEvent.NetworkError(it, false))
+                    }
+                ).addTo(disposables)
+        } else {
+            refreshData()
         }
     }
 

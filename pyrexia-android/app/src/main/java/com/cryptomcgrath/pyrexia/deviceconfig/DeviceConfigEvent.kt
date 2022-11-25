@@ -18,6 +18,7 @@ internal sealed class DeviceConfigEvent: Event {
     data class GoToSensorDelete(val sensor: Sensor) : DeviceConfigEvent()
 
     data class GoToControlEdit(val control: Control): DeviceConfigEvent()
+    data class GoToControlDelete(val control: Control): DeviceConfigEvent()
     data class SetLoading(val loading: Boolean): DeviceConfigEvent()
 
     data class OnComponentAddSelected(val component: Component): DeviceConfigEvent()

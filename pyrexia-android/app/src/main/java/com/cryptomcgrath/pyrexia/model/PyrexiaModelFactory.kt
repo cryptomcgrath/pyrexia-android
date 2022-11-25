@@ -133,7 +133,7 @@ private fun Sensor.SensorType?.toSensorTypeDtoString(): String {
 
 internal fun Control.toControlUpdateDto(): ControlUpdateDto {
     return ControlUpdateDto(
-        id = this.id,
+        id = if (this.id == 0) null else this.id,
         name = this.name,
         gpio = this.gpio,
         gpio_on_high = if (gpioOnHigh) 1 else 0,
