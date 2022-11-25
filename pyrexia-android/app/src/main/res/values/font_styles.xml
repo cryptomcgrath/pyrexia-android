@@ -13,4 +13,10 @@
         <item name="android:textColor">@color/grey42</item>
     </style>
 
+    <style name="TextRegular16Grey42" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/grey42</item>
+    </style>
+
 </resources>

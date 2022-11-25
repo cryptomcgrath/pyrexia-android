@@ -9,12 +9,13 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/section_spacing"
+        android:paddingBottom="@dimen/section_spacing"
         android:onClick="@{()->model.onClickItem()}">
 
         <ImageView
             android:id="@+id/component_image"
             android:layout_width="60dp"
-            android:layout_height="30dp"
+            android:layout_height="35dp"
             android:src="@{model.imageResId}"
             android:scaleType="centerInside"
             app:layout_constraintTop_toTopOf="parent"
@@ -22,10 +23,11 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <TextView
-            style="@style/TextMedium18Grey42"
+            style="@style/TextRegular16Grey42"
             android:id="@+id/name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:text="@{model.nameResId}"
             android:gravity="center"
             app:layout_constraintTop_toBottomOf="@id/component_image"
