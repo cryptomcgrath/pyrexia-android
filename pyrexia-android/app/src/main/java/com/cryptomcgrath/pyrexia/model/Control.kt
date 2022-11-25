@@ -5,13 +5,13 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Control(
-    val id: Int,
-    val name: String,
-    val gpio: Int,
-    val gpioOnHigh: Boolean,
-    val lastOnTime: Long,
-    val lastOffTime: Long,
-    val minRun: Int,
-    val minRest: Int,
-    val controlOn: Boolean
+    val id: Int = 0,
+    val name: String = "",
+    val gpio: Int = 0,
+    val gpioOnHigh: Boolean = false,
+    val lastOnTime: Long = 0L,
+    val lastOffTime: Long = 0L,
+    val minRun: Int = 300,
+    val minRest: Int = 300,
+    val controlOn: Boolean = false
 ): Parcelable

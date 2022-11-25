@@ -21,7 +21,7 @@ internal val deviceConfigReducerFun: ReducerFun<DeviceConfigState> = { inState, 
             )
         }
 
-        is DeviceConfigEvent.ServicesError -> {
+        is DeviceConfigEvent.NetworkError -> {
             state.copy(
                 loading = false
             )

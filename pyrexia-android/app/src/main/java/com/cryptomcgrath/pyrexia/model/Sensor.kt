@@ -6,12 +6,12 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Sensor(
-    val id: Int,
-    val name: String,
-    val value: Float,
+    val id: Int = 0,
+    val name: String = "",
+    val value: Float = 0f,
     val sensorType: SensorType? = null,
     val addr: String = "",
-    val updateInterval: Int = 0,
+    val updateInterval: Int = 300,
     val lastUpdatedTs: Long = 0L
 ): Parcelable {
     enum class SensorType(val imageResId: Int, val addrHintResId: Int) {

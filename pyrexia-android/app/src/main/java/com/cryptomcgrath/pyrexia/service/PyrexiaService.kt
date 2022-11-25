@@ -104,12 +104,20 @@ internal class PyrexiaService(application: Application, pyDevice: PyDevice) {
         return client.updateSensor(sensor.id.toString(), sensor.toSensorUpdateDto())
     }
 
+    fun deleteSensor(sensor: Sensor): Completable {
+        return client.deleteSensor(sensor.id.toString())
+    }
+
     fun addControl(control: Control): Completable {
         return client.addControl(control.toControlUpdateDto())
     }
 
     fun updateControl(control: Control): Completable {
         return client.updateControl(control.id.toString(), control.toControlUpdateDto())
+    }
+
+    fun deleteControl(control: Control): Completable {
+        return client.deleteControl(control.id.toString())
     }
 }
 

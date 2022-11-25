@@ -115,7 +115,7 @@ internal fun GetControlsDto.toControlsList(): List<Control> {
 
 internal fun Sensor.toSensorUpdateDto(): SensorUpdateDto {
     return SensorUpdateDto(
-        id = this.id,
+        id = if (this.id == 0) null else this.id,
         name = this.name,
         sensor_type = this.sensorType.toSensorTypeDtoString(),
         addr = this.addr,

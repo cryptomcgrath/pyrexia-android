@@ -3,6 +3,8 @@ package com.cryptomcgrath.pyrexia.deviceconfig
 import android.content.Context
 import android.view.View
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.PopupMenu
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ObservableField
 import com.cryptomcgrath.pyrexia.R
@@ -26,7 +28,34 @@ internal class SensorDiffableItem(private val context: Context,
     val sensorDrawableInt = sensor.sensorType?.imageResId ?: 0
 
     fun onClickOverflow(view: View?) {
-        dispatcher.post(DeviceConfigEvent.GoToSensorEdit(sensor))
+        view?.let { showPopupMenu(view) }
+    }
+
+    private fun showPopupMenu(view: View) {
+        PopupMenu(view.context, view).apply {
+            menuInflater.inflate(R.menu.deviceconfig_overflow, menu)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.component_delete -> {
+                        AlertDialog.Builder(view.context)
+                            .setMessage(view.context.getString(R.string.component_delete_confirm))
+                        .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.GoToSensorDelete(sensor)) }
+                            .setNegativeButton(R.string.no) { _, _ -> }
+                            .show()
+                        true
+                    }
+
+                    R.id.component_edit -> {
+                        dispatcher.post(DeviceConfigEvent.GoToSensorEdit(sensor))
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+            setForceShowIcon(true)
+            show()
+        }
     }
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {
@@ -38,6 +67,8 @@ internal class SensorDiffableItem(private val context: Context,
         return other is SensorDiffableItem
     }
 }
+
+
 
 @BindingAdapter("android:src")
 fun setImageResource(imageView: ImageView, resource: Int) {

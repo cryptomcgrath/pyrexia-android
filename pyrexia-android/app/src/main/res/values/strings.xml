@@ -49,4 +49,15 @@
     <string name="control_min_run_error">Invalid minimum run time in seconds</string>
     <string name="control_min_rest_error">Invalid minimum rest time in seconds</string>
     <string name="control_gpio_error">Invalid gpio pin number</string>
+
+    <!-- Components -->
+    <string name="component_sensor_dht22">DHT22 Temperature Sensor</string>
+    <string name="component_sensor_sp">SensorPush HW.t Bluetooth Sensor</string>
+    <string name="component_relay">Relay (gpio)</string>
+    <string name="component_vstat">Virtual Thermostat</string>
+
+    <!-- DeviceConfig Overflow Menu -->
+    <string name="component_edit">Edit</string>
+    <string name="component_delete">Delete</string>
+    <string name="component_delete_confirm">Are you sure?</string>
 </resources>

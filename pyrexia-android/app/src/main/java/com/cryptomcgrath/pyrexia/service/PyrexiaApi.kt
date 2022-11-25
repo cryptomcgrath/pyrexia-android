@@ -5,6 +5,7 @@ import com.cryptomcgrath.pyrexia.model.Sensor
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.PATCH
@@ -80,6 +81,12 @@ internal interface PyrexiaApi {
     @Headers(
         "Accept: application/json",
         "Content-Type: application/json")
+    @DELETE("/sensors/{id}")
+    fun deleteSensor(@Path("id") id: String): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
     @PATCH("/controls/{id}")
     fun updateControl(@Path("id") id: String,
                       @Body control: ControlUpdateDto): Completable
@@ -89,4 +96,10 @@ internal interface PyrexiaApi {
         "Content-Type: application/json")
     @POST("/controls")
     fun addControl(@Body control: ControlUpdateDto): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @DELETE("/controls/{id}")
+    fun deleteControl(@Path("id") id: String): Completable
 }

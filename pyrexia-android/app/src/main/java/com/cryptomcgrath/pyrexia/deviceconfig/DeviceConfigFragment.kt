@@ -1,19 +1,15 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentDeviceConfigBinding
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
@@ -40,8 +36,36 @@ internal class DeviceConfigFragment: Fragment() {
                     goToControlEditDialog(args.pyDevice, event.control)
                 }
 
-                is DeviceConfigEvent.ServicesError -> {
-                    showServicesError(event.throwable)
+                is DeviceConfigEvent.NetworkError -> {
+                    showNetworkError(event.throwable, event.finish)
+                }
+
+                is DeviceConfigEvent.OnComponentAddSelected -> {
+                    when (event.component) {
+                        Component.DHT22 -> {
+                            goToSensorEditDialog(
+                                pyDevice = args.pyDevice,
+                                sensor = Sensor(
+                                    sensorType = Sensor.SensorType.DHT22
+                                )
+                            )
+                        }
+                        Component.SENSORPUSH -> {
+                            goToSensorEditDialog(
+                                pyDevice = args.pyDevice,
+                                sensor = Sensor(
+                                    sensorType = Sensor.SensorType.SENSORPUSH
+                                )
+                            )
+                        }
+                        Component.RELAY -> {
+                            goToControlEditDialog(
+                                pyDevice = args.pyDevice,
+                                control = Control()
+                            )
+                        }
+                        else -> Unit
+                    }
                 }
             }
         }
@@ -62,6 +86,9 @@ internal class DeviceConfigFragment: Fragment() {
         val appBarConfiguration = AppBarConfiguration(findNavController().graph)
         binding.toolbar
             .setupWithNavController(findNavController(), appBarConfiguration)
+        binding.fab.setOnClickListener {
+            goToAddComponent(args.pyDevice)
+        }
         return binding.root
     }
 
@@ -82,15 +109,14 @@ internal class DeviceConfigFragment: Fragment() {
         findNavController().navigate(action)
     }
 
-    private fun showServicesError(throwable: Throwable) {
-        AlertDialog.Builder(requireActivity())
-            .setPositiveButton(R.string.ok) { di, _ ->
-                di.dismiss()
-                findNavController().popBackStack()
-            }
-            .setTitle(getString(R.string.network_error_title))
-            .setMessage(throwable.toString())
-            .create().show()
+    private fun showNetworkError(throwable: Throwable, finish: Boolean) {
+        createNetworkErrorAlertDialog(requireContext(), throwable) {
+            if (finish) findNavController().popBackStack()
+        }.show()
     }
 
+    private fun goToAddComponent(pyDevice: PyDevice) {
+        val action = DeviceConfigFragmentDirections.actionDeviceConfigFragmentToAddComponentBottomSheetFragment(pyDevice)
+        findNavController().navigate(action)
+    }
 }

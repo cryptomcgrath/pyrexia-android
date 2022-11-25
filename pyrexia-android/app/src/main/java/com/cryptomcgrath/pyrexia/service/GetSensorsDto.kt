@@ -16,7 +16,7 @@ internal data class GetSensorsDto(
 }
 
 internal data class SensorUpdateDto(
-    val id: Int,
+    val id: Int?,
     val name: String,
     val sensor_type: String,
     val addr: String,
