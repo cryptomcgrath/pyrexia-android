@@ -23,7 +23,7 @@
     <string name="no">No</string>
 
     <!-- DeviceConfigFragment -->
-    <string name="sensor_addr_hint_dht22">Gpio board pin #</string>
+    <string name="sensor_addr_hint_dht22">Gpio #</string>
     <string name="sensor_addr_hint_sp">Sensorpush Mac Address</string>
     <string name="sensor_addr_hint_generic">Sensor address</string>
     <string name="high">high</string>
@@ -41,14 +41,14 @@
 
     <!-- ControlEdit -->
     <string name="control_name_hint">Name for this control</string>
-    <string name="control_gpio_hint">Gpio board pin number</string>
+    <string name="control_gpio_hint">Gpio #</string>
     <string name="control_gpio_on_high_hint">Gpio high is ON?</string>
     <string name="control_min_run_hint">Minimum run time (seconds)</string>
     <string name="control_min_rest_hint">Minimum rest time (seconds)</string>
     <string name="control_name_error">Name cannot be blank</string>
     <string name="control_min_run_error">Invalid minimum run time in seconds</string>
     <string name="control_min_rest_error">Invalid minimum rest time in seconds</string>
-    <string name="control_gpio_error">Invalid gpio pin number</string>
+    <string name="control_gpio_error">Invalid gpio #</string>
 
     <!-- Components -->
     <string name="component_sensor_dht22">DHT22 Temperature Sensor</string>

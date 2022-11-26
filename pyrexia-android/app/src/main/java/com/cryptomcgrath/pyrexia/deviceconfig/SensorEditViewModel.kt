@@ -46,7 +46,7 @@ internal class SensorEditViewModel(application: Application,
     val nameError = ObservableField<String>()
     var addr: String = sensor.addr
     val addrError = ObservableField<String>()
-    val addressHint = getApplication<Application>().getString(sensor.sensorType?.addrHintResId ?: R.string.sensor_addr_hint_generic)
+    val addressHintResId = sensor.sensorType?.addrHintResId ?: R.string.sensor_addr_hint_generic
     var updateInterval: String = sensor.updateInterval.toString()
     val updateIntervalError = ObservableField<String>()
     val sensorDrawableInt = sensor.sensorType?.imageResId ?: 0
