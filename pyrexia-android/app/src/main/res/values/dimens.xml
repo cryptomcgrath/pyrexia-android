@@ -6,4 +6,6 @@
     <dimen name="section_spacing">16dp</dimen>
     <dimen name="section_half">8dp</dimen>
     <dimen name="side_margin">16dp</dimen>
+    <dimen name="text_input_vertical_spacing">12dp</dimen>
+    <dimen name="text_input_left_margin">8dp</dimen>
 </resources>
