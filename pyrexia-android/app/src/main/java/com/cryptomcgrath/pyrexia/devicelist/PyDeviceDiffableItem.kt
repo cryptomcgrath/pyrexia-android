@@ -20,7 +20,8 @@ import com.edwardmcgrath.blueflux.core.Dispatcher
 
 internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
                                     private val pyDevice: PyDevice,
-                                    val isEditMode: Boolean) : DiffableItem {
+                                    val isEditMode: Boolean,
+                                    val isLoading: Boolean = false) : DiffableItem {
     var name = pyDevice.name
     var url = pyDevice.baseUrl
 
@@ -106,7 +107,8 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
     override fun areContentsTheSame(other: DiffableItem): Boolean {
         return other is PyDeviceDiffableItem &&
                 other.name == name &&
-                other.url == url
+                other.url == url &&
+                other.isLoading == isLoading
     }
 
     override fun areItemsTheSame(other: DiffableItem): Boolean {

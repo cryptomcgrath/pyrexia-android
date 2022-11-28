@@ -103,7 +103,7 @@ internal fun GetControlsDto.toControlsList(): List<Control> {
             id = it.id,
             name = it.name,
             gpio = it.gpio,
-            gpioOnHigh = it.gpio_on_high == 1,
+            gpioOnHigh = it.gpio_on_hi == 1,
             minRest = it.min_rest,
             minRun = it.min_run,
             controlOn = it.control_on == 1,
@@ -136,7 +136,7 @@ internal fun Control.toControlUpdateDto(): ControlUpdateDto {
         id = if (this.id == 0) null else this.id,
         name = this.name,
         gpio = this.gpio,
-        gpio_on_high = if (gpioOnHigh) 1 else 0,
+        gpio_on_hi = if (gpioOnHigh) 1 else 0,
         min_run = this.minRun,
         min_rest = this.minRest
     )

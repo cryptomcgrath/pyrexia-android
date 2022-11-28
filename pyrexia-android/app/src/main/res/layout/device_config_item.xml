@@ -13,6 +13,24 @@
         android:layout_marginBottom="16dp"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="@{model.loading ? View.VISIBLE : View.GONE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/pi_image_shimmer"
+            android:layout_width="125dp"
+            android:layout_height="63dp"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/pisnip2"
+            android:scaleType="centerInside"
+            android:onClick="@{()->model.onClickImage()}" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
         <ImageView
             android:id="@+id/pi_image"
             android:layout_width="125dp"
@@ -21,8 +39,9 @@
             android:src="@drawable/pisnip2"
             android:scaleType="centerInside"
             android:onClick="@{()->model.onClickImage()}"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:visibility="@{model.loading ? View.GONE : View.VISIBLE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

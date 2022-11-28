@@ -12,6 +12,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.cryptomcgrath.pyrexia.databinding.FragmentStatListBinding
+import com.cryptomcgrath.pyrexia.deviceconfig.createNetworkErrorAlertDialog
 import com.cryptomcgrath.pyrexia.thermostat.ThermostatFragmentDirections
 
 internal class StatListFragment: Fragment() {
@@ -31,6 +32,9 @@ internal class StatListFragment: Fragment() {
                         name = event.name,
                         pydevice = args.pydevice)
                     findNavController().navigate(action)
+                }
+                is StatListEvent.NetworkError -> {
+                    showNetworkError(event.throwable)
                 }
             }
         }
@@ -66,6 +70,10 @@ internal class StatListFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.setupAutoRefresh()
+    }
+
+    private fun showNetworkError(throwable: Throwable) {
+        createNetworkErrorAlertDialog(requireContext(), throwable) {}.show()
     }
 }
 

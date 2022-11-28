@@ -7,6 +7,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.cryptomcgrath.pyrexia.R
+import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Date
@@ -62,4 +63,11 @@ internal fun createNetworkErrorAlertDialog(context: Context,
         .setTitle(context.getString(R.string.network_error_title))
         .setMessage(throwable.toString())
         .create()
+}
+
+internal fun Throwable.toUserFriendlyMessageResId(): Int? {
+    return when {
+        this is SocketTimeoutException -> R.string.network_error_socket_timeout
+        else -> null
+    }
 }

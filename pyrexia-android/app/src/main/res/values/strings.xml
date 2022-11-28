@@ -49,6 +49,7 @@
     <string name="control_min_run_error">Invalid minimum run time in seconds</string>
     <string name="control_min_rest_error">Invalid minimum rest time in seconds</string>
     <string name="control_gpio_error">Invalid gpio #</string>
+    <string name="control_on_high">on high</string>
 
     <!-- Components -->
     <string name="component_sensor_dht22">DHT22 Temperature Sensor</string>
@@ -60,4 +61,7 @@
     <string name="component_edit">Edit</string>
     <string name="component_delete">Delete</string>
     <string name="component_delete_confirm">Are you sure?</string>
+
+    <!-- Network Error Messages -->
+    <string name="network_error_socket_timeout">Check your network connection</string>
 </resources>

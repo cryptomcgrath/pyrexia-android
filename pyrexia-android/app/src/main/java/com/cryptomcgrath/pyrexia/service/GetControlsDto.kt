@@ -8,7 +8,7 @@ internal data class GetControlsDto(
         val id: Int,
         val name: String,
         val gpio: Int,
-        val gpio_on_high: Int,
+        val gpio_on_hi: Int,
         val last_on_time: Long,
         val last_off_time: Long,
         val min_run: Int,
@@ -21,7 +21,7 @@ internal data class ControlUpdateDto(
     val id: Int?,
     val name: String,
     val gpio: Int,
-    val gpio_on_high: Int,
+    val gpio_on_hi: Int,
     val min_run: Int,
     val min_rest: Int
 )

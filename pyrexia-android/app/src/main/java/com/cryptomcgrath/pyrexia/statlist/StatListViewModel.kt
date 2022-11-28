@@ -88,7 +88,11 @@ internal class StatListViewModel(application: Application,
                     dispatcher.post(StatListEvent.NewStatList(it))
                 },
                 onError = {
-                    dispatcher.post(StatListEvent.ConnectionError(it))
+                    if (store.state.dataLoaded) {
+                        dispatcher.post(StatListEvent.RefreshDataError(it))
+                    } else {
+                        dispatcher.post(StatListEvent.NetworkError(it))
+                    }
                 }
             ).addTo(disposables)
     }
@@ -104,7 +108,7 @@ internal class StatListViewModel(application: Application,
                     refreshData()
                 },
                 onError = {
-                    dispatcher.post(StatListEvent.ConnectionError(it))
+                    dispatcher.post(StatListEvent.RefreshDataError(it))
                 }
             )
     }
