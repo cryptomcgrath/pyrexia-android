@@ -15,5 +15,6 @@ data class Control(
     val minRest: Int = 300,
     val controlOn: Boolean = false,
     val numCycles: Int = 0,
-    val totalRun: Int = 0
+    val totalRun: Int = 0,
+    val runCapacity: Int = 0
 ): Parcelable

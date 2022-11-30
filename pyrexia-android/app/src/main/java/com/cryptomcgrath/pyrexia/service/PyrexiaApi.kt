@@ -1,7 +1,5 @@
 package com.cryptomcgrath.pyrexia.service
 
-import com.cryptomcgrath.pyrexia.model.Control
-import com.cryptomcgrath.pyrexia.model.Sensor
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.http.Body

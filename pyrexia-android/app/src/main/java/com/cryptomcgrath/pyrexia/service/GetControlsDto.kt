@@ -15,7 +15,8 @@ internal data class GetControlsDto(
         val min_rest: Int,
         val control_on: Int,
         val num_cycles: Int,
-        val total_run: Int
+        val total_run: Int,
+        val run_capacity: Int
     )
 }
 
@@ -25,5 +26,6 @@ internal data class ControlUpdateDto(
     val gpio: Int,
     val gpio_on_hi: Int,
     val min_run: Int,
-    val min_rest: Int
+    val min_rest: Int,
+    val run_capacity: Int
 )

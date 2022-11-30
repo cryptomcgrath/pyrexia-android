@@ -45,6 +45,7 @@
     <string name="control_gpio_on_high_hint">Gpio high is ON?</string>
     <string name="control_min_run_hint">Minimum run time (seconds)</string>
     <string name="control_min_rest_hint">Minimum rest time (seconds)</string>
+    <string name="control_run_capacity_hint">Propane tank run time (seconds)</string>
     <string name="control_name_error">Name cannot be blank</string>
     <string name="control_min_run_error">Invalid minimum run time in seconds</string>
     <string name="control_min_rest_error">Invalid minimum rest time in seconds</string>

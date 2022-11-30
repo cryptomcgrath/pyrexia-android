@@ -52,6 +52,7 @@ internal class ControlEditViewModel(application: Application,
     var gpio = control.gpio.toString()
     val gpioError = ObservableField<String>()
     var gpioOnHigh = control.gpioOnHigh
+    var runCapacity = control.runCapacity.toString()
 
     // TODO: show readonly info about control
     //val lastOnTime = control.lastOnTime.toLastUpdatedTimeString()
@@ -82,7 +83,8 @@ internal class ControlEditViewModel(application: Application,
                     minRun = minRun.toIntOrNull() ?: 0,
                     minRest = minRest.toIntOrNull() ?: 0,
                     gpio = gpio.toIntOrNull() ?: 0,
-                    gpioOnHigh = gpioOnHigh
+                    gpioOnHigh = gpioOnHigh,
+                    runCapacity = runCapacity.toIntOrNull() ?: 0
                 )
             )
         }

@@ -108,7 +108,8 @@ internal fun GetControlsDto.toControlsList(): List<Control> {
             minRun = it.min_run,
             controlOn = it.control_on == 1,
             lastOnTime = it.last_on_time,
-            lastOffTime = it.last_off_time
+            lastOffTime = it.last_off_time,
+            runCapacity = it.run_capacity
         )
     }
 }
@@ -138,6 +139,7 @@ internal fun Control.toControlUpdateDto(): ControlUpdateDto {
         gpio = this.gpio,
         gpio_on_hi = if (gpioOnHigh) 1 else 0,
         min_run = this.minRun,
-        min_rest = this.minRest
+        min_rest = this.minRest,
+        run_capacity = this.runCapacity
     )
 }
