@@ -11,16 +11,4 @@ data class PyDevice(
     val email: String = "",
     val password: String = "",
     val token: String = ""
-): Parcelable {
-    companion object {
-        fun createEmpty(): PyDevice {
-            return PyDevice(
-                name = "",
-                baseUrl = "",
-                email = "",
-                password = "",
-                token = ""
-            )
-        }
-    }
-}
+): Parcelable

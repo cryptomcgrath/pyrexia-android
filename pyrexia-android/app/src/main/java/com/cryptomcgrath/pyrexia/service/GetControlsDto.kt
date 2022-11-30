@@ -13,7 +13,9 @@ internal data class GetControlsDto(
         val last_off_time: Long,
         val min_run: Int,
         val min_rest: Int,
-        val control_on: Int
+        val control_on: Int,
+        val num_cycles: Int,
+        val total_run: Int
     )
 }
 

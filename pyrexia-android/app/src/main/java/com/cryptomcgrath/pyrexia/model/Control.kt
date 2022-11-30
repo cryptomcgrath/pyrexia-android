@@ -13,5 +13,7 @@ data class Control(
     val lastOffTime: Long = 0L,
     val minRun: Int = 300,
     val minRest: Int = 300,
-    val controlOn: Boolean = false
+    val controlOn: Boolean = false,
+    val numCycles: Int = 0,
+    val totalRun: Int = 0
 ): Parcelable
