@@ -3,8 +3,27 @@ Pyrexia Smart Thermostat Client for Android
 
 Thermostat client which communciates with a Raspberry Pi running pyrexia-stat
 <br><br>
-![pyrexia_screenshot_1](https://user-images.githubusercontent.com/5443337/204953103-5ec2191f-5343-419d-bb82-de0348a33426.png)
-![pyrexia_screenshot_2](https://user-images.githubusercontent.com/5443337/204953101-2896d0d1-64f1-416e-bacd-03ebdcde44dd.png)
-![pyrexia_screenshot_3](https://user-images.githubusercontent.com/5443337/204953097-c748fe9e-f767-42db-965a-39c10ed2e099.png)
-![pyrexia_screenshot_4](https://user-images.githubusercontent.com/5443337/204953117-9d19b311-da0f-4939-bb1a-899e7ffef641.png)
-![pyrexia_screenshot_5](https://user-images.githubusercontent.com/5443337/204953106-c13b06db-5c95-433c-804c-d0f5a621e383.png)
+<table>
+  <tr>
+    <td>
+      ![pyrexia_screenshot_1_sm](https://user-images.githubusercontent.com/5443337/204954603-68865236-a9ea-4047-bff6-3e084c263ef9.png)
+    </td>
+    <td>
+      ![pyrexia_screenshot_2_sm](https://user-images.githubusercontent.com/5443337/204954664-39bb8d59-204d-43df-812e-da8d1db99262.png)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      ![pyrexia_screenshot_3_sm](https://user-images.githubusercontent.com/5443337/204954775-d4c68207-49e0-4c9e-9461-1b07137ef5db.png)
+    </td>
+    <td>
+![pyrexia_screenshot_4_sm](https://user-images.githubusercontent.com/5443337/204954836-99e710d5-9ae1-4e17-980e-5d55ac2f06d4.png)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      ![pyrexia_screenshot_5_sm](https://user-images.githubusercontent.com/5443337/204954899-154ff13a-8c65-4dbd-a983-1e40e0f21cca.png)
+    </td>
+  </tr>
+  </table>
+
