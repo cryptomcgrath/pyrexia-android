@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PropaneView">
+        <attr name="percentFull" format="integer" />
+        <attr name="fullColor" format="integer" />
+        <attr name="emptyColor" format="integer" />
+    </declare-styleable>
+</resources>

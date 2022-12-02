@@ -369,7 +369,7 @@ fun ThermostatView.setOnClickDecreaseListener(listener: ThermostatView.OnClickDe
     this.onClickDecreaseListener = listener
 }
 
-private fun measureDimension(desiredSize: Int, measureSpec: Int): Int {
+internal fun measureDimension(desiredSize: Int, measureSpec: Int): Int {
     val specMode = View.MeasureSpec.getMode(measureSpec)
     val specSize = View.MeasureSpec.getSize(measureSpec)
 

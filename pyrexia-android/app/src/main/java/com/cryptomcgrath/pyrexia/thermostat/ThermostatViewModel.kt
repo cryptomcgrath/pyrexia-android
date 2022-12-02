@@ -70,6 +70,9 @@ internal class ThermostatViewModel(application: Application,
                     is ThermostatEvent.RequestMoreHistory -> {
                         fetchMoreHistoryIfNeeded(it.timeStamp)
                     }
+                    ThermostatEvent.OnClickRefill -> {
+                        refill()
+                    }
                 }
                 eventQueue.post(it)
             },
@@ -157,7 +160,7 @@ internal class ThermostatViewModel(application: Application,
             onSuccess = {
                 dispatcher.post(ThermostatEvent.NewHistory(store.state.historyOffset, it))
             }, onError = {
-
+                    // ignore
             }
         ).addTo(disposables)
     }
@@ -197,8 +200,8 @@ internal class ThermostatViewModel(application: Application,
                 onComplete = {
                     refreshData()
                 },
-                onError = {
-                    dispatcher.post(ThermostatEvent.ConnectionError(it))
+                onError = { throwable ->
+                    dispatcher.post(ThermostatEvent.ConnectionError(throwable))
                 }
             ).addTo(disposables)
     }
@@ -211,8 +214,8 @@ internal class ThermostatViewModel(application: Application,
                 onComplete = {
                     refreshData()
                 },
-                onError = {
-                    dispatcher.post(ThermostatEvent.ConnectionError(it))
+                onError = { throwable ->
+                    dispatcher.post(ThermostatEvent.ConnectionError(throwable))
                 }
             ).addTo(disposables)
     }
@@ -227,8 +230,8 @@ internal class ThermostatViewModel(application: Application,
                         onComplete = {
                             refreshData()
                         },
-                        onError = {
-                            dispatcher.post(ThermostatEvent.ConnectionError(it))
+                        onError = { throwable ->
+                            dispatcher.post(ThermostatEvent.ConnectionError(throwable))
                         }
                     ).addTo(disposables)
             }
@@ -245,11 +248,27 @@ internal class ThermostatViewModel(application: Application,
                         onComplete = {
                             refreshData()
                         },
-                        onError = {
-                            dispatcher.post(ThermostatEvent.ConnectionError(it))
+                        onError = { throwable ->
+                            dispatcher.post(ThermostatEvent.ConnectionError(throwable))
                         }
                     ).addTo(disposables)
             }
+        }
+    }
+
+    private fun refill() {
+        current?.let {
+            pyrexiaService.refill(it.control.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = {
+                        refreshData()
+                    },
+                    onError = { throwable ->
+                        dispatcher.post(ThermostatEvent.ConnectionError(throwable))
+                    }
+                )
         }
     }
 

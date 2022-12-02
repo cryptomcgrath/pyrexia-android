@@ -2,6 +2,7 @@ package com.cryptomcgrath.pyrexia.thermostat
 
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.util.DiffableItem
+import kotlin.math.max
 
 internal class StatModeDiffableItem(mode: Program.Mode) : DiffableItem {
     val modeText = mode.name.sentenceCase()

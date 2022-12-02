@@ -1,11 +1,11 @@
 package com.cryptomcgrath.pyrexia.statlist
 
-import com.cryptomcgrath.pyrexia.model.ProgramRun
+import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.edwardmcgrath.blueflux.core.Event
 
 internal sealed class StatListEvent: Event {
 
-    data class NewStatList(val statList: List<ProgramRun>): StatListEvent()
+    data class NewStatList(val statList: List<VirtualStat>): StatListEvent()
     data class RefreshDataError(val throwable: Throwable): StatListEvent()
     data class NetworkError(val throwable: Throwable): StatListEvent()
 

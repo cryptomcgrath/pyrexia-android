@@ -3,13 +3,13 @@ package com.cryptomcgrath.pyrexia.deviceconfig
 import android.view.View
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
-import com.cryptomcgrath.pyrexia.model.ProgramRun
+import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.cryptomcgrath.pyrexia.thermostat.sentenceCase
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Dispatcher
 
-internal class VStatDiffableItem(val stat: ProgramRun, dispatcher: Dispatcher): DiffableItem {
+internal class VStatDiffableItem(val stat: VirtualStat, dispatcher: Dispatcher): DiffableItem {
     val name = stat.program.name
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
     val sensorValue = stat.sensor.value.toFormattedTemperatureString()

@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
-import androidx.navigation.fragment.findNavController
 import com.cryptomcgrath.pyrexia.R
 import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
@@ -16,17 +15,22 @@ private val lastUpdatedFormatter by lazy {
     SimpleDateFormat("MMM dd h:mma", Locale.US)
 }
 
+const val SECONDS_IN_DAY = 24*3600
+const val SECONDS_IN_HOUR = 3600
+const val SECONDS_IN_MINUTE = 60
+
 internal fun Long.toLastUpdatedTimeString(): String {
     val now = Date().time / 1000
     val elapsed = now - this
-    val d = (elapsed / 24*60*60).toInt()
-    val h = ((elapsed - d * 24*60*60) / 3600).toInt()
-    val m = (elapsed - (d * 24*60*60) - (h * 3600)) / 60
-    val s = elapsed - (d * 24*60*60) - (h * 3600) - (m * 60)
+    val d = (elapsed / (SECONDS_IN_DAY)).toInt()
+    val h = ((elapsed - d * SECONDS_IN_DAY) / SECONDS_IN_HOUR).toInt()
+    val m = (elapsed - (d * SECONDS_IN_DAY) - (h * SECONDS_IN_HOUR)) / SECONDS_IN_MINUTE
+    val s = elapsed - (d * SECONDS_IN_DAY) - (h * SECONDS_IN_HOUR) - (m * SECONDS_IN_MINUTE)
 
     return when {
         d > 0 -> lastUpdatedFormatter.format(this*1000)
-        h > 0 -> "$h hours $m minutes ago"
+        h > 1 -> "$h hours $m minutes ago"
+        m == 1L -> "$m minute ago"
         m > 0 -> "$m minutes ago"
         else -> "$s seconds ago"
     }

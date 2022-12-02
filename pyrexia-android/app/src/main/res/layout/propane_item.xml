@@ -4,37 +4,44 @@
     <data>
         <variable
             name="model"
-            type="com.cryptomcgrath.pyrexia.thermostat.StatModeDiffableItem" />
+            type="com.cryptomcgrath.pyrexia.thermostat.PropaneDiffableItem" />
         <import type="android.view.View" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/section_spacing"
+        android:layout_marginTop="@dimen/section_half"
         android:layout_marginStart="@dimen/side_margin"
-        android:layout_marginEnd="@dimen/side_margin">
+        android:layout_marginEnd="@dimen/side_margin"
+        tools:background="@color/cooling">
 
         <TextView
-            android:id="@+id/mode_text"
+            android:id="@+id/propane_remaining"
+            android:text="@{model.propaneRemaining}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/mode"
             android:textSize="18sp"
             android:textColor="@color/white"
+            android:visibility="@{model.showPropane ? View.VISIBLE : View.GONE}"
+            tools:text="Propane: 50%"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/mode_name"
-            android:text="@{model.modeText}"
+            android:id="@+id/propane_refill"
+            android:text="@string/refill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:textSize="18sp"
-            android:textColor="@color/white"
-            tools:text="Heat"
-            app:layout_constraintStart_toEndOf="@id/mode_text"
+            android:fontFamily="sans-serif"
+            android:textStyle="italic"
+            android:textColor="@color/green"
+            android:visibility="@{model.showPropane ? View.VISIBLE : View.GONE}"
+            android:onClick="@{(v)->model.onClickRefill(v)}"
+            app:layout_constraintStart_toEndOf="@id/propane_remaining"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

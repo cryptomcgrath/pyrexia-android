@@ -9,6 +9,7 @@ import com.cryptomcgrath.pyrexia.RxStoreAdapter
 import com.cryptomcgrath.pyrexia.databinding.CycleInfoItemBinding
 import com.cryptomcgrath.pyrexia.databinding.HistoryChartItemBinding
 import com.cryptomcgrath.pyrexia.databinding.HistoryInfoItemBinding
+import com.cryptomcgrath.pyrexia.databinding.PropaneItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatEnabledItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatModeItemBinding
 import com.cryptomcgrath.pyrexia.databinding.ThermostatItemBinding
@@ -28,6 +29,7 @@ internal class ThermostatAdapter(private val context: Context,
             StatDiffableItem::class.java,
             StatModeDiffableItem::class.java,
             StatEnabledDiffableItem::class.java,
+            PropaneDiffableItem::class.java,
             StatLoadingDiffableItem::class.java,
             HistoryChartDiffableItem::class.java,
             HistoryInfoDiffableItem::class.java,
@@ -43,8 +45,14 @@ internal class ThermostatAdapter(private val context: Context,
         } else {
             state.current?.let {
                 items += StatDiffableItem(state.current, dispatcher)
-                items += StatModeDiffableItem(state.current.program.mode)
+                items += StatModeDiffableItem(mode = state.current.program.mode)
+                items += PropaneDiffableItem(
+                    dispatcher = dispatcher,
+                    totalRun = state.current.control.totalRun,
+                    runCapacity = state.current.control.runCapacity
+                )
                 items += StatEnabledDiffableItem(dispatcher, state.current.program.enabled, state.current.program.id)
+
                 items += HistoryChartDiffableItem(context, store)
                 items += HistoryInfoDiffableItem(state.historyOldtoNew)
 
@@ -78,6 +86,13 @@ internal class ThermostatAdapter(private val context: Context,
                 val binding = StatEnabledItemBinding.inflate(inflater, parent, false)
                 BindFunViewHolder(binding) {
                     binding.model = it as StatEnabledDiffableItem
+                }
+            }
+
+            PropaneDiffableItem::class.java -> {
+                val binding = PropaneItemBinding.inflate(inflater, parent, false)
+                BindFunViewHolder(binding) {
+                    binding.model = it as PropaneDiffableItem
                 }
             }
 

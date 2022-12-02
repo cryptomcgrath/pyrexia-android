@@ -2,14 +2,14 @@ package com.cryptomcgrath.pyrexia.thermostat
 
 import com.cryptomcgrath.pyrexia.model.History
 import com.cryptomcgrath.pyrexia.model.Program
-import com.cryptomcgrath.pyrexia.model.ProgramRun
+import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.edwardmcgrath.blueflux.core.State
 import java.lang.Float.min
 import kotlin.math.abs
 import kotlin.math.max
 
 internal data class ThermostatState(
-    val statList: List<ProgramRun> = emptyList(),
+    val statList: List<VirtualStat> = emptyList(),
     val selectedStatId: Int? = null,
     val connectionError: Throwable? = null,
     val isLoading: Boolean = false,

@@ -3,27 +3,12 @@ package com.cryptomcgrath.pyrexia.model
 import com.cryptomcgrath.pyrexia.service.ControlUpdateDto
 import com.cryptomcgrath.pyrexia.service.GetControlsDto
 import com.cryptomcgrath.pyrexia.service.GetHistoryDto
-import com.cryptomcgrath.pyrexia.service.GetProgramsDto
 import com.cryptomcgrath.pyrexia.service.GetSensorsDto
 import com.cryptomcgrath.pyrexia.service.GetStatListDto
 import com.cryptomcgrath.pyrexia.service.SensorUpdateDto
 import java.util.*
 
-internal fun GetProgramsDto.toProgramList(): List<Program> {
-    return this.data.map {
-        Program(
-            id = it.id,
-            name = it.name,
-            sensor_id = it.sensor_id,
-            control_id = it.control_id,
-            mode = Program.Mode.fromString(it.mode),
-            enabled = it.enabled == 1,
-            setPoint = it.set_point
-        )
-    }
-}
-
-internal fun GetStatListDto.toStatList(): List<ProgramRun> {
+internal fun GetStatListDto.toStatList(): List<VirtualStat> {
     return this.data.map {
         val program = Program(
             id = it.program_id,
@@ -43,14 +28,16 @@ internal fun GetStatListDto.toStatList(): List<ProgramRun> {
             minRest = it.min_rest,
             gpio = it.gpio,
             gpioOnHigh = it.gpio_on_high == 1,
-            controlOn = it.control_on == 1
+            controlOn = it.control_on == 1,
+            totalRun = it.total_run,
+            runCapacity = it.run_capacity
         )
         val sensor = Sensor(
             id = it.sensor_id,
             name = it.sensor_name,
             value = it.sensor_value
         )
-        ProgramRun(
+        VirtualStat(
             program = program,
             control = control,
             sensor = sensor
@@ -109,7 +96,8 @@ internal fun GetControlsDto.toControlsList(): List<Control> {
             controlOn = it.control_on == 1,
             lastOnTime = it.last_on_time,
             lastOffTime = it.last_off_time,
-            runCapacity = it.run_capacity
+            runCapacity = it.run_capacity,
+            totalRun = it.total_run
         )
     }
 }

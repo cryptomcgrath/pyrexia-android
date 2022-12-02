@@ -22,6 +22,48 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <TextView
+            style="@style/TextRegular12Grey61"
+            android:id="@+id/run_time_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/control_run_time"
+            app:layout_constraintTop_toBottomOf="@id/control_image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/control_image" />
+
+        <TextView
+            style="@style/TextRegular12Grey61"
+            android:id="@+id/run_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.totalRun}"
+            app:layout_constraintTop_toBottomOf="@id/run_time_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/control_image" />
+
+        <TextView
+            style="@style/TextRegular12Grey61"
+            android:id="@+id/last_text_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@{model.lastTextResId}"
+            app:layout_constraintTop_toBottomOf="@id/run_time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/control_image" />
+
+        <TextView
+            style="@style/TextRegular12Grey61"
+            android:id="@+id/last_time_string"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{model.lastTimeString}"
+            app:layout_constraintTop_toBottomOf="@id/last_text_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/control_image" />
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:id="@+id/name_edit"
@@ -77,6 +119,7 @@
             android:paddingEnd="8dp"
             android:text="@string/control_on_high"
             android:checked="@={model.gpioOnHigh}"
+            android:buttonTint="@color/pi_green"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/gpio_edit"
             app:layout_constraintBottom_toBottomOf="@id/gpio_edit"/>

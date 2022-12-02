@@ -3,7 +3,7 @@ package com.cryptomcgrath.pyrexia.service
 import android.app.Application
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.History
-import com.cryptomcgrath.pyrexia.model.ProgramRun
+import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
 import com.cryptomcgrath.pyrexia.model.toControlUpdateDto
@@ -52,7 +52,7 @@ internal class PyrexiaService(application: Application, pyDevice: PyDevice) {
             .build()
     private val client = retrofit.create(PyrexiaApi::class.java)
 
-    fun getStatList(): Single<List<ProgramRun>> {
+    fun getStatList(): Single<List<VirtualStat>> {
         return client.getStatList()
             .map {
                 it.toStatList()
@@ -73,6 +73,10 @@ internal class PyrexiaService(application: Application, pyDevice: PyDevice) {
 
     fun statDisable(id: Int): Completable {
         return client.statDisable(id)
+    }
+
+    fun refill(id: Int): Completable {
+        return client.refill(id)
     }
 
     fun getHistory(offset: Int, limit: Int, programId: Int?): Single<List<History>> {
@@ -113,7 +117,7 @@ internal class PyrexiaService(application: Application, pyDevice: PyDevice) {
     }
 
     fun updateControl(control: Control): Completable {
-        return client.updateControl(control.id.toString(), control.toControlUpdateDto())
+        return client.updateControl(control.id, control.toControlUpdateDto())
     }
 
     fun deleteControl(control: Control): Completable {

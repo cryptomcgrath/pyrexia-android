@@ -19,4 +19,10 @@
         <item name="android:textColor">@color/grey42</item>
     </style>
 
+    <style name="TextRegular12Grey61" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/grey61</item>
+    </style>
+
 </resources>

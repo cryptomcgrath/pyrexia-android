@@ -53,10 +53,17 @@ internal class ControlEditViewModel(application: Application,
     val gpioError = ObservableField<String>()
     var gpioOnHigh = control.gpioOnHigh
     var runCapacity = control.runCapacity.toString()
+    val totalRun = control.totalRun.toString()
 
-    // TODO: show readonly info about control
-    //val lastOnTime = control.lastOnTime.toLastUpdatedTimeString()
-    //val lastOffTime = control.lastOffTime.toLastUpdatedTimeString()
+    val lastTextResId = if (control.lastOnTime > control.lastOffTime)
+        R.string.control_last_on
+    else R.string.control_last_off
+
+    val lastTimeString = if (control.lastOnTime > control.lastOffTime) {
+        control.lastOnTime.toLastUpdatedTimeString()
+    } else {
+        control.lastOffTime.toLastUpdatedTimeString()
+    }
 
     init {
         dispatcher.getEventBus()

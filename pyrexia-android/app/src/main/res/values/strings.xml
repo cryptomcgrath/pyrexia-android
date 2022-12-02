@@ -14,6 +14,7 @@
     <string name="off">Off</string>
     <string name="enabled">Enabled:</string>
     <string name="unknown_temp">---</string>
+    <string name="refill">refill</string>
 
     <!-- pydevice overflow menu -->
     <string name="forget">Forget</string>
@@ -40,6 +41,9 @@
     <string name="sensor_update_interval_hint">Update interval (seconds)</string>
 
     <!-- ControlEdit -->
+    <string name="control_run_time">Run time:</string>
+    <string name="control_last_off">Last off:</string>
+    <string name="control_last_on">Last on:</string>
     <string name="control_name_hint">Name for this control</string>
     <string name="control_gpio_hint">Gpio #</string>
     <string name="control_gpio_on_high_hint">Gpio high is ON?</string>
@@ -51,6 +55,7 @@
     <string name="control_min_rest_error">Invalid minimum rest time in seconds</string>
     <string name="control_gpio_error">Invalid gpio #</string>
     <string name="control_on_high">on high</string>
+    <string name="control_refill_confirm">Refill propane to 100%?</string>
 
     <!-- Components -->
     <string name="component_sensor_dht22">DHT22 Temperature Sensor</string>

@@ -86,7 +86,7 @@ internal interface PyrexiaApi {
         "Accept: application/json",
         "Content-Type: application/json")
     @PATCH("/controls/{id}")
-    fun updateControl(@Path("id") id: String,
+    fun updateControl(@Path("id") id: Int,
                       @Body control: ControlUpdateDto): Completable
 
     @Headers(
@@ -100,4 +100,10 @@ internal interface PyrexiaApi {
         "Content-Type: application/json")
     @DELETE("/controls/{id}")
     fun deleteControl(@Path("id") id: String): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @POST("/controls/{id}/refill")
+    fun refill(@Path("id") id: Int): Completable
 }

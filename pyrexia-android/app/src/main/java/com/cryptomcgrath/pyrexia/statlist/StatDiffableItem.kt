@@ -5,11 +5,11 @@ import android.util.Log
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
-import com.cryptomcgrath.pyrexia.model.ProgramRun
+import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Dispatcher
 
-internal class StatDiffableItem(private val stat: ProgramRun,
+internal class StatDiffableItem(private val stat: VirtualStat,
                                 private val dispatcher: Dispatcher) : DiffableItem {
 
     val name = stat.program.name
