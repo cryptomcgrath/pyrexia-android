@@ -97,7 +97,7 @@ internal class StatEditViewModel(application: Application,
                     eventQueue.post(StatEditUiEvent.SaveStatSuccess)
                 },
                 onError = {
-                    // TODO:
+                    eventQueue.post(StatEditUiEvent.ShowNetworkError(it))
                 }
             ).addTo(disposables)
     }
@@ -109,5 +109,6 @@ internal class StatEditViewModel(application: Application,
 
     sealed class StatEditUiEvent : Event {
         object SaveStatSuccess : StatEditUiEvent()
+        data class ShowNetworkError(val throwable: Throwable): StatEditUiEvent()
     }
 }

@@ -36,6 +36,15 @@ internal class StatEditBottomSheetFragment: BottomSheetDialogFragment() {
                     deviceConfigViewModel.refreshData()
                     dismiss()
                 }
+
+                is StatEditViewModel.StatEditUiEvent.ShowNetworkError -> {
+                    createNetworkErrorAlertDialog(
+                        context = requireContext(),
+                        throwable = event.throwable
+                    ) {
+                        // do nothing on dismiss
+                    }.show()
+                }
             }
         }
     }
