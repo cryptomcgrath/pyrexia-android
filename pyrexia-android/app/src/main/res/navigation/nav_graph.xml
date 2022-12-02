@@ -49,7 +49,7 @@
     <fragment
         android:id="@+id/deviceConfigFragment"
         android:name="com.cryptomcgrath.pyrexia.deviceconfig.DeviceConfigFragment"
-        android:label="{name}" >
+        android:label="{name} configure" >
         <argument
             android:name="pyDevice"
             app:argType="com.cryptomcgrath.pyrexia.model.PyDevice" />

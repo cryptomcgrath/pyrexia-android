@@ -173,7 +173,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/text_input_vertical_spacing"
             app:boxBackgroundColor="@color/white"
-            app:layout_constraintTop_toBottomOf="@id/min_run"
+            app:layout_constraintTop_toBottomOf="@id/min_rest"
             app:layout_constraintStart_toStartOf="@id/name_edit"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -194,7 +194,7 @@
             android:layout_marginTop="10dp"
             android:text="@string/button_save"
             android:onClick="@{(v)->model.onClickSave(v)}"
-            app:layout_constraintTop_toBottomOf="@id/min_rest"
+            app:layout_constraintTop_toBottomOf="@id/run_capacity"
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
