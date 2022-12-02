@@ -1,7 +1,7 @@
 # pyrexia-android
 Pyrexia Smart Thermostat Client for Android
 
-Thermostat client which communciates with a Raspberry Pi running pyrexia-stat
+Thermostat client which communciates with a Raspberry Pi running pyrexia-stat thermostat software ( https://github.com/cryptomcgrath/pyrexia-stat )
 <br><br>
 ![pyrexia_screenshot_1_sm](https://user-images.githubusercontent.com/5443337/204954603-68865236-a9ea-4047-bff6-3e084c263ef9.png)
 ![pyrexia_screenshot_2_sm](https://user-images.githubusercontent.com/5443337/204954664-39bb8d59-204d-43df-812e-da8d1db99262.png)
