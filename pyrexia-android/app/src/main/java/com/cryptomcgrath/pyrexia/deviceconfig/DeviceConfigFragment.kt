@@ -14,6 +14,7 @@ import com.cryptomcgrath.pyrexia.databinding.FragmentDeviceConfigBinding
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
+import com.cryptomcgrath.pyrexia.model.VirtualStat
 
 internal class DeviceConfigFragment: Fragment() {
     private val args: DeviceConfigFragmentArgs by navArgs()
@@ -34,6 +35,10 @@ internal class DeviceConfigFragment: Fragment() {
 
                 is DeviceConfigEvent.GoToControlEdit -> {
                     goToControlEditDialog(args.pyDevice, event.control)
+                }
+
+                is DeviceConfigEvent.GoToStatEdit -> {
+                    goToStatEditDialog(args.pyDevice, event.stat)
                 }
 
                 is DeviceConfigEvent.NetworkError -> {
@@ -117,6 +122,11 @@ internal class DeviceConfigFragment: Fragment() {
 
     private fun goToAddComponent(pyDevice: PyDevice) {
         val action = DeviceConfigFragmentDirections.actionDeviceConfigFragmentToAddComponentBottomSheetFragment(pyDevice)
+        findNavController().navigate(action)
+    }
+
+    private fun goToStatEditDialog(pyDevice: PyDevice, stat: VirtualStat) {
+        val action = DeviceConfigFragmentDirections.actionDeviceConfigFragmentToStatEditBottomSheetFragment(pyDevice, stat)
         findNavController().navigate(action)
     }
 }

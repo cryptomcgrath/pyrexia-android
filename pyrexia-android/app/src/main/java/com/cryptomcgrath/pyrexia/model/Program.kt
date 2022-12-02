@@ -1,8 +1,11 @@
 package com.cryptomcgrath.pyrexia.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.Locale
 
-internal data class Program(
+@Parcelize
+data class Program(
     val id: Int,
     val name: String,
     val setPoint: Float,
@@ -10,7 +13,7 @@ internal data class Program(
     val sensor_id: Int,
     val mode: Mode,
     val enabled: Boolean
-) {
+): Parcelable {
     enum class Mode {
         HEAT,
         COOL;

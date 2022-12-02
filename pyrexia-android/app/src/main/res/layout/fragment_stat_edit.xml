@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="model"
+            type="com.cryptomcgrath.pyrexia.deviceconfig.StatEditViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/side_margin">
+
+        <com.cryptomcgrath.pyrexia.thermostat.ThermostatView
+            android:id="@+id/vstat_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:bezelWidth="3dp"
+            app:currentTemp="@{model.sensorValue}"
+            app:setPoint="@{model.setPointText}"
+            app:centerColor="@{model.backgroundColor}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:id="@+id/name_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/text_input_left_margin"
+            app:boxBackgroundColor="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/vstat_image"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                style="@style/TextMedium18Grey61"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={model.name}"
+                android:error="@{model.nameError}"
+                android:hint="@string/stat_name_hint"
+                android:singleLine="true"
+                tools:text="Living Room Sensor" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/button_save"
+            android:onClick="@{(v)->model.onClickSave(v)}"
+            app:layout_constraintTop_toBottomOf="@id/name_edit"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+

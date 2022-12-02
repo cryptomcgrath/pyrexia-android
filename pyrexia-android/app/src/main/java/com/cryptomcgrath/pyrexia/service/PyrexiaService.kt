@@ -3,9 +3,11 @@ package com.cryptomcgrath.pyrexia.service
 import android.app.Application
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.History
+import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
+import com.cryptomcgrath.pyrexia.model.toAddStatDto
 import com.cryptomcgrath.pyrexia.model.toControlUpdateDto
 import com.cryptomcgrath.pyrexia.model.toControlsList
 import com.cryptomcgrath.pyrexia.model.toHistoryList
@@ -59,6 +61,16 @@ internal class PyrexiaService(application: Application, pyDevice: PyDevice) {
             }
     }
 
+    fun addStat(program: Program): Completable {
+        return client.addStat(
+            program.toAddStatDto()
+        )
+    }
+
+    fun updateStat(program: Program): Completable {
+        return client.updateStat(program.id, program.toAddStatDto())
+    }
+
     fun statIncrease(id: Int): Completable {
         return client.statIncrease(id)
     }
@@ -105,11 +117,11 @@ internal class PyrexiaService(application: Application, pyDevice: PyDevice) {
     }
 
     fun updateSensor(sensor: Sensor): Completable {
-        return client.updateSensor(sensor.id.toString(), sensor.toSensorUpdateDto())
+        return client.updateSensor(sensor.id, sensor.toSensorUpdateDto())
     }
 
     fun deleteSensor(sensor: Sensor): Completable {
-        return client.deleteSensor(sensor.id.toString())
+        return client.deleteSensor(sensor.id)
     }
 
     fun addControl(control: Control): Completable {
@@ -121,7 +133,7 @@ internal class PyrexiaService(application: Application, pyDevice: PyDevice) {
     }
 
     fun deleteControl(control: Control): Completable {
-        return client.deleteControl(control.id.toString())
+        return client.deleteControl(control.id)
     }
 }
 

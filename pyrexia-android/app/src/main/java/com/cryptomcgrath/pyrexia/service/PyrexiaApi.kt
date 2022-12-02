@@ -22,6 +22,19 @@ internal interface PyrexiaApi {
     @Headers(
         "Accept: application/json",
         "Content-Type: application/json")
+    @POST("/programs")
+    fun addStat(@Body program: AddStatDto): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @PATCH("/programs/{id}")
+    fun updateStat(@Path("id") id: Int,
+                   @Body program: AddStatDto): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
     @POST("/stat/{id}/increase")
     fun statIncrease(@Path("id") id: Int): Completable
 
@@ -67,7 +80,7 @@ internal interface PyrexiaApi {
         "Accept: application/json",
         "Content-Type: application/json")
     @PATCH("/sensors/{id}")
-    fun updateSensor(@Path("id") id: String,
+    fun updateSensor(@Path("id") id: Int,
                      @Body sensor: SensorUpdateDto): Completable
 
     @Headers(
@@ -80,7 +93,7 @@ internal interface PyrexiaApi {
         "Accept: application/json",
         "Content-Type: application/json")
     @DELETE("/sensors/{id}")
-    fun deleteSensor(@Path("id") id: String): Completable
+    fun deleteSensor(@Path("id") id: Int): Completable
 
     @Headers(
         "Accept: application/json",
@@ -99,7 +112,7 @@ internal interface PyrexiaApi {
         "Accept: application/json",
         "Content-Type: application/json")
     @DELETE("/controls/{id}")
-    fun deleteControl(@Path("id") id: String): Completable
+    fun deleteControl(@Path("id") id: Int): Completable
 
     @Headers(
         "Accept: application/json",

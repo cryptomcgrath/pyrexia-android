@@ -40,6 +40,9 @@
     <string name="sensor_name_hint">Sensor Name</string>
     <string name="sensor_update_interval_hint">Update interval (seconds)</string>
 
+    <!-- StatEditViewModel -->
+    <string name="stat_name_hint">Thermostat name</string>
+
     <!-- ControlEdit -->
     <string name="control_run_time">Run time:</string>
     <string name="control_last_off">Last off:</string>

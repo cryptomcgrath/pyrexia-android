@@ -1,5 +1,6 @@
 package com.cryptomcgrath.pyrexia.model
 
+import com.cryptomcgrath.pyrexia.service.AddStatDto
 import com.cryptomcgrath.pyrexia.service.ControlUpdateDto
 import com.cryptomcgrath.pyrexia.service.GetControlsDto
 import com.cryptomcgrath.pyrexia.service.GetHistoryDto
@@ -129,5 +130,16 @@ internal fun Control.toControlUpdateDto(): ControlUpdateDto {
         min_run = this.minRun,
         min_rest = this.minRest,
         run_capacity = this.runCapacity
+    )
+}
+
+internal fun Program.toAddStatDto(): AddStatDto {
+    return AddStatDto(
+        name = this.name,
+        mode = this.mode.name,
+        enabled = if (this.enabled) 1 else 0,
+        sensor_id = this.sensor_id,
+        control_id = this.control_id,
+        set_point = this.setPoint
     )
 }

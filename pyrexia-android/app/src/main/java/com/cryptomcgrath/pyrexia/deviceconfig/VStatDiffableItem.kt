@@ -1,6 +1,8 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
 import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.PopupMenu
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.VirtualStat
@@ -9,7 +11,8 @@ import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Dispatcher
 
-internal class VStatDiffableItem(val stat: VirtualStat, dispatcher: Dispatcher): DiffableItem {
+internal class VStatDiffableItem(val stat: VirtualStat,
+                                 private val dispatcher: Dispatcher): DiffableItem {
     val name = stat.program.name
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
     val sensorValue = stat.sensor.value.toFormattedTemperatureString()
@@ -23,7 +26,36 @@ internal class VStatDiffableItem(val stat: VirtualStat, dispatcher: Dispatcher):
     }
 
     fun onClickOverflow(view: View?) {
+        view?.let { showPopupMenu(view) }
+    }
 
+    private fun showPopupMenu(view: View) {
+        PopupMenu(view.context, view).apply {
+            menuInflater.inflate(R.menu.deviceconfig_overflow, menu)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.component_delete -> {
+                        AlertDialog.Builder(view.context)
+                            .setMessage(view.context.getString(R.string.component_delete_confirm))
+                            .setPositiveButton(R.string.yes) { _, _ ->
+                                //dispatcher.post(DeviceConfigEvent.GoToSensorDelete(sensor))
+                            }
+                            .setNegativeButton(R.string.no) { _, _ -> }
+                            .show()
+                        true
+                    }
+
+                    R.id.component_edit -> {
+                        dispatcher.post(DeviceConfigEvent.GoToStatEdit(stat))
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+            setForceShowIcon(true)
+            show()
+        }
     }
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {
