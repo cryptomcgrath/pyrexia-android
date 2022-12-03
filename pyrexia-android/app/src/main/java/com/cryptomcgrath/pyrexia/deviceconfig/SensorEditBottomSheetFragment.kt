@@ -32,9 +32,17 @@ internal class SensorEditBottomSheetFragment: BottomSheetDialogFragment() {
 
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
-                SensorEditEvent.SaveSensorSuccess -> {
+                SensorEditViewModel.SensorEditUiEvent.SaveSensorSuccess -> {
                     deviceConfigViewModel.refreshData()
                     dismiss()
+                }
+                is SensorEditViewModel.SensorEditUiEvent.ShowNetworkError -> {
+                    createNetworkErrorAlertDialog(
+                        context = requireContext(),
+                        throwable = event.throwable
+                    ) {
+                        // do nothing on dismiss
+                    }.show()
                 }
             }
         }
@@ -51,5 +59,4 @@ internal class SensorEditBottomSheetFragment: BottomSheetDialogFragment() {
             dialog.setContentView(root)
         }
     }
-
 }

@@ -10,12 +10,8 @@ import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
-import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
-import com.edwardmcgrath.blueflux.core.ReducerFun
-import com.edwardmcgrath.blueflux.core.RxStore
-import com.edwardmcgrath.blueflux.core.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -37,8 +33,6 @@ internal class SensorEditViewModel(application: Application,
 
     private val pyrexiaService = PyrexiaService(application, pyDevice)
 
-    private val store = RxStore.create(sensorEditReducerFun)
-    private val dispatcher = Dispatcher.create(store)
     val eventQueue = EventQueue.create()
     private val disposables = CompositeDisposable()
 
@@ -53,22 +47,6 @@ internal class SensorEditViewModel(application: Application,
 
     // TODO: show readonly info about sensor
     val lastUpdated = sensor.lastUpdatedTs.toLastUpdatedTimeString()
-
-    init {
-        dispatcher.getEventBus()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    eventQueue.post(it)
-                },
-                onError = {
-                    // ignore
-                }
-            ).addTo(disposables)
-
-        dispatcher.post(SensorEditEvent.Init(sensor))
-    }
 
     fun onClickSave(view: View?) {
         view?.hideKeyboard()
@@ -92,10 +70,10 @@ internal class SensorEditViewModel(application: Application,
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    dispatcher.post(SensorEditEvent.SaveSensorSuccess)
+                    eventQueue.post(SensorEditUiEvent.SaveSensorSuccess)
                 },
                 onError = {
-                    // TODO:
+                    eventQueue.post(SensorEditUiEvent.ShowNetworkError(it))
                 }
             ).addTo(disposables)
     }
@@ -124,27 +102,10 @@ internal class SensorEditViewModel(application: Application,
         super.onCleared()
         disposables.clear()
     }
-}
 
-internal data class SensorEditState(
-    val sensor: Sensor? = null
-): State
-
-internal val sensorEditReducerFun: ReducerFun<SensorEditState> = { inState, event ->
-    val state = inState ?: SensorEditState()
-
-    when (event) {
-        is SensorEditEvent.Init -> {
-            state.copy(
-                sensor = event.sensor
-            )
-        }
-
-        else -> state
+    sealed class SensorEditUiEvent : Event {
+        object SaveSensorSuccess: SensorEditUiEvent()
+        data class ShowNetworkError(val throwable: Throwable): SensorEditUiEvent()
     }
 }
 
-internal sealed class SensorEditEvent : Event {
-    data class Init(val sensor: Sensor): SensorEditEvent()
-    object SaveSensorSuccess: SensorEditEvent()
-}

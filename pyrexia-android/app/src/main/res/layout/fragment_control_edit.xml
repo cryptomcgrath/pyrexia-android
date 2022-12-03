@@ -7,6 +7,7 @@
         <variable
             name="model"
             type="com.cryptomcgrath.pyrexia.deviceconfig.ControlEditViewModel" />
+        <import type="android.view.View" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -29,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/control_run_time"
+            android:visibility="@{model.showRunTime ? View.VISIBLE : View.GONE}"
             app:layout_constraintTop_toBottomOf="@id/control_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="@id/control_image" />
@@ -39,6 +41,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@{model.totalRun}"
+            android:visibility="@{model.showRunTime ? View.VISIBLE : View.GONE}"
             app:layout_constraintTop_toBottomOf="@id/run_time_text"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="@id/control_image" />
@@ -50,6 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@{model.lastTextResId}"
+            android:visibility="@{model.showLastText ? View.VISIBLE : View.GONE}"
             app:layout_constraintTop_toBottomOf="@id/run_time"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="@id/control_image" />
@@ -60,6 +64,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@{model.lastTimeString}"
+            android:visibility="@{model.showLastText ? View.VISIBLE : View.GONE}"
             app:layout_constraintTop_toBottomOf="@id/last_text_label"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="@id/control_image" />

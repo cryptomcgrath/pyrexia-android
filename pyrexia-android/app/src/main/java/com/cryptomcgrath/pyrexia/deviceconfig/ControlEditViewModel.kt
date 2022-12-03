@@ -10,12 +10,8 @@ import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
-import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
-import com.edwardmcgrath.blueflux.core.ReducerFun
-import com.edwardmcgrath.blueflux.core.RxStore
-import com.edwardmcgrath.blueflux.core.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -37,10 +33,8 @@ internal class ControlEditViewModel(application: Application,
     }
 
     private val pyrexiaService = PyrexiaService(application, pyDevice)
-    private val store = RxStore.create(controlEditReducerFun)
-    private val dispatcher = Dispatcher.create(store)
-    val eventQueue = EventQueue.create()
 
+    val eventQueue = EventQueue.create()
     private val disposables = CompositeDisposable()
 
     var name = control.name
@@ -54,6 +48,7 @@ internal class ControlEditViewModel(application: Application,
     var gpioOnHigh = control.gpioOnHigh
     var runCapacity = control.runCapacity.toString()
     val totalRun = control.totalRun.toString()
+    val showRunTime = control.totalRun > 0
 
     val lastTextResId = if (control.lastOnTime > control.lastOffTime)
         R.string.control_last_on
@@ -64,22 +59,7 @@ internal class ControlEditViewModel(application: Application,
     } else {
         control.lastOffTime.toLastUpdatedTimeString()
     }
-
-    init {
-        dispatcher.getEventBus()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    eventQueue.post(it)
-                },
-                onError = {
-                    // ignore
-                }
-            ).addTo(disposables)
-
-        dispatcher.post(ControlEditEvent.Init(control))
-    }
+    val showLastText = control.lastOffTime > 0
 
     fun onClickSave(view: View?) {
         view?.hideKeyboard()
@@ -106,10 +86,10 @@ internal class ControlEditViewModel(application: Application,
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    dispatcher.post(ControlEditEvent.SaveControlSuccess)
+                    eventQueue.post(ControlEditUiEvent.SaveControlSuccess)
                 },
                 onError = {
-                    dispatcher.post(ControlEditEvent.ShowNetworkError(it))
+                    eventQueue.post(ControlEditUiEvent.ShowNetworkError(it))
                 }
             ).addTo(disposables)
     }
@@ -144,28 +124,10 @@ internal class ControlEditViewModel(application: Application,
         super.onCleared()
         disposables.clear()
     }
-}
 
-internal data class ControlEditState(
-    val control: Control? = null
-): State
-
-internal val controlEditReducerFun: ReducerFun<ControlEditState> = { inState, event ->
-    val state = inState ?: ControlEditState()
-
-    when (event) {
-        is ControlEditEvent.Init -> {
-            state.copy(
-                control = event.control
-            )
-        }
-
-        else -> state
+    internal sealed class ControlEditUiEvent : Event {
+        object SaveControlSuccess: ControlEditUiEvent()
+        data class ShowNetworkError(val throwable: Throwable): ControlEditUiEvent()
     }
 }
 
-internal sealed class ControlEditEvent : Event {
-    data class Init(val control: Control): ControlEditEvent()
-    object SaveControlSuccess: ControlEditEvent()
-    data class ShowNetworkError(val throwable: Throwable): ControlEditEvent()
-}

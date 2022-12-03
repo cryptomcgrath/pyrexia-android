@@ -31,12 +31,12 @@ internal class ControlEditBottomSheetFragment : BottomSheetDialogFragment() {
         setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
-                ControlEditEvent.SaveControlSuccess -> {
+                ControlEditViewModel.ControlEditUiEvent.SaveControlSuccess -> {
                     deviceConfigViewModel.refreshData()
                     dismiss()
                 }
 
-                is ControlEditEvent.ShowNetworkError -> {
+                is ControlEditViewModel.ControlEditUiEvent.ShowNetworkError -> {
                     createNetworkErrorAlertDialog(
                         context = requireContext(),
                         throwable = event.throwable
