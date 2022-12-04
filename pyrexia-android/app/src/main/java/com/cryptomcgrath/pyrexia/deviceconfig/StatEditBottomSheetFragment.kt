@@ -22,7 +22,8 @@ internal class StatEditBottomSheetFragment: BottomSheetDialogFragment() {
         StatEditViewModel.Factory(
             application = requireActivity().application,
             pyDevice = args.pydevice,
-            stat = args.stat)
+            stat = args.stat,
+            store = deviceConfigViewModel.store)
     }
     private val deviceConfigViewModel: DeviceConfigViewModel by activityViewModels {
         DeviceConfigViewModel.Factory(
@@ -61,12 +62,28 @@ internal class StatEditBottomSheetFragment: BottomSheetDialogFragment() {
             false
         ).apply {
             model = viewModel
-            val adapter = NoFilterAdapter(
+            val modeAdapter = NoFilterAdapter(
                 requireContext(),
                 R.layout.mode_dropdown_item,
                 Program.Mode.values().map { it.slug }
             )
-            modeAutoComplete.setAdapter(adapter)
+            modeAutoComplete.setAdapter(modeAdapter)
+            val controlAdapter = NoFilterAdapter(
+                requireContext(),
+                R.layout.mode_dropdown_item,
+                deviceConfigViewModel.store.state.controls.map {
+                    it.name
+                }
+            )
+            controlAutoComplete.setAdapter(controlAdapter)
+            val sensorsAdapter = NoFilterAdapter(
+                requireContext(),
+                R.layout.mode_dropdown_item,
+                deviceConfigViewModel.store.state.sensors.map {
+                    it.name
+                }
+            )
+            sensorAutoComplete.setAdapter(sensorsAdapter)
             dialog.setContentView(root)
         }
     }

@@ -6,6 +6,7 @@
         <variable
             name="model"
             type="com.cryptomcgrath.pyrexia.deviceconfig.StatEditViewModel" />
+        <import type="com.cryptomcgrath.pyrexia.deviceconfig.Converters"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,8 +17,8 @@
 
         <com.cryptomcgrath.pyrexia.thermostat.ThermostatView
             android:id="@+id/vstat_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             app:bezelWidth="3dp"
             app:currentTemp="@{model.sensorValue}"
             app:setPoint="@{model.setPointText}"
@@ -71,6 +72,88 @@
                 tools:text="Heat"/>
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/enabled_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="@string/enabled"
+            android:checked="@={model.enabled}"
+            android:buttonTint="@color/pi_green"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/mode_edit"
+            app:layout_constraintBottom_toBottomOf="@id/mode_edit"/>
+
+        <ImageView
+            android:id="@+id/control_image"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:src="@drawable/relay_snip1"
+            android:scaleType="centerInside"
+            app:layout_constraintTop_toTopOf="@id/control_dropdown"
+            app:layout_constraintBottom_toBottomOf="@id/control_dropdown"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:id="@+id/control_dropdown"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_input_vertical_spacing"
+            android:layout_marginStart="@dimen/text_input_left_margin"
+            app:boxBackgroundColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/mode_edit"
+            app:layout_constraintStart_toEndOf="@id/vstat_image"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                style="@style/TextMedium18Grey61"
+                android:id="@+id/control_auto_complete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:text="@={Converters.INSTANCE.control_index_to_name(model.controls, model.controlId)}"
+                android:error="@{model.controlError}"
+                android:hint="@string/stat_control_hint"
+                tools:text="furnace"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/sensor_image"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:src="@{model.sensorDrawableInt}"
+            android:scaleType="centerInside"
+            app:layout_constraintTop_toTopOf="@id/sensor_dropdown"
+            app:layout_constraintBottom_toBottomOf="@id/sensor_dropdown"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:id="@+id/sensor_dropdown"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_input_vertical_spacing"
+            android:layout_marginStart="@dimen/text_input_left_margin"
+            app:boxBackgroundColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/control_dropdown"
+            app:layout_constraintStart_toEndOf="@id/vstat_image"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                style="@style/TextMedium18Grey61"
+                android:id="@+id/sensor_auto_complete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:text="@={Converters.INSTANCE.sensor_index_to_name(model.sensors, model.sensorId)}"
+                android:error="@{model.sensorError}"
+                android:hint="@string/stat_sensor_hint"
+                app:addTextChangedListener="@{model.onSensorTextWatcher()}"
+                tools:text="living room"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
         <Button
             android:id="@+id/save_button"
             android:layout_width="wrap_content"
@@ -78,7 +161,7 @@
             android:layout_marginTop="90dp"
             android:text="@string/button_save"
             android:onClick="@{(v)->model.onClickSave(v)}"
-            app:layout_constraintTop_toBottomOf="@id/mode_edit"
+            app:layout_constraintTop_toBottomOf="@id/sensor_dropdown"
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

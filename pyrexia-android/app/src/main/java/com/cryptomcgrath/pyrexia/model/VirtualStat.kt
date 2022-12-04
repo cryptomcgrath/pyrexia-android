@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class VirtualStat(
-    val program: Program,
-    val sensor: Sensor,
-    val control: Control
+    val program: Program = Program(),
+    val sensor: Sensor = Sensor(),
+    val control: Control = Control()
 ) : Parcelable

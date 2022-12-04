@@ -43,6 +43,8 @@
     <!-- StatEditViewModel -->
     <string name="stat_name_hint">Thermostat name</string>
     <string name="stat_mode_hint">Mode</string>
+    <string name="stat_control_hint">Control? (relay)</string>
+    <string name="stat_sensor_hint">Sensor?</string>
 
     <!-- ControlEdit -->
     <string name="control_run_time">Run time:</string>

@@ -6,13 +6,13 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Program(
-    val id: Int,
-    val name: String,
-    val setPoint: Float,
-    val control_id: Int,
-    val sensor_id: Int,
-    val mode: Mode,
-    val enabled: Boolean
+    val id: Int = 0,
+    val name: String = "",
+    val setPoint: Float = 70f,
+    val control_id: Int = 0,
+    val sensor_id: Int = 0,
+    val mode: Mode = Mode.HEAT,
+    val enabled: Boolean = true
 ): Parcelable {
     enum class Mode(val slug: String) {
         HEAT("heat"),

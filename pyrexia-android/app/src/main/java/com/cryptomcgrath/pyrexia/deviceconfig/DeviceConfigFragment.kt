@@ -69,7 +69,12 @@ internal class DeviceConfigFragment: Fragment() {
                                 control = Control()
                             )
                         }
-                        else -> Unit
+                        Component.VSTAT -> {
+                            goToStatEditDialog(
+                                pyDevice = args.pyDevice,
+                                stat = VirtualStat()
+                            )
+                        }
                     }
                 }
             }
