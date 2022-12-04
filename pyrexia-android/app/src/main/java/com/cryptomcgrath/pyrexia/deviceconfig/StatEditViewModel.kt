@@ -1,11 +1,9 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
 import android.app.Application
-import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.AdapterView
 import androidx.databinding.InverseMethod
 import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
@@ -67,7 +65,7 @@ internal class StatEditViewModel(application: Application,
     }
     val sensorDrawableInt = ObservableField<Int>()
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
-    val sensorValue = stat.sensor.value.toFormattedTemperatureString()
+    val sensorValue = ObservableField<String>()
 
     val backgroundColor: Int = when {
         !stat.program.enabled -> R.color.grey42
@@ -110,6 +108,11 @@ internal class StatEditViewModel(application: Application,
         sensorDrawableInt.set(
             sensors.firstOrNull { it.id == sensorId }?.sensorType?.imageResId
                 ?: 0
+        )
+        sensorValue.set(
+            (sensors.firstOrNull() {
+                it.id == sensorId
+            }?.value ?: 0f).toFormattedTemperatureString()
         )
     }
 
