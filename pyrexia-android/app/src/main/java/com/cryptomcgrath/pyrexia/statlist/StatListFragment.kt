@@ -73,7 +73,9 @@ internal class StatListFragment: Fragment() {
     }
 
     private fun showNetworkError(throwable: Throwable) {
-        createNetworkErrorAlertDialog(requireContext(), throwable) {}.show()
+        createNetworkErrorAlertDialog(requireContext(), throwable) {
+            findNavController().popBackStack()
+        }.show()
     }
 }
 
