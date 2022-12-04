@@ -15,8 +15,6 @@ import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.ComponentItemBinding
 import com.cryptomcgrath.pyrexia.databinding.FragmentAddComponentBinding
 import com.cryptomcgrath.pyrexia.util.DiffableItem
-import com.edwardmcgrath.blueflux.core.Dispatcher
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 internal class AddComponentBottomSheetFragment: BottomSheetDialogFragment() {

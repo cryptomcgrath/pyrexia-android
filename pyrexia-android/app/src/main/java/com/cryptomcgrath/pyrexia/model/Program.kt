@@ -2,7 +2,7 @@ package com.cryptomcgrath.pyrexia.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import java.util.Locale
+
 
 @Parcelize
 data class Program(
@@ -14,17 +14,15 @@ data class Program(
     val mode: Mode,
     val enabled: Boolean
 ): Parcelable {
-    enum class Mode {
-        HEAT,
-        COOL;
+    enum class Mode(val slug: String) {
+        HEAT("heat"),
+        COOL("cool");
 
         companion object {
             fun fromString(s: String?): Mode {
-                return when(s?.uppercase(Locale.US)) {
-                    "heat" -> Mode.HEAT
-                    "cool" -> Mode.COOL
-                    else -> Mode.HEAT
-                }
+                return values().firstOrNull {
+                    it.slug.equals(s, ignoreCase = true)
+                } ?: HEAT
             }
         }
 

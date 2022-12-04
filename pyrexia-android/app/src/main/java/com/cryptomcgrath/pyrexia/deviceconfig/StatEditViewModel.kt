@@ -11,7 +11,6 @@ import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
-import com.cryptomcgrath.pyrexia.thermostat.sentenceCase
 import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
@@ -42,7 +41,9 @@ internal class StatEditViewModel(application: Application,
 
     var name = stat.program.name
     val nameError = ObservableField<String>()
-    var mode = stat.program.mode.name
+    var mode = stat.program.mode.slug
+    val modeError = ObservableField<String>()
+
     var enabled = stat.program.enabled
 
     var sensorId = stat.program.sensor_id
@@ -51,7 +52,6 @@ internal class StatEditViewModel(application: Application,
 
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
     val sensorValue = stat.sensor.value.toFormattedTemperatureString()
-    val modeText = stat.program.mode.name.sentenceCase()
 
     val backgroundColor: Int = when {
         !stat.program.enabled -> R.color.grey42
@@ -61,6 +61,7 @@ internal class StatEditViewModel(application: Application,
     }
 
     fun onClickSave(view: View?) {
+        view?.hideKeyboard()
         if (!checkErrors()) {
             saveStat(
                 stat.program.copy(
@@ -112,3 +113,4 @@ internal class StatEditViewModel(application: Application,
         data class ShowNetworkError(val throwable: Throwable): StatEditUiEvent()
     }
 }
+

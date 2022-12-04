@@ -47,14 +47,38 @@
                 tools:text="Living Room Sensor" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            android:id="@+id/mode_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_input_vertical_spacing"
+            android:layout_marginStart="@dimen/text_input_left_margin"
+            app:boxBackgroundColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/name_edit"
+            app:layout_constraintStart_toEndOf="@id/vstat_image"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                style="@style/TextMedium18Grey61"
+                android:id="@+id/mode_auto_complete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:text="@={model.mode}"
+                android:error="@{model.modeError}"
+                android:hint="@string/stat_mode_hint"
+                tools:text="Heat"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
         <Button
             android:id="@+id/save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="90dp"
             android:text="@string/button_save"
             android:onClick="@{(v)->model.onClickSave(v)}"
-            app:layout_constraintTop_toBottomOf="@id/name_edit"
+            app:layout_constraintTop_toBottomOf="@id/mode_edit"
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

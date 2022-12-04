@@ -42,6 +42,7 @@
 
     <!-- StatEditViewModel -->
     <string name="stat_name_hint">Thermostat name</string>
+    <string name="stat_mode_hint">Mode</string>
 
     <!-- ControlEdit -->
     <string name="control_run_time">Run time:</string>
