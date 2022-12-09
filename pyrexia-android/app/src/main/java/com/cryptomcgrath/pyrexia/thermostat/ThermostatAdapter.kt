@@ -1,6 +1,7 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -19,6 +20,9 @@ import com.cryptomcgrath.pyrexia.statlist.StatLoadingDiffableItem
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.RxStore
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.subscribeBy
 
 internal class ThermostatAdapter(private val context: Context,
                                  store: RxStore<ThermostatState>,
@@ -36,7 +40,38 @@ internal class ThermostatAdapter(private val context: Context,
             CycleInfoDiffableItem::class.java
         )
 
+    private var historyDisposable: Disposable? = null
+
     override val differ: AsyncListDiffer<DiffableItem> = AsyncListDiffer(this, DIFF_CALLBACK)
+
+    override fun onViewAttachedToWindow(holder: BindFunViewHolder) {
+        super.onViewAttachedToWindow(holder)
+        if (holder.binding is HistoryChartItemBinding) {
+            holder.binding.model?.let { model ->
+                historyDisposable = model.store.stateStream.map {
+                    it.historyOldtoNew
+                }.observeOn(AndroidSchedulers.mainThread())
+
+                    .subscribeBy(
+                    onNext = {
+                        holder.binding.pointsChart.setSeriesData(it.toSeries(context))
+                        Log.d(TAG, "addSeries ${it.size}")
+                    }, onError = {
+                        // ignore
+                    }
+                )
+            }
+
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: BindFunViewHolder) {
+        super.onViewDetachedFromWindow(holder)
+        if (holder.binding is HistoryChartItemBinding) {
+            historyDisposable?.dispose()
+            historyDisposable = null
+        }
+    }
 
     override fun buildList(state: ThermostatState): List<DiffableItem> {
         val items = mutableListOf<DiffableItem>()
@@ -53,7 +88,8 @@ internal class ThermostatAdapter(private val context: Context,
                 )
                 items += StatEnabledDiffableItem(dispatcher, state.current.program.enabled, state.current.program.id)
 
-                items += HistoryChartDiffableItem(context, store)
+                items += HistoryChartDiffableItem(store)
+
                 items += HistoryInfoDiffableItem(state.historyOldtoNew)
 
                 items += createCycleInfoItems(
@@ -110,7 +146,6 @@ internal class ThermostatAdapter(private val context: Context,
                     binding.model = model
 
                     binding.pointsChart.apply {
-                        addSeries(model.series)
                         listener = object: PointsChart.Listener {
                             override fun onMoreDataRequest(timeStamp: Long) {
                                 dispatcher.post(ThermostatEvent.RequestMoreHistory(timeStamp))

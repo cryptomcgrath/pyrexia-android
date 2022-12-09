@@ -72,23 +72,27 @@ class PointsChart @JvmOverloads constructor(
         style = Paint.Style.STROKE
     }
 
-    fun addSeries(seriesList: List<Series>) {
-        data.addAll(
-            seriesList.map { series ->
-                DrawSeries(
-                    series = series,
-                    plotPaint = Paint().apply {
-                        color = ContextCompat.getColor(context, series.color)
-                        isAntiAlias = true
-                        strokeWidth = series.lineWidth
-                        style = Paint.Style.STROKE
-                    }
-                )
-            }
-        )
-        computePoints()
-        invalidate()
-        requestLayout()
+    fun setSeriesData(seriesList: List<Series>) {
+        synchronized(data) {
+            data.clear()
+            data.addAll(
+                seriesList.map { series ->
+                    DrawSeries(
+                        series = series,
+                        plotPaint = Paint().apply {
+                            color = ContextCompat.getColor(context, series.color)
+                            isAntiAlias = true
+                            strokeWidth = series.lineWidth
+                            style = Paint.Style.STROKE
+                        }
+                    )
+                }
+            )
+            computePoints()
+            computeLabels()
+            invalidate()
+            requestLayout()
+        }
     }
 
     var bgColor: Int = R.color.white
@@ -107,9 +111,7 @@ class PointsChart @JvmOverloads constructor(
         isSaveEnabled = true
 
         val typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.PointsChart)
-
         bgColor = typedArray.getInteger(R.styleable.PointsChart_bgColor, R.color.white)
-
         typedArray.recycle()
     }
 
@@ -127,6 +129,7 @@ class PointsChart @JvmOverloads constructor(
             bottom.toFloat() - margin
         )
         computePoints()
+        computeLabels()
     }
 
     private fun autoScale() {
@@ -142,17 +145,23 @@ class PointsChart @JvmOverloads constructor(
             it.x
         }?.x
 
-        val minY = data.map {
+        var minY = data.map {
             it.series.points
         }.flatten().minByOrNull {
             it.y
         }?.y
 
-        val maxY = data.map {
+        var maxY = data.map {
             it.series.points
         }.flatten().maxByOrNull {
             it.y
         }?.y
+
+        // add top and bottom margin of temperature
+        if (minY != null && maxY != null) {
+            minY -= (maxY - minY)
+            maxY += (maxY - minY)
+        }
 
         if (minX != null && maxX != null && minY != null && maxY != null) {
             allDataBounds.set(
@@ -176,7 +185,7 @@ class PointsChart @JvmOverloads constructor(
         autoScale()
 
         data.forEach {
-            var j=0
+            var j = 0
             var xPrev = 0f
             var yPrev = 0f
             it.packedPoints = FloatArray(it.series.points.size * 4)
@@ -197,6 +206,9 @@ class PointsChart @JvmOverloads constructor(
             }
         }
 
+    }
+
+    private fun computeLabels() {
         yLabels.clear()
         yLabels.add(
             DrawLabel(
@@ -257,54 +269,57 @@ class PointsChart @JvmOverloads constructor(
 
         canvas.drawRect(bounds, bgPaint)
 
-        // hilite
-        val midX = plotBounds.width()/2
-        data.forEach {
-            if (it.series.color == R.color.heating && it.packedPoints.size >= 4) {
-                val x1 = it.packedPoints[0]
-                val x2 = it.packedPoints[it.packedPoints.size-2]
-                if (x1 < midX && x2 >= midX) {
-                    val y1 = it.packedPoints[1]
-                    val y2 = it.packedPoints[it.packedPoints.size-1]
-                    canvas.drawOval(x1-margin, y1+margin, x2+margin, y2-margin, circlePaint)
+        synchronized(data) {
+            // hilite
+            val midX = plotBounds.width()/2
+            data.forEach {
+                if (it.series.color == R.color.heating && it.packedPoints.size >= 4) {
+                    val x1 = it.packedPoints[0]
+                    val x2 = it.packedPoints[it.packedPoints.size-2]
+                    if (x1 < midX && x2 >= midX) {
+                        val y1 = it.packedPoints[1]
+                        val y2 = it.packedPoints[it.packedPoints.size-1]
+                        canvas.drawOval(x1-margin, y1+margin, x2+margin, y2-margin, circlePaint)
+                    }
                 }
+
             }
 
+            data.forEach {
+                canvas.drawLines(it.packedPoints, it.plotPaint)
+            }
+
+            // y labels
+            labelPaint.getTextBounds("12:00p", 0, "12:00p".length, textBounds)
+            val ySpacing = (abs(textBounds.top) * 5).toInt()
+            //yLabels.forEach {
+            //    canvas.drawLine(it.startPoint.x, it.startPoint.y, it.endPoint.x, it.endPoint.y, it.plotPaint)
+            //    canvas.drawText(it.label.name, it.startPoint.x, it.startPoint.y, labelPaint)
+            //}
+            for (y in plotBounds.top.toInt() until plotBounds.bottom.toInt() step ySpacing) {
+                canvas.drawText(
+                    y.toFloat().unScaleY().toTempLabel(),
+                    1f,
+                    y.toFloat(),
+                    labelPaint
+                )
+                canvas.drawLine(1f, y.toFloat(), plotBounds.right, y.toFloat(), dashPaint)
+            }
+
+            // x labels
+            val xSpacing = (textBounds.right * 1.5).toInt()
+            for (x in plotBounds.left.toInt() until plotBounds.right.toInt() step xSpacing) {
+                textBounds.drawTextCentered(
+                    canvas,
+                    labelPaint,
+                    x.toFloat().unScaleX().toLong().toTimeLabel(),
+                    x.toFloat(),
+                    plotBounds.bottom+margin/2,
+                )
+                canvas.drawLine(x.toFloat(), plotBounds.bottom - markLength, x.toFloat(), plotBounds.bottom + markLength, labelPaint)
+            }
         }
 
-        data.forEach {
-            canvas.drawLines(it.packedPoints, it.plotPaint)
-        }
-
-        // y labels
-        labelPaint.getTextBounds("12:00p", 0, "12:00p".length, textBounds)
-        val ySpacing = (abs(textBounds.top) * 5).toInt()
-        //yLabels.forEach {
-        //    canvas.drawLine(it.startPoint.x, it.startPoint.y, it.endPoint.x, it.endPoint.y, it.plotPaint)
-        //    canvas.drawText(it.label.name, it.startPoint.x, it.startPoint.y, labelPaint)
-        //}
-        for (y in plotBounds.top.toInt() until plotBounds.bottom.toInt() step ySpacing) {
-            canvas.drawText(
-                y.toFloat().unScaleY().toTempLabel(),
-                1f,
-                y.toFloat(),
-                labelPaint
-            )
-            canvas.drawLine(1f, y.toFloat(), plotBounds.right, y.toFloat(), dashPaint)
-        }
-
-        // x labels
-        val xSpacing = (textBounds.right * 1.5).toInt()
-        for (x in plotBounds.left.toInt() until plotBounds.right.toInt() step xSpacing) {
-            textBounds.drawTextCentered(
-                canvas,
-                labelPaint,
-                x.toFloat().unScaleX().toLong().toTimeLabel(),
-                x.toFloat(),
-                plotBounds.bottom+margin/2,
-            )
-            canvas.drawLine(x.toFloat(), plotBounds.bottom - markLength, x.toFloat(), plotBounds.bottom + markLength, labelPaint)
-        }
     }
 
     data class Point(
