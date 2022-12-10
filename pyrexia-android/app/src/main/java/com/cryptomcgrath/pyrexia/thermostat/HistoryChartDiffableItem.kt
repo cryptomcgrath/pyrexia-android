@@ -21,6 +21,23 @@ internal class HistoryChartDiffableItem(val store: RxStore<ThermostatState>): Di
 
 internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> {
     val result = mutableListOf<PointsChart.Series>()
+
+    // **** set points plot ****
+    val setPoints = this.map {
+        PointsChart.Point(
+            name = it.programAction.name,
+            x = it.actionTs.toDouble(),
+            y = it.setPoint.toDouble()
+        )
+    }
+    result.add(PointsChart.Series(
+        points = setPoints,
+        label = "",
+        color = R.color.hilite,
+        lineWidth = context.resources.getDimension(R.dimen.pointschart_default_line_width)
+    ))
+
+    // **** on points plot ****
     var onPoints = mutableListOf<PointsChart.Point>()
     this.forEach {
         if (it.controlOn) {
@@ -56,6 +73,8 @@ internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> 
             )
         )
     }
+
+    // **** temperature plot ****
     val points = this.map {
         Log.d(TAG, "point xstr=${it.actionTs} x=${it.actionTs.toDouble()} y=${it.sensorValue}")
         PointsChart.Point(
