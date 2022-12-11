@@ -241,15 +241,15 @@ class PointsChart @JvmOverloads constructor(
     }
 
     private fun Double.scaleY(): Float {
-        return ((plotBounds.height()*scale - ((this - dataBounds.top) / dataBounds.height() * (plotBounds.height() * scale - margin))).toFloat() - originY)
+        return ((plotBounds.height()*scale - ((this - dataBounds.top) / dataBounds.height() * (plotBounds.height() * scale))).toFloat() - originY - plotBounds.top)
     }
 
     private fun Double.scaleYNoPan(): Float {
-        return ((plotBounds.height() *scale - ((this - dataBounds.top) / dataBounds.height() * scale * plotBounds.height() - margin))).toFloat()
+        return (plotBounds.top + (plotBounds.height() *scale - ((this - dataBounds.top) / dataBounds.height() * scale * plotBounds.height()))).toFloat()
     }
 
     private fun Float.unScaleY(): Double {
-        return (plotBounds.height() * scale - (this + originY + margin)) / (plotBounds.height() * scale) * dataBounds.height() + dataBounds.top
+        return (plotBounds.height() * scale - (this + originY + plotBounds.top)) / (plotBounds.height() * scale) * dataBounds.height() + dataBounds.top
     }
 
     private fun Double.scaleX(): Float {
@@ -285,17 +285,14 @@ class PointsChart @JvmOverloads constructor(
 
             }
 
+            // points plot
             data.forEach {
                 canvas.drawLines(it.packedPoints, it.plotPaint)
             }
 
-            // y labels
+            // y labels (temperature)
             labelPaint.getTextBounds("12:00p", 0, "12:00p".length, textBounds)
             val ySpacing = (abs(textBounds.top) * 5).toInt()
-            //yLabels.forEach {
-            //    canvas.drawLine(it.startPoint.x, it.startPoint.y, it.endPoint.x, it.endPoint.y, it.plotPaint)
-            //    canvas.drawText(it.label.name, it.startPoint.x, it.startPoint.y, labelPaint)
-            //}
             for (y in plotBounds.top.toInt() until plotBounds.bottom.toInt() step ySpacing) {
                 canvas.drawText(
                     y.toFloat().unScaleY().toTempLabel(),
@@ -306,7 +303,7 @@ class PointsChart @JvmOverloads constructor(
                 canvas.drawLine(1f, y.toFloat(), plotBounds.right, y.toFloat(), dashPaint)
             }
 
-            // x labels
+            // x labels (time)
             val xSpacing = (textBounds.right * 1.5).toInt()
             for (x in plotBounds.left.toInt() until plotBounds.right.toInt() step xSpacing) {
                 textBounds.drawTextCentered(
