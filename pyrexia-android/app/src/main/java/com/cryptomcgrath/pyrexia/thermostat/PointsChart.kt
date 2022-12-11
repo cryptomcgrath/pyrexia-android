@@ -50,12 +50,20 @@ class PointsChart @JvmOverloads constructor(
     private var maxScale = 8.0f
     private var markLength = 20f
 
+    private var touchPoints: List<TouchPoint> = emptyList()
+
     var listener: Listener? = null
 
     private val labelPaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.grey42)
         isAntiAlias = true
         textSize = margin
+    }
+
+    private val labelBgPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.transparent_white)
+        isAntiAlias = true
+        style = Paint.Style.FILL
     }
 
     private val dashPaint = Paint().apply {
@@ -65,11 +73,49 @@ class PointsChart @JvmOverloads constructor(
         pathEffect = DashPathEffect(floatArrayOf(10f, 40f), 0f)
     }
 
+    private val touchLinePaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.heating)
+        isAntiAlias = true
+        style = Paint.Style.STROKE
+    }
+
     private val circlePaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.hilite)
         isAntiAlias = true
         strokeWidth = 4f
         style = Paint.Style.STROKE
+    }
+
+    private val plotPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.grey42)
+        isAntiAlias = true
+        style = Paint.Style.STROKE
+    }
+
+    private val heatPlotPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.heating)
+        isAntiAlias = true
+        style = Paint.Style.STROKE
+        strokeWidth = context.resources.getDimension(R.dimen.pointschart_commandon_line_width)
+    }
+
+    private val coolPlotPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.cooling)
+        isAntiAlias = true
+        style = Paint.Style.STROKE
+        strokeWidth = context.resources.getDimension(R.dimen.pointschart_commandon_line_width)
+    }
+
+    private val setPointPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.green)
+        isAntiAlias = true
+        style = Paint.Style.STROKE
+    }
+
+    private val setPointLabelPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.green)
+        isAntiAlias = true
+        textSize = margin
     }
 
     fun setSeriesData(seriesList: List<Series>) {
@@ -79,12 +125,6 @@ class PointsChart @JvmOverloads constructor(
                 seriesList.map { series ->
                     DrawSeries(
                         series = series,
-                        plotPaint = Paint().apply {
-                            color = ContextCompat.getColor(context, series.color)
-                            isAntiAlias = true
-                            strokeWidth = series.lineWidth
-                            style = Paint.Style.STROKE
-                        }
                     )
                 }
             )
@@ -264,6 +304,29 @@ class PointsChart @JvmOverloads constructor(
         return ((this - dataBounds.left) / dataBounds.width() * plotBounds.width() * scale).toFloat()
     }
 
+    private data class TouchPoint(val type: Series.Type, val dataPoint: Point, val plotPoint: PointF)
+
+    private fun List<DrawSeries>.intersectsFromTouch(touchX: Float): List<TouchPoint> {
+        val unScaledTouchX = touchX.unScaleX()
+
+        return this.filter {
+            it.series.type != Series.Type.ON_POINTS
+        }.mapNotNull {
+            val hitPoint = it.series.points.minByOrNull {
+                abs(it.x - unScaledTouchX)
+            }
+            if (hitPoint != null) {
+                TouchPoint(
+                    type = it.series.type,
+                    dataPoint = Point(hitPoint.x, hitPoint.y, ""),
+                    plotPoint = PointF(hitPoint.x.scaleX(), hitPoint.y.scaleY())
+                )
+            } else {
+                null
+            }
+        }
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -273,7 +336,7 @@ class PointsChart @JvmOverloads constructor(
             // hilite
             val midX = plotBounds.width()/2
             data.forEach {
-                if (it.series.color == R.color.heating && it.packedPoints.size >= 4) {
+                if (it.series.type == Series.Type.ON_POINTS && it.packedPoints.size >= 4) {
                     val x1 = it.packedPoints[0]
                     val x2 = it.packedPoints[it.packedPoints.size-2]
                     if (x1 < midX && x2 >= midX) {
@@ -282,12 +345,11 @@ class PointsChart @JvmOverloads constructor(
                         canvas.drawOval(x1-margin, y1+margin, x2+margin, y2-margin, circlePaint)
                     }
                 }
-
             }
 
             // points plot
             data.forEach {
-                canvas.drawLines(it.packedPoints, it.plotPaint)
+                canvas.drawLines(it.packedPoints, it.series.type.toPlotPaint())
             }
 
             // y labels (temperature)
@@ -315,8 +377,47 @@ class PointsChart @JvmOverloads constructor(
                 )
                 canvas.drawLine(x.toFloat(), plotBounds.bottom - markLength, x.toFloat(), plotBounds.bottom + markLength, labelPaint)
             }
-        }
 
+            // touch point
+            touchPoints.forEach {
+                if (it.type == Series.Type.TEMP) {
+                    canvas.drawLine(it.plotPoint.x, plotBounds.bottom, it.plotPoint.x, plotBounds.top, touchLinePaint)
+                }
+
+                it.type.toLabelPaint().getTextBounds(it.dataPoint.y.toTempLabel(), 0, it.dataPoint.y.toTempLabel().length, textBounds)
+                val offset = textBounds.height() / 3
+                // TODO: paint a white bg behind temp label
+                //canvas.drawRect(
+                //    it.plotPoint.x+offset,
+                //    it.plotPoint.y+offset,
+                //    it.plotPoint.x+textBounds.width()+offset,
+                //    it.plotPoint.y+textBounds.height()+offset,
+                //    labelBgPaint
+                //)
+                canvas.drawText(
+                    it.dataPoint.y.toTempLabel(),
+                    it.plotPoint.x+offset,
+                    it.plotPoint.y+offset,
+                    it.type.toLabelPaint()
+                )
+            }
+        }
+    }
+
+    private fun Series.Type.toPlotPaint(): Paint {
+        return when(this) {
+            Series.Type.ON_POINTS -> heatPlotPaint
+            Series.Type.SET_POINT -> setPointPaint
+            Series.Type.TEMP-> plotPaint
+        }
+    }
+
+    private fun Series.Type.toLabelPaint(): Paint {
+        return when (this) {
+            Series.Type.ON_POINTS -> labelPaint
+            Series.Type.SET_POINT -> setPointLabelPaint
+            Series.Type.TEMP -> labelPaint
+        }
     }
 
     data class Point(
@@ -326,10 +427,14 @@ class PointsChart @JvmOverloads constructor(
 
     data class Series(
         val points: List<Point>,
-        val label: String,
-        val color: Int,
-        val lineWidth: Float
-    )
+        val type: Type
+    ) {
+        enum class Type {
+            TEMP,
+            SET_POINT,
+            ON_POINTS
+        }
+    }
 
     data class Label(
         val position: Float,
@@ -341,19 +446,22 @@ class PointsChart @JvmOverloads constructor(
         val endPoint: PointF,
         val plotPaint: Paint = Paint())
 
-    private data class DrawSeries(
+    data class DrawSeries(
         val series: Series,
-        var packedPoints: FloatArray = floatArrayOf(),
-        val plotPaint: Paint = Paint()
+        var packedPoints: FloatArray = floatArrayOf()
     )
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 parent.requestDisallowInterceptTouchEvent(true)
+                updateTouchPoint(event)
             }
             MotionEvent.ACTION_UP -> {
                 parent.requestDisallowInterceptTouchEvent(false)
+            }
+            MotionEvent.ACTION_MOVE -> {
+                updateTouchPoint(event)
             }
         }
         // try using the scroll/fling/tap/double-tap first
@@ -364,8 +472,22 @@ class PointsChart @JvmOverloads constructor(
         return true
     }
 
+    private fun updateTouchPoint(event: MotionEvent) {
+        synchronized (data) {
+            val existingX = touchPoints.firstOrNull {
+                it.type == Series.Type.TEMP
+            }
+            if (event.actionMasked != MotionEvent.ACTION_DOWN && existingX != null) {
+                touchPoints = data.intersectsFromTouch(existingX.plotPoint.x)
+            } else {
+                touchPoints = data.intersectsFromTouch(event.x)
+            }
+        }
+    }
+
     // ** gesture detector **
-    override fun onDown(p0: MotionEvent): Boolean {
+    override fun onDown(event: MotionEvent): Boolean {
+        updateTouchPoint(event)
         return false
     }
 
@@ -463,3 +585,5 @@ internal fun Long.toTimeLabel(): String {
 private fun Double.toTempLabel(): String {
     return "%3.2f".format(this)
 }
+
+

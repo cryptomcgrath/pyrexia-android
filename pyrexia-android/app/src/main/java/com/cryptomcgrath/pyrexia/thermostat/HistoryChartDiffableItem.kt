@@ -32,9 +32,7 @@ internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> 
     }
     result.add(PointsChart.Series(
         points = setPoints,
-        label = "",
-        color = R.color.hilite,
-        lineWidth = context.resources.getDimension(R.dimen.pointschart_default_line_width)
+        type = PointsChart.Series.Type.SET_POINT
     ))
 
     // **** on points plot ****
@@ -45,7 +43,7 @@ internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> 
                 PointsChart.Point(
                     name = it.programAction.name,
                     x = it.actionTs.toDouble(),
-                    y = it.sensorValue.toDouble()
+                    y = it.sensorValue.toDouble(),
                 )
             )
         } else {
@@ -53,9 +51,7 @@ internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> 
                 result.add(
                     PointsChart.Series(
                         points = onPoints,
-                        color = R.color.heating,
-                        lineWidth = context.resources.getDimension(R.dimen.pointschart_commandon_line_width),
-                        label = ""
+                        type = PointsChart.Series.Type.ON_POINTS
                     )
                 )
                 onPoints = mutableListOf<PointsChart.Point>()
@@ -67,9 +63,7 @@ internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> 
         result.add(
             PointsChart.Series(
                 points = onPoints,
-                color = R.color.heating,
-                lineWidth = context.resources.getDimension(R.dimen.pointschart_commandon_line_width),
-                label = ""
+                type = PointsChart.Series.Type.ON_POINTS
             )
         )
     }
@@ -85,9 +79,7 @@ internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> 
     }
     result.add(PointsChart.Series(
         points = points,
-        label = "",
-        color = R.color.grey42,
-        lineWidth = context.resources.getDimension(R.dimen.pointschart_default_line_width)
+        type = PointsChart.Series.Type.TEMP
     ))
     return result
 }
