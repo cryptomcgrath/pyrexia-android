@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="transparent_white">#22ffffff</color>
+    <color name="no_data_background">#eeeeee</color>
 
     <color name="light_blue">#add8ec</color>
     <color name="light_grey">#cccccc</color>

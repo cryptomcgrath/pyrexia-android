@@ -54,7 +54,7 @@ internal class ThermostatAdapter(private val context: Context,
 
                     .subscribeBy(
                     onNext = {
-                        holder.binding.pointsChart.setSeriesData(it.toSeries(context))
+                        holder.binding.pointsChart.setSeriesData(it.toSeries(store.state.current?.program?.mode))
                         Log.d(TAG, "addSeries ${it.size}")
                     }, onError = {
                         // ignore

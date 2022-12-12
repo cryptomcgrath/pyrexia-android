@@ -1,9 +1,9 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
-import android.content.Context
 import android.util.Log
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.History
+import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.RxStore
 
@@ -19,7 +19,7 @@ internal class HistoryChartDiffableItem(val store: RxStore<ThermostatState>): Di
     }
 }
 
-internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> {
+internal fun List<History>.toSeries(mode: Program.Mode?): List<PointsChart.Series> {
     val result = mutableListOf<PointsChart.Series>()
 
     // **** set points plot ****
@@ -51,7 +51,10 @@ internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> 
                 result.add(
                     PointsChart.Series(
                         points = onPoints,
-                        type = PointsChart.Series.Type.ON_POINTS
+                        type = if (mode == Program.Mode.COOL)
+                            PointsChart.Series.Type.ON_COOL
+                        else
+                            PointsChart.Series.Type.ON_HEAT
                     )
                 )
                 onPoints = mutableListOf<PointsChart.Point>()
@@ -63,7 +66,10 @@ internal fun List<History>.toSeries(context: Context): List<PointsChart.Series> 
         result.add(
             PointsChart.Series(
                 points = onPoints,
-                type = PointsChart.Series.Type.ON_POINTS
+                type = if (mode == Program.Mode.COOL)
+                    PointsChart.Series.Type.ON_COOL
+                else
+                    PointsChart.Series.Type.ON_HEAT
             )
         )
     }

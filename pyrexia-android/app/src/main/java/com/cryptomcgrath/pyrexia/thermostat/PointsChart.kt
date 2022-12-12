@@ -16,7 +16,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.cryptomcgrath.pyrexia.R
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -54,16 +54,15 @@ class PointsChart @JvmOverloads constructor(
 
     var listener: Listener? = null
 
+    private val bgNoData = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.no_data_background)
+        isAntiAlias = true
+    }
+
     private val labelPaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.grey42)
         isAntiAlias = true
         textSize = margin
-    }
-
-    private val labelBgPaint = Paint().apply {
-        color = ContextCompat.getColor(context, R.color.transparent_white)
-        isAntiAlias = true
-        style = Paint.Style.FILL
     }
 
     private val dashPaint = Paint().apply {
@@ -77,6 +76,12 @@ class PointsChart @JvmOverloads constructor(
         color = ContextCompat.getColor(context, R.color.heating)
         isAntiAlias = true
         style = Paint.Style.STROKE
+    }
+
+    private val touchLabelPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.heating)
+        isAntiAlias = true
+        textSize = margin
     }
 
     private val circlePaint = Paint().apply {
@@ -197,12 +202,6 @@ class PointsChart @JvmOverloads constructor(
             it.y
         }?.y
 
-        // add top and bottom margin of temperature
-        if (minY != null && maxY != null) {
-            minY -= (maxY - minY)
-            maxY += (maxY - minY)
-        }
-
         if (minX != null && maxX != null && minY != null && maxY != null) {
             allDataBounds.set(
                 minX,
@@ -215,6 +214,13 @@ class PointsChart @JvmOverloads constructor(
                     minX,
                     minY,
                     maxX,
+                    maxY
+                )
+            } else {
+                dataBounds.set(
+                    dataBounds.left,
+                    minY,
+                    dataBounds.right,
                     maxY
                 )
             }
@@ -310,7 +316,7 @@ class PointsChart @JvmOverloads constructor(
         val unScaledTouchX = touchX.unScaleX()
 
         return this.filter {
-            it.series.type != Series.Type.ON_POINTS
+            !setOf(Series.Type.ON_HEAT, Series.Type.ON_COOL).contains(it.series.type)
         }.mapNotNull {
             val hitPoint = it.series.points.minByOrNull {
                 abs(it.x - unScaledTouchX)
@@ -330,13 +336,19 @@ class PointsChart @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        // background
         canvas.drawRect(bounds, bgPaint)
+
+        // data loading background
+        if (bounds.left.unScaleX() < allDataBounds.left) {
+            canvas.drawRect(bounds.left, bounds.top, allDataBounds.left.scaleX(), bounds.bottom, bgNoData)
+        }
 
         synchronized(data) {
             // hilite
             val midX = plotBounds.width()/2
             data.forEach {
-                if (it.series.type == Series.Type.ON_POINTS && it.packedPoints.size >= 4) {
+                if (setOf(Series.Type.ON_HEAT, Series.Type.ON_COOL).contains(it.series.type) && it.packedPoints.size >= 4) {
                     val x1 = it.packedPoints[0]
                     val x2 = it.packedPoints[it.packedPoints.size-2]
                     if (x1 < midX && x2 >= midX) {
@@ -386,19 +398,18 @@ class PointsChart @JvmOverloads constructor(
 
                 it.type.toLabelPaint().getTextBounds(it.dataPoint.y.toTempLabel(), 0, it.dataPoint.y.toTempLabel().length, textBounds)
                 val offset = textBounds.height() / 3
-                // TODO: paint a white bg behind temp label
-                //canvas.drawRect(
-                //    it.plotPoint.x+offset,
-                //    it.plotPoint.y+offset,
-                //    it.plotPoint.x+textBounds.width()+offset,
-                //    it.plotPoint.y+textBounds.height()+offset,
-                //    labelBgPaint
-                //)
                 canvas.drawText(
                     it.dataPoint.y.toTempLabel(),
                     it.plotPoint.x+offset,
                     it.plotPoint.y+offset,
                     it.type.toLabelPaint()
+                )
+                textBounds.drawTextCentered(
+                    canvas,
+                    touchLabelPaint,
+                    it.dataPoint.x.toLong().toTimeLabel(),
+                    it.plotPoint.x,
+                    plotBounds.top
                 )
             }
         }
@@ -406,7 +417,8 @@ class PointsChart @JvmOverloads constructor(
 
     private fun Series.Type.toPlotPaint(): Paint {
         return when(this) {
-            Series.Type.ON_POINTS -> heatPlotPaint
+            Series.Type.ON_HEAT -> heatPlotPaint
+            Series.Type.ON_COOL -> coolPlotPaint
             Series.Type.SET_POINT -> setPointPaint
             Series.Type.TEMP-> plotPaint
         }
@@ -414,7 +426,8 @@ class PointsChart @JvmOverloads constructor(
 
     private fun Series.Type.toLabelPaint(): Paint {
         return when (this) {
-            Series.Type.ON_POINTS -> labelPaint
+            Series.Type.ON_HEAT -> labelPaint
+            Series.Type.ON_COOL -> labelPaint
             Series.Type.SET_POINT -> setPointLabelPaint
             Series.Type.TEMP -> labelPaint
         }
@@ -432,7 +445,8 @@ class PointsChart @JvmOverloads constructor(
         enum class Type {
             TEMP,
             SET_POINT,
-            ON_POINTS
+            ON_HEAT,
+            ON_COOL
         }
     }
 
@@ -583,7 +597,7 @@ internal fun Long.toTimeLabel(): String {
 }
 
 private fun Double.toTempLabel(): String {
-    return "%3.2f".format(this)
+    return "%3.2f°".format(this)
 }
 
 
