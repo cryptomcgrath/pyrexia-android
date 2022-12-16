@@ -6,6 +6,7 @@
         <attr name="currentTemp" format="string" />
         <attr name="centerColor" format="integer" />
         <attr name="setPoint" format="string" />
+        <attr name="message" format="string" />
         <attr name="tickGapDegrees" format="integer"/>
     </declare-styleable>
 

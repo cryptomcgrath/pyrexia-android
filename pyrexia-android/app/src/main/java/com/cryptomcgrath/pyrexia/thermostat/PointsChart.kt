@@ -16,7 +16,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.cryptomcgrath.pyrexia.R
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -76,6 +76,7 @@ class PointsChart @JvmOverloads constructor(
         color = ContextCompat.getColor(context, R.color.heating)
         isAntiAlias = true
         style = Paint.Style.STROKE
+        pathEffect = DashPathEffect(floatArrayOf(10f, 20f), 0f)
     }
 
     private val touchLabelPaint = Paint().apply {
@@ -404,7 +405,7 @@ class PointsChart @JvmOverloads constructor(
                     it.plotPoint.y+offset,
                     it.type.toLabelPaint()
                 )
-                textBounds.drawTextCentered(
+                textBounds.drawTextCenteredWithX(
                     canvas,
                     touchLabelPaint,
                     it.dataPoint.x.toLong().toTimeLabel(),
@@ -513,7 +514,11 @@ class PointsChart @JvmOverloads constructor(
     }
 
     override fun onScroll(p0: MotionEvent, p1: MotionEvent, dx: Float, dy: Float): Boolean {
-        originX += dx
+        // prevent scrolling x into future
+        val now = Date().time / 1000
+        if (dx < 0 || bounds.right.unScaleX() < now) {
+            originX += dx
+        }
         originY += dy
         computePoints()
         checkForRequestMoreData()

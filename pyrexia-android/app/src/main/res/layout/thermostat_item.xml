@@ -28,6 +28,7 @@
             app:onClickIncrease="@{()->model.onClickIncrease()}"
             app:bezelWidth="15dp"
             app:tickGapDegrees="3"
+            app:message="@{model.message}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

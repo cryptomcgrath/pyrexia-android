@@ -37,15 +37,29 @@ class ThermostatView @JvmOverloads constructor(
     private var markLength = 0f
 
     private var centerPaint: Paint = Paint()
-    private var rimPaint: Paint
     private var tickPaint: Paint
     private var tickLight: Paint
     private var tickDark: Paint
 
-    private var temperaturePaint: Paint
-    private var setPointPaint: Paint
+    private var rimPaint: Paint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.silver)
+        isAntiAlias = true
+    }
+    private var messagePaint: Paint = Paint().apply {
+        isAntiAlias = true
+        color = ContextCompat.getColor(context, R.color.white)
+    }
+    private var temperaturePaint: Paint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.white)
+        isAntiAlias = true
+    }
+    private var setPointPaint: Paint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.white)
+        isAntiAlias = true
+    }
     private var temperatureTextSize: Float
     private var setPointTextSize: Float
+    private var messageTextSize: Float
 
     var onClickIncreaseListener: OnClickIncreaseListener? = null
     var onClickDecreaseListener: OnClickDecreaseListener? = null
@@ -86,6 +100,14 @@ class ThermostatView @JvmOverloads constructor(
             requestLayout()
         }
 
+    var message: String = ""
+        set(value) {
+            field = value
+
+            invalidate()
+            requestLayout()
+        }
+
     var bezelWidth: Float = resources.getDimension(R.dimen.thermostatview_default_bezel_width)
         set(value) {
             field = value
@@ -117,12 +139,12 @@ class ThermostatView @JvmOverloads constructor(
         centerColor = typedArray.getInteger(R.styleable.ThermostatView_centerColor, R.color.black)
         currentTemp = typedArray.getString(R.styleable.ThermostatView_currentTemp) ?: "---"
         setPoint = typedArray.getString(R.styleable.ThermostatView_setPoint) ?: "---"
-
+        message = typedArray.getString(R.styleable.ThermostatView_message).orEmpty()
         // will be set in onLayout
         temperatureTextSize = 0f
         setPointTextSize = 0f
-        temperaturePaint = Paint()
-        setPointPaint = Paint()
+        messageTextSize = 0f
+
         rimPaint = Paint()
         tickPaint = Paint().apply {
             isAntiAlias = true
@@ -167,26 +189,12 @@ class ThermostatView @JvmOverloads constructor(
 
         temperatureTextSize = xCenter / 2f
         setPointTextSize = temperatureTextSize * .4f
+        messageTextSize = temperatureTextSize * .2f
 
-
-        rimPaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.silver)
-            isAntiAlias = true
-        }
-
-        setPointPaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.white)
-            isAntiAlias = true
-            textSize = setPointTextSize
-        }
-        temperaturePaint = Paint().apply {
-            color = ContextCompat.getColor(context, R.color.white)
-            isAntiAlias = true
-            textSize = temperatureTextSize
-        }
+        setPointPaint.textSize = setPointTextSize
+        temperaturePaint.textSize = temperatureTextSize
+        messagePaint.textSize = messageTextSize
     }
-
-
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         // use parent width for x and y desired sizes if not specified
@@ -225,10 +233,16 @@ class ThermostatView @JvmOverloads constructor(
         canvas.drawLine(p1.x, p1.y, p2.x, p2.y, tickDark)
 
         // current temp
-        textBounds.drawTextCentered(canvas, temperaturePaint, currentTemp, xCenter, yCenter)
+        textBounds.drawTextCentered(canvas, temperaturePaint, currentTemp, currentTemp.replace("°" , ""), xCenter, yCenter )
+        val h = textBounds.height()
 
         // set point
         textBounds.drawTextCentered(canvas, setPointPaint, setPoint, p3.x, p3.y)
+
+        // message
+        if (message.isNotEmpty()) {
+            textBounds.drawTextCentered(canvas, messagePaint, message, xCenter, yCenter + h)
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -386,5 +400,15 @@ fun convertDpToPixel(dp: Float, context: Context): Float {
 
 fun Rect.drawTextCentered(canvas: Canvas, paint: Paint, text: String, cx: Float, cy: Float) {
     paint.getTextBounds(text, 0, text.length, this)
+    canvas.drawText(text, cx - this.exactCenterX(), cy - this.exactCenterY(), paint)
+}
+
+fun Rect.drawTextCenteredWithX(canvas: Canvas, paint: Paint, text: String, cx: Float, cy: Float) {
+    paint.getTextBounds(text, 0, text.length, this)
+    canvas.drawText(text, cx - this.exactCenterX(), cy, paint)
+}
+
+fun Rect.drawTextCentered(canvas: Canvas, paint: Paint, text: String, textForGuide: String, cx: Float, cy: Float) {
+    paint.getTextBounds(textForGuide, 0, textForGuide.length, this)
     canvas.drawText(text, cx - this.exactCenterX(), cy - this.exactCenterY(), paint)
 }
