@@ -15,6 +15,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.cryptomcgrath.pyrexia.R
+import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.min
@@ -209,18 +210,20 @@ class ThermostatView @JvmOverloads constructor(
         // paint bg
         canvas.drawCircle(xCenter, yCenter, rimRadius, centerPaint)
 
-        // rim
-        for (i in 1..360 step tickGapDegrees) {
+        for (d in DIAL_START_TEMP.toInt() .. DIAL_END_TEMP.toInt()) {
+            val a = d.toFloat().temperatureToDegrees()
             val r1 = centerRadius
-            val t1 = Math.toRadians(i.toDouble())
+            val t1 = Math.toRadians(a.toDouble())
             val x1 = r1 * cos(t1) + xCenter
             val y1 = r1 * sin(t1) + yCenter
             val r2 = rimRadius
             val x2 = r2 * cos(t1) + xCenter
             val y2 = r2 * sin(t1) + yCenter
-
             canvas.drawLine(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat(), tickLight)
         }
+
+        canvas.drawArc(xCenter - rimRadius, yCenter - rimRadius, xCenter+rimRadius, yCenter+rimRadius, DIAL_BUTTON_1_DEG.toFloat(), DIAL_BUTTON_SWEEP.toFloat(), true, tickLight )
+        canvas.drawArc(xCenter - rimRadius, yCenter - rimRadius, xCenter+rimRadius, yCenter+rimRadius, DIAL_BUTTON_2_DEG.toFloat(), DIAL_BUTTON_SWEEP.toFloat(), true, tickLight )
 
         // center
         canvas.drawCircle(xCenter, yCenter, centerRadius, centerPaint)
@@ -354,16 +357,25 @@ class ThermostatView @JvmOverloads constructor(
     }
 }
 
-private const val startDial = -40f
-private const val endDial = 115f
-private const val dialFactor = (endDial - startDial) / 360f
+private const val DIAL_START_TEMP = 0f
+private const val DIAL_END_TEMP = 110f
+private const val DIAL_START_DEG = 92
+private const val DIAL_END_DEG = 88
+private const val DIAL_TOTAL_DEG = 360f - (DIAL_START_DEG - DIAL_END_DEG)
+
+private const val DIAL_BUTTON_SWEEP = (DIAL_START_DEG - DIAL_END_DEG - 5) / 2
+private const val DIAL_BUTTON_1_DEG = DIAL_START_DEG - DIAL_BUTTON_SWEEP
+private const val DIAL_BUTTON_2_DEG = DIAL_END_DEG
+private const val DIAL_SWEEP_PER_ONE_DEGREE = DIAL_TOTAL_DEG / (DIAL_END_TEMP - DIAL_START_TEMP)
 
 fun Float.degreesToTemperature(): Float {
-    return this * dialFactor + startDial
+    return ((this - DIAL_START_DEG) / DIAL_SWEEP_PER_ONE_DEGREE) + DIAL_START_TEMP
 }
 
 fun Float.temperatureToDegrees(): Float {
-    return (this - startDial) / dialFactor
+    var d = ((this - DIAL_START_TEMP) * DIAL_SWEEP_PER_ONE_DEGREE + DIAL_START_DEG)
+    if (d > 360f) d -= 360f
+    return d
 }
 
 fun computeDestPoint(startX: Float, startY: Float, angle: Float, r: Float): PointF {
