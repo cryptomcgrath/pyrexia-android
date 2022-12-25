@@ -4,6 +4,7 @@ package com.cryptomcgrath.pyrexia.statlist
 import android.util.Log
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.cryptomcgrath.pyrexia.R
+import com.cryptomcgrath.pyrexia.deviceconfig.secsToLastUpdatedTimeString
 import com.cryptomcgrath.pyrexia.deviceconfig.toLastUpdatedTimeString
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.VirtualStat
@@ -17,12 +18,19 @@ internal class StatDiffableItem(private val stat: VirtualStat,
     val name = stat.program.name
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
     val sensorValue = stat.sensor.value.toFormattedTemperatureString()
-    val message = when {
-        Date().time / 1000 - stat.lastRefreshTimeSecs > 60 -> stat.lastRefreshTimeSecs.toLastUpdatedTimeString()
-        stat.control.controlOn -> {
-            if (stat.program.mode == Program.Mode.HEAT) "Heating" else "Cooling"
+    private val elapsedSecs = Date().time / 1000 - stat.lastRefreshTimeSecs
+    private val secsSinceSensorUpdate = (stat.currentTimeSecs ?: 0L) - stat.sensor.lastUpdatedTs
+    private val totalSecs = elapsedSecs + secsSinceSensorUpdate
+    private val hasTimeData = stat.sensor.lastUpdatedTs > 0L && (stat.currentTimeSecs ?: 0L) > 0L
+    val message: String get() {
+        Log.d("StatDiffableItem", "elapsedSecs=$elapsedSecs secSinceSensorUpdate=$secsSinceSensorUpdate totalSecs=$totalSecs")
+        return when {
+                    hasTimeData && totalSecs > 60 -> totalSecs.secsToLastUpdatedTimeString()
+            stat.control.controlOn -> {
+                if (stat.program.mode == Program.Mode.HEAT) "Heating" else "Cooling"
+            }
+            else -> ""
         }
-        else -> ""
     }
     private val isEnabled = stat.program.enabled
 

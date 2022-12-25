@@ -210,6 +210,7 @@ class ThermostatView @JvmOverloads constructor(
         // paint bg
         canvas.drawCircle(xCenter, yCenter, rimRadius, centerPaint)
 
+        // draw tick marks around circle at each degree
         for (d in DIAL_START_TEMP.toInt() .. DIAL_END_TEMP.toInt()) {
             val a = d.toFloat().temperatureToDegrees()
             val r1 = centerRadius

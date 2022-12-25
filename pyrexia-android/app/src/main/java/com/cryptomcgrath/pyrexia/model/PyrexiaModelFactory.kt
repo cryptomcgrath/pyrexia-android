@@ -36,12 +36,14 @@ internal fun GetStatListDto.toStatList(): List<VirtualStat> {
         val sensor = Sensor(
             id = it.sensor_id,
             name = it.sensor_name,
-            value = it.sensor_value
+            value = it.sensor_value,
+            lastUpdatedTs = it.sensor_update_time
         )
         VirtualStat(
             program = program,
             control = control,
-            sensor = sensor
+            sensor = sensor,
+            currentTimeSecs = current_time
         )
     }
 }

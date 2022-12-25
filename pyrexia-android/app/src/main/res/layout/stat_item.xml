@@ -36,6 +36,7 @@
             app:currentTemp="@{model.sensorValue}"
             app:setPoint="@{model.setPointText}"
             app:centerColor="@{model.backgroundColor}"
+            app:message="@{model.message}"
             app:onClickDecrease="@{()->model.onClickDecrease()}"
             app:onClickIncrease="@{()->model.onClickIncrease()}"
             app:layout_constraintStart_toStartOf="parent"

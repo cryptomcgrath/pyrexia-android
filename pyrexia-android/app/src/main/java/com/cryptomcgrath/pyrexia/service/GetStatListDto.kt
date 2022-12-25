@@ -2,7 +2,8 @@ package com.cryptomcgrath.pyrexia.service
 
 internal data class GetStatListDto(
     val message: String,
-    val data: List<StatListDto>
+    val data: List<StatListDto>,
+    val current_time: Long
 ) {
     data class StatListDto(
         val program_id: Int,
@@ -10,6 +11,7 @@ internal data class GetStatListDto(
         val sensor_id: Int,
         val sensor_name: String,
         val sensor_value: Float,
+        val sensor_update_time: Long,
         val control_id: Int,
         val control_name: String,
         val mode: String,

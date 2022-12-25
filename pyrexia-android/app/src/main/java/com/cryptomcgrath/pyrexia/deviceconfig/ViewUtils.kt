@@ -19,9 +19,8 @@ const val SECONDS_IN_DAY = 24*3600
 const val SECONDS_IN_HOUR = 3600
 const val SECONDS_IN_MINUTE = 60
 
-internal fun Long.toLastUpdatedTimeString(): String {
-    val now = Date().time / 1000
-    val elapsed = now - this
+internal fun Long.secsToLastUpdatedTimeString(): String {
+    val elapsed = this
     val d = (elapsed / (SECONDS_IN_DAY)).toInt()
     val h = ((elapsed - d * SECONDS_IN_DAY) / SECONDS_IN_HOUR).toInt()
     val m = (elapsed - (d * SECONDS_IN_DAY) - (h * SECONDS_IN_HOUR)) / SECONDS_IN_MINUTE
@@ -34,6 +33,12 @@ internal fun Long.toLastUpdatedTimeString(): String {
         m > 0 -> "$m minutes ago"
         else -> "$s seconds ago"
     }
+}
+
+internal fun Long.toLastUpdatedTimeString(): String {
+    val now = Date().time / 1000
+    val elapsed = now - this
+    return elapsed.secsToLastUpdatedTimeString()
 }
 
 internal fun View.hideKeyboard() {

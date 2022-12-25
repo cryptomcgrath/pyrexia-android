@@ -346,19 +346,19 @@ class PointsChart @JvmOverloads constructor(
         }
 
         synchronized(data) {
-            // hilite
-            val midX = plotBounds.width()/2
-            data.forEach {
-                if (setOf(Series.Type.ON_HEAT, Series.Type.ON_COOL).contains(it.series.type) && it.packedPoints.size >= 4) {
-                    val x1 = it.packedPoints[0]
-                    val x2 = it.packedPoints[it.packedPoints.size-2]
-                    if (x1 < midX && x2 >= midX) {
-                        val y1 = it.packedPoints[1]
-                        val y2 = it.packedPoints[it.packedPoints.size-1]
-                        canvas.drawOval(x1-margin, y1+margin, x2+margin, y2-margin, circlePaint)
-                    }
-                }
-            }
+            // hilite cycle near mid point
+            //val midX = plotBounds.width()/2
+            //data.forEach {
+            //    if (setOf(Series.Type.ON_HEAT, Series.Type.ON_COOL).contains(it.series.type) && it.packedPoints.size >= 4) {
+            //        val x1 = it.packedPoints[0]
+            //        val x2 = it.packedPoints[it.packedPoints.size-2]
+            //        if (x1 < midX && x2 >= midX) {
+            //            val y1 = it.packedPoints[1]
+            //            val y2 = it.packedPoints[it.packedPoints.size-1]
+            //            canvas.drawOval(x1-margin, y1+margin, x2+margin, y2-margin, circlePaint)
+            //        }
+            //    }
+            //}
 
             // points plot
             data.forEach {
