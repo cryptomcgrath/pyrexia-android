@@ -35,7 +35,7 @@ internal class DeviceConfigViewModel(application: Application,
     val dispatcher = Dispatcher.create(store)
     val eventQueue = EventQueue.create()
 
-    private val pyrexiaService = PyrexiaService(application, pyDevice)
+    private var pyrexiaService = PyrexiaService(application, pyDevice)
 
     init {
         reactToEvents()
@@ -61,7 +61,10 @@ internal class DeviceConfigViewModel(application: Application,
             ).addTo(disposables)
     }
 
-    fun refreshData() {
+    fun refreshData(pyDevice: PyDevice? = null) {
+        if (pyDevice != null && pyDevice != pyrexiaService.pyDevice) {
+            pyrexiaService = PyrexiaService(getApplication(), pyDevice)
+        }
         fetchDeviceConfig()
     }
 

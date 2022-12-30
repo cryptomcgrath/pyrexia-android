@@ -25,7 +25,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-internal class PyrexiaService(application: Application, pyDevice: PyDevice) {
+internal class PyrexiaService(application: Application, val pyDevice: PyDevice) {
     private val networkFlipperPlugin = AndroidFlipperClient.getInstance(application)
         .getPlugin<NetworkFlipperPlugin>(NetworkFlipperPlugin.ID)
 

@@ -104,7 +104,7 @@ internal class DeviceConfigFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshData()
+        viewModel.refreshData(args.pyDevice)
     }
 
     private fun goToSensorEditDialog(pyDevice: PyDevice,
