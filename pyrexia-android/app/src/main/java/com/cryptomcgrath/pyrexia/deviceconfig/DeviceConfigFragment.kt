@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
@@ -19,7 +20,7 @@ import com.cryptomcgrath.pyrexia.model.VirtualStat
 internal class DeviceConfigFragment: Fragment() {
     private val args: DeviceConfigFragmentArgs by navArgs()
 
-    private val viewModel: DeviceConfigViewModel by activityViewModels {
+    private val viewModel: DeviceConfigViewModel by viewModels {
         DeviceConfigViewModel.Factory(
             application = requireActivity().application,
             pyDevice = args.pyDevice)
@@ -104,7 +105,7 @@ internal class DeviceConfigFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshData(args.pyDevice)
+        viewModel.refreshData()
     }
 
     private fun goToSensorEditDialog(pyDevice: PyDevice,

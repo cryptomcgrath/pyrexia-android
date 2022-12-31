@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.AsyncListDiffer
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
@@ -20,7 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 internal class AddComponentBottomSheetFragment: BottomSheetDialogFragment() {
     private val args: AddComponentBottomSheetFragmentArgs by navArgs()
 
-    private val viewModel: DeviceConfigViewModel by activityViewModels {
+    private val viewModel: DeviceConfigViewModel by viewModels(ownerProducer = {requireParentFragment()}) {
         DeviceConfigViewModel.Factory(
             application = requireActivity().application,
             pyDevice = args.pydevice)

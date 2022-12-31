@@ -22,7 +22,7 @@ internal class ControlEditBottomSheetFragment : BottomSheetDialogFragment() {
             control = args.control
         )
     }
-    private val deviceConfigViewModel: DeviceConfigViewModel by activityViewModels {
+    private val deviceConfigViewModel: DeviceConfigViewModel by viewModels(ownerProducer={requireParentFragment()}) {
         DeviceConfigViewModel.Factory(requireActivity().application, args.pydevice)
     }
 

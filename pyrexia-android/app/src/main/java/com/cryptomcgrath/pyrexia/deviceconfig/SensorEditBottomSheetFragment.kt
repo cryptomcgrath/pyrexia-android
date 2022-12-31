@@ -20,7 +20,7 @@ internal class SensorEditBottomSheetFragment: BottomSheetDialogFragment() {
             pyDevice = args.pydevice,
             sensor = args.sensor)
     }
-    private val deviceConfigViewModel: DeviceConfigViewModel by activityViewModels {
+    private val deviceConfigViewModel: DeviceConfigViewModel by viewModels(ownerProducer = {requireParentFragment()}) {
         DeviceConfigViewModel.Factory(
             application = requireActivity().application,
             pyDevice = args.pydevice)
