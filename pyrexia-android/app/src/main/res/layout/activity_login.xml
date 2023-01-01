@@ -99,6 +99,8 @@
                 android:error="@{model.passwordError}"
                 android:hint="@string/login_enter_your_password"
                 android:inputType="textPassword"
+                android:imeOptions="actionDone"
+                android:onEditorAction="@{(view, actionId, event) -> model.onEditorAction(view, actionId, event)}"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 

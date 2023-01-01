@@ -5,9 +5,12 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.view.KeyEvent
+import android.view.KeyEvent.KEYCODE_ENTER
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.databinding.ObservableField
 import androidx.fragment.app.FragmentActivity
@@ -27,6 +30,7 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.regex.Pattern
+
 
 class LoginActivity: FragmentActivity() {
     internal val viewModel: LoginViewModel by viewModels {
@@ -120,12 +124,19 @@ internal class LoginViewModel(application: Application, pyDevice: PyDevice) : An
                     onComplete = {
                         eventQueue.post(UiEvent.LoginSuccess)
                     }, onError = {
-                        Log.d("LoginActivity", it.stackTraceToString())
                         eventQueue.post(UiEvent.NetworkError(it))
-                        // TODO: show error message
                     }
                 ).addTo(disposables)
         }
+    }
+
+    fun onEditorAction(view: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        if (actionId == EditorInfo.IME_ACTION_DONE ||
+            (event?.action == KeyEvent.ACTION_DOWN && event.keyCode == KEYCODE_ENTER)) {
+            onClickLogin(view)
+            return true
+        }
+        return false
     }
 
     override fun onCleared() {
@@ -149,6 +160,6 @@ private val EMAIL_ADDRESS_PATTERN = Pattern.compile(
             ")+"
 )
 
-fun isValidEmail(email: String): Boolean{
+fun isValidEmail(email: String): Boolean {
     return EMAIL_ADDRESS_PATTERN.matcher(email).matches()
 }
