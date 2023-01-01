@@ -21,7 +21,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 internal class DeviceConfigViewModel(application: Application,
-                                     private val pyDevice: PyDevice) : AndroidViewModel(application) {
+                                     pyDevice: PyDevice) : AndroidViewModel(application) {
 
     class Factory(private val application: Application,
                   private val pyDevice: PyDevice) : ViewModelProvider.Factory {
