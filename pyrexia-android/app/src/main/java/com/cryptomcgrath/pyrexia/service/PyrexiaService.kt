@@ -38,8 +38,8 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
         .addNetworkInterceptor(Interceptor { chain ->
             val original = chain.request()
             val newRequest = original.newBuilder().apply {
-                if (pyDevice.token.isNotEmpty()) {
-                    this.addHeader(HEADER_TOKEN, pyDevice.token)
+                tokenMap[pyDevice.uid]?.let {
+                    this.addHeader(HEADER_TOKEN, it)
                 }
             }.addHeader(HEADER_API, API_KEY)
                 .addHeader("Platform", "android")
@@ -152,6 +152,7 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
                 token = it.token
             )
             pyDevice = updatedPyDevice
+            tokenMap[pyDevice.uid] = pyDevice.token
             db.devicesDao().updateDevice(pyDevice.toDevice())
         }
     }
@@ -160,8 +161,13 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
         return db.devicesDao().getDevice(pyDevice.uid)
             .flatMap {
                 pyDevice = it.toPyDevice()
+                tokenMap[it.uid] = it.token
                 Single.just(it.token.isNotEmpty())
             }
+    }
+
+    companion object {
+        val tokenMap = mutableMapOf<Int, String>()
     }
 }
 
