@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.cryptomcgrath.pyrexia.databinding.FragmentDeviceConfigBinding
+import com.cryptomcgrath.pyrexia.login.LoginActivity
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
@@ -30,6 +30,9 @@ internal class DeviceConfigFragment: Fragment() {
         super.onCreate(savedInstanceState)
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
+                DeviceConfigEvent.GoToLogin -> {
+                    startActivity(LoginActivity.createLoginIntent(requireActivity(), args.pyDevice))
+                }
                 is DeviceConfigEvent.GoToSensorEdit -> {
                     goToSensorEditDialog(args.pyDevice, event.sensor)
                 }

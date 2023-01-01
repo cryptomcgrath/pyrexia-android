@@ -1,6 +1,9 @@
 package com.cryptomcgrath.pyrexia.service
 
 import android.app.Application
+import com.cryptomcgrath.pyrexia.db.PyrexiaDb
+import com.cryptomcgrath.pyrexia.db.toDevice
+import com.cryptomcgrath.pyrexia.db.toPyDevice
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.History
 import com.cryptomcgrath.pyrexia.model.Program
@@ -25,7 +28,9 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-internal class PyrexiaService(application: Application, val pyDevice: PyDevice) {
+internal class PyrexiaService(application: Application, var pyDevice: PyDevice) {
+    private val db = PyrexiaDb.getDatabase(application)
+
     private val networkFlipperPlugin = AndroidFlipperClient.getInstance(application)
         .getPlugin<NetworkFlipperPlugin>(NetworkFlipperPlugin.ID)
 
@@ -135,8 +140,31 @@ internal class PyrexiaService(application: Application, val pyDevice: PyDevice) 
     fun deleteControl(control: Control): Completable {
         return client.deleteControl(control.id)
     }
+
+    fun login(email: String, password: String): Completable {
+        return client.login(
+            LoginRequestDto(
+                email = email,
+                password = password
+            )
+        ).flatMapCompletable {
+            val updatedPyDevice = pyDevice.copy(
+                token = it.token
+            )
+            pyDevice = updatedPyDevice
+            db.devicesDao().updateDevice(pyDevice.toDevice())
+        }
+    }
+
+    fun isLoggedIn(): Single<Boolean> {
+        return db.devicesDao().getDevice(pyDevice.uid)
+            .flatMap {
+                pyDevice = it.toPyDevice()
+                Single.just(it.token.isNotEmpty())
+            }
+    }
 }
 
-private const val HEADER_TOKEN = "token"
+private const val HEADER_TOKEN = "x-access-token"
 private const val HEADER_API = "apikey"
 private const val API_KEY = "e4-5f-01-5b-f4-4f"

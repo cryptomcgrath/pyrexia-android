@@ -119,4 +119,10 @@ internal interface PyrexiaApi {
         "Content-Type: application/json")
     @POST("/controls/{id}/refill")
     fun refill(@Path("id") id: Int): Completable
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @POST("/users/login")
+    fun login(@Body loginRequestDto: LoginRequestDto): Single<LoginResponseDto>
 }

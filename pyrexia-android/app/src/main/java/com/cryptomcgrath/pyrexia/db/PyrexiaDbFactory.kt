@@ -8,7 +8,7 @@ internal fun List<Device>.toPyDeviceList(): List<PyDevice> {
     }
 }
 
-private fun Device.toPyDevice(): PyDevice {
+internal fun Device.toPyDevice(): PyDevice {
     return PyDevice(
         uid = this.uid,
         name = this.name,

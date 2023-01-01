@@ -13,4 +13,5 @@ internal sealed class StatListEvent: Event {
     data class OnClickIncreaseTemp(val id: Int) : StatListEvent()
     data class OnClickDecreaseTemp(val id: Int) : StatListEvent()
     data class SetLoading(val isLoading: Boolean) : StatListEvent()
+    object GoToLogin: StatListEvent()
 }

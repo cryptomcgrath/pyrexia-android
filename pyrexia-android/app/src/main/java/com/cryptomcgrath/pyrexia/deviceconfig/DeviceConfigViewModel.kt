@@ -18,9 +18,10 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import retrofit2.HttpException
 
 internal class DeviceConfigViewModel(application: Application,
-                                     pyDevice: PyDevice) : AndroidViewModel(application) {
+                                     private val pyDevice: PyDevice) : AndroidViewModel(application) {
 
     class Factory(private val application: Application,
                   private val pyDevice: PyDevice) : ViewModelProvider.Factory {
@@ -62,7 +63,20 @@ internal class DeviceConfigViewModel(application: Application,
     }
 
     fun refreshData() {
-        fetchDeviceConfig()
+        pyrexiaService.isLoggedIn()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        fetchDeviceConfig()
+                    } else {
+                        dispatcher.post(DeviceConfigEvent.GoToLogin)
+                    }
+                }, onError = {
+
+                }
+            ).addTo(disposables)
     }
 
     private fun deleteSensor(sensor: Sensor) {
@@ -115,7 +129,11 @@ internal class DeviceConfigViewModel(application: Application,
                     dispatcher.post(DeviceConfigEvent.NewDeviceConfig(stats, sensors, controls))
                 },
                 onError = {
-                    dispatcher.post(DeviceConfigEvent.NetworkError(it, true))
+                    if (it.isUnauthorized()) {
+                        dispatcher.post(DeviceConfigEvent.GoToLogin)
+                    } else {
+                        dispatcher.post(DeviceConfigEvent.NetworkError(it, true))
+                    }
                 }
         ).addTo(disposables)
     }
@@ -128,3 +146,7 @@ internal class DeviceConfigViewModel(application: Application,
 }
 
 private const val TAG="DeviceConfigViewModel"
+
+internal  fun Throwable.isUnauthorized(): Boolean {
+    return this is HttpException && setOf(401,403).contains(this.code())
+}

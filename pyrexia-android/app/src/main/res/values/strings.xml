@@ -76,4 +76,9 @@
 
     <!-- Network Error Messages -->
     <string name="network_error_socket_timeout">Check your network connection</string>
+
+    <!-- Login -->
+    <string name="login_enter_your_email">Enter your email</string>
+    <string name="login_enter_your_password">Enter your password</string>
+    <string name="login_sign_in">Sign in</string>
 </resources>

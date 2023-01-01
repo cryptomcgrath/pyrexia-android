@@ -11,6 +11,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Update
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -48,6 +49,12 @@ internal interface DeviceDao {
 
     @Insert
     fun addDevice(device: Device): Completable
+
+    @Query("select * from device where uid = :id")
+    fun getDevice(id: Int): Single<Device>
+
+    @Update
+    fun updateDevice(device: Device): Completable
 
     @Delete
     fun deleteDevice(device: Device): Completable

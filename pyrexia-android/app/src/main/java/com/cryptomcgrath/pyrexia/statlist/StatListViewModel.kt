@@ -6,6 +6,7 @@ import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.cryptomcgrath.pyrexia.deviceconfig.isUnauthorized
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.cryptomcgrath.pyrexia.thermostat.AUTO_REFRESH_INTERVAL
@@ -88,16 +89,38 @@ internal class StatListViewModel(application: Application,
                     dispatcher.post(StatListEvent.NewStatList(it))
                 },
                 onError = {
-                    if (store.state.dataLoaded) {
-                        dispatcher.post(StatListEvent.RefreshDataError(it))
+                    if (it.isUnauthorized()) {
+                        dispatcher.post(StatListEvent.GoToLogin)
                     } else {
-                        dispatcher.post(StatListEvent.NetworkError(it))
+                        if (store.state.dataLoaded) {
+                            dispatcher.post(StatListEvent.RefreshDataError(it))
+                        } else {
+                            dispatcher.post(StatListEvent.NetworkError(it))
+                        }
                     }
                 }
             ).addTo(disposables)
     }
 
     fun setupAutoRefresh() {
+        pyrexiaService.isLoggedIn()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        setupAutoRefreshInternal()
+                    } else {
+                        dispatcher.post(StatListEvent.GoToLogin)
+                    }
+                }, onError = {
+                    dispatcher.post(StatListEvent.NetworkError(it))
+                }
+            ).addTo(disposables)
+
+    }
+
+    private fun setupAutoRefreshInternal() {
         refreshData()
         autoRefreshDisposable = Observable.interval(AUTO_REFRESH_INTERVAL, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.io())

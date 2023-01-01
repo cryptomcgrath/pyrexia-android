@@ -13,6 +13,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.cryptomcgrath.pyrexia.databinding.FragmentStatListBinding
 import com.cryptomcgrath.pyrexia.deviceconfig.createNetworkErrorAlertDialog
+import com.cryptomcgrath.pyrexia.login.LoginActivity
 import com.cryptomcgrath.pyrexia.thermostat.ThermostatFragmentDirections
 
 internal class StatListFragment: Fragment() {
@@ -35,6 +36,9 @@ internal class StatListFragment: Fragment() {
                 }
                 is StatListEvent.NetworkError -> {
                     showNetworkError(event.throwable)
+                }
+                StatListEvent.GoToLogin -> {
+                    startActivity(LoginActivity.createLoginIntent(requireActivity(), args.pydevice))
                 }
             }
         }
