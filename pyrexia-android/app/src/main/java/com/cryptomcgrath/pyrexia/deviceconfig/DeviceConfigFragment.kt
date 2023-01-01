@@ -1,18 +1,20 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.navGraphViewModels
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentDeviceConfigBinding
 import com.cryptomcgrath.pyrexia.login.LoginActivity
+import com.cryptomcgrath.pyrexia.login.RESULT_CODE_LOGIN
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
@@ -21,10 +23,11 @@ import com.cryptomcgrath.pyrexia.model.VirtualStat
 internal class DeviceConfigFragment: Fragment() {
     private val args: DeviceConfigFragmentArgs by navArgs()
 
-    private val viewModel: DeviceConfigViewModel by navGraphViewModels(R.id.nav_graph) {
+    private val viewModel: DeviceConfigViewModel by activityViewModels {
         DeviceConfigViewModel.Factory(
             application = requireActivity().application,
-            pyDevice = args.pyDevice)
+            pyDevice = args.pyDevice
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +35,9 @@ internal class DeviceConfigFragment: Fragment() {
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
                 DeviceConfigEvent.GoToLogin -> {
-                    startActivity(LoginActivity.createLoginIntent(requireActivity(), args.pyDevice))
+                    requireActivity().startActivityForResult(
+                        LoginActivity.createLoginIntent(requireActivity(), args.pyDevice),
+                        RESULT_CODE_LOGIN)
                 }
                 is DeviceConfigEvent.GoToSensorEdit -> {
                     goToSensorEditDialog(args.pyDevice, event.sensor)
@@ -109,7 +114,7 @@ internal class DeviceConfigFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshData()
+        viewModel.refreshData(args.pyDevice)
     }
 
     private fun goToSensorEditDialog(pyDevice: PyDevice,

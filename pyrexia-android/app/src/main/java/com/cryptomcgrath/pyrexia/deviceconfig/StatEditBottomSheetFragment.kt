@@ -8,9 +8,9 @@ import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import android.widget.Filter
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.navGraphViewModels
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentStatEditBinding
 import com.cryptomcgrath.pyrexia.model.Program
@@ -25,7 +25,7 @@ internal class StatEditBottomSheetFragment: BottomSheetDialogFragment() {
             stat = args.stat,
             store = deviceConfigViewModel.store)
     }
-    private val deviceConfigViewModel: DeviceConfigViewModel by navGraphViewModels(R.id.nav_graph) {
+    private val deviceConfigViewModel: DeviceConfigViewModel by activityViewModels {
         DeviceConfigViewModel.Factory(
             application = requireActivity().application,
             pyDevice = args.pydevice)

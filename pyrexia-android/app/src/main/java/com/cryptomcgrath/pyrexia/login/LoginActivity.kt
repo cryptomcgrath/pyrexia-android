@@ -58,6 +58,8 @@ class LoginActivity: FragmentActivity() {
             LayoutInflater.from(this), null, false)
         binding.model = viewModel
         setContentView(binding.root)
+
+        setResult(Activity.RESULT_CANCELED)
     }
 
     companion object {
@@ -163,3 +165,6 @@ private val EMAIL_ADDRESS_PATTERN = Pattern.compile(
 fun isValidEmail(email: String): Boolean {
     return EMAIL_ADDRESS_PATTERN.matcher(email).matches()
 }
+
+internal const val RESULT_CODE_LOGIN = 10001
+

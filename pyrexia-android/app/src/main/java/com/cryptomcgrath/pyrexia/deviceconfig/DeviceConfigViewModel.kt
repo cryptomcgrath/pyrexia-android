@@ -36,7 +36,7 @@ internal class DeviceConfigViewModel(application: Application,
     val dispatcher = Dispatcher.create(store)
     val eventQueue = EventQueue.create()
 
-    private val pyrexiaService = PyrexiaService(application, pyDevice)
+    private var pyrexiaService = PyrexiaService(application, pyDevice)
 
     init {
         reactToEvents()
@@ -62,7 +62,11 @@ internal class DeviceConfigViewModel(application: Application,
             ).addTo(disposables)
     }
 
-    fun refreshData() {
+    fun refreshData(pyDevice: PyDevice? = null) {
+        if (pyDevice != null && pyrexiaService.pyDevice.baseUrl != pyDevice.baseUrl) {
+            pyrexiaService = PyrexiaService(getApplication(), pyDevice)
+        }
+
         pyrexiaService.isLoggedIn()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

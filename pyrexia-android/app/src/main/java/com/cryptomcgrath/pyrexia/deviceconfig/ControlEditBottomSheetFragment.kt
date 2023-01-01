@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
@@ -22,7 +23,7 @@ internal class ControlEditBottomSheetFragment : BottomSheetDialogFragment() {
             control = args.control
         )
     }
-    private val deviceConfigViewModel: DeviceConfigViewModel by navGraphViewModels(R.id.nav_graph) {
+    private val deviceConfigViewModel: DeviceConfigViewModel by activityViewModels {
         DeviceConfigViewModel.Factory(requireActivity().application, args.pydevice)
     }
 
