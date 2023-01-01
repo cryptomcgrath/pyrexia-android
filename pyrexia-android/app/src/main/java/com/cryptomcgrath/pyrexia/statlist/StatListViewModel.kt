@@ -6,9 +6,9 @@ import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.cryptomcgrath.pyrexia.deviceconfig.isUnauthorized
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
+import com.cryptomcgrath.pyrexia.service.isUnauthorized
 import com.cryptomcgrath.pyrexia.thermostat.AUTO_REFRESH_INTERVAL
 import com.cryptomcgrath.pyrexia.thermostat.TAG
 import com.cryptomcgrath.pyrexia.thermostat.ThermostatEvent

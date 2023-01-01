@@ -9,6 +9,7 @@ import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
+import com.cryptomcgrath.pyrexia.service.isUnauthorized
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.EventQueue
 import com.edwardmcgrath.blueflux.core.RxStore
@@ -18,7 +19,6 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import retrofit2.HttpException
 
 internal class DeviceConfigViewModel(application: Application,
                                      private val pyDevice: PyDevice) : AndroidViewModel(application) {
@@ -146,7 +146,3 @@ internal class DeviceConfigViewModel(application: Application,
 }
 
 private const val TAG="DeviceConfigViewModel"
-
-internal  fun Throwable.isUnauthorized(): Boolean {
-    return this is HttpException && setOf(401,403).contains(this.code())
-}

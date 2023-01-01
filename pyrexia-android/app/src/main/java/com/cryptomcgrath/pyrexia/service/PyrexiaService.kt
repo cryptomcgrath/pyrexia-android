@@ -24,6 +24,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -41,8 +42,7 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
                 tokenMap[pyDevice.uid]?.let {
                     this.addHeader(HEADER_TOKEN, it)
                 }
-            }.addHeader(HEADER_API, API_KEY)
-                .addHeader("Platform", "android")
+            }.addHeader("Platform", "android")
             chain.proceed(newRequest.build())
         }).apply {
             if (networkFlipperPlugin != null) {
@@ -172,5 +172,7 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
 }
 
 private const val HEADER_TOKEN = "x-access-token"
-private const val HEADER_API = "apikey"
-private const val API_KEY = "e4-5f-01-5b-f4-4f"
+
+internal  fun Throwable.isUnauthorized(): Boolean {
+    return this is HttpException && setOf(401,403).contains(this.code())
+}
