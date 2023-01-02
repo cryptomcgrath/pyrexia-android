@@ -149,7 +149,8 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
             )
         ).flatMapCompletable {
             val updatedPyDevice = pyDevice.copy(
-                token = it.token
+                token = it.token,
+                email = email
             )
             pyDevice = updatedPyDevice
             tokenMap[pyDevice.uid] = pyDevice.token

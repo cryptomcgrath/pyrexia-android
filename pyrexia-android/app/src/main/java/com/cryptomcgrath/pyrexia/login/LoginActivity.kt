@@ -12,6 +12,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
@@ -57,6 +58,9 @@ class LoginActivity: FragmentActivity() {
         val binding = ActivityLoginBinding.inflate(
             LayoutInflater.from(this), null, false)
         binding.model = viewModel
+        if (viewModel.email.isNotEmpty()) {
+            binding.passwordText.requestFocus()
+        }
         setContentView(binding.root)
 
         setResult(Activity.RESULT_CANCELED)
@@ -96,6 +100,8 @@ internal class LoginViewModel(application: Application, pyDevice: PyDevice) : An
     val emailError = ObservableField<String>()
     val passwordError = ObservableField<String>()
 
+    val loading = ObservableBoolean()
+
     private val disposables = CompositeDisposable()
 
     private fun checkErrors(): Boolean {
@@ -122,10 +128,14 @@ internal class LoginViewModel(application: Application, pyDevice: PyDevice) : An
             pyrexiaService.login(email, password)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
+                .doOnSubscribe {
+                    loading.set(true)
+                }.subscribeBy(
                     onComplete = {
+                        loading.set(false)
                         eventQueue.post(UiEvent.LoginSuccess)
                     }, onError = {
+                        loading.set(false)
                         eventQueue.post(UiEvent.NetworkError(it))
                     }
                 ).addTo(disposables)

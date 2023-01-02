@@ -5,6 +5,7 @@
         <variable
             name="model"
             type="com.cryptomcgrath.pyrexia.login.LoginViewModel" />
+        <import type="android.view.View"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,8 +17,7 @@
         android:layout_marginTop="@dimen/top_padding"
         android:layout_marginStart="@dimen/side_margin"
         android:layout_marginEnd="@dimen/side_margin"
-        android:background="@color/light_blue"
-        >
+        android:background="@color/light_blue">
 
         <ImageView
             android:id="@+id/pi_image"
@@ -76,7 +76,8 @@
                 android:error="@{model.emailError}"
                 android:hint="@string/login_enter_your_email"
                 android:inputType="textEmailAddress"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:enabled="@{!model.loading}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -101,7 +102,8 @@
                 android:inputType="textPassword"
                 android:imeOptions="actionDone"
                 android:onEditorAction="@{(view, actionId, event) -> model.onEditorAction(view, actionId, event)}"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:enabled="@{!model.loading}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
@@ -117,8 +119,17 @@
             android:textColor="@color/white"
             android:fontFamily="sans-serif"
             android:textSize="18sp"
+            android:enabled="@{!model.loading}"
             app:layout_constraintTop_toBottomOf="@id/password_text"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#eeeeeeee"
+            android:visibility="@{model.loading ? View.VISIBLE : View.GONE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
