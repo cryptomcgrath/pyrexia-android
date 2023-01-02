@@ -28,7 +28,7 @@ class MainActivity: AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
             if (requestCode == RESULT_CODE_LOGIN && resultCode != Activity.RESULT_OK) {
-                navController?.navigate(R.id.deviceListFragment)
+                navController?.popBackStack(R.id.deviceListFragment, false)
             } else {
                 super.onActivityResult(requestCode, resultCode, data)
             }
