@@ -7,17 +7,12 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.cryptomcgrath.pyrexia.R
 import java.net.SocketTimeoutException
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.Date
-
-private val lastUpdatedFormatter by lazy {
-    SimpleDateFormat("MMM dd h:mma", Locale.US)
-}
+import java.util.*
 
 const val SECONDS_IN_DAY = 24*3600
 const val SECONDS_IN_HOUR = 3600
 const val SECONDS_IN_MINUTE = 60
+
 
 internal fun Long.secsToLastUpdatedTimeString(): String {
     val elapsed = this
@@ -27,8 +22,10 @@ internal fun Long.secsToLastUpdatedTimeString(): String {
     val s = elapsed - (d * SECONDS_IN_DAY) - (h * SECONDS_IN_HOUR) - (m * SECONDS_IN_MINUTE)
 
     return when {
-        d > 0 -> lastUpdatedFormatter.format(this*1000)
-        h > 1 -> "$h hours $m minutes ago"
+        d == 1 -> "over 1 day ago"
+        d > 1 -> "over $d days ago"
+        h == 1 -> "$h hour $m mins ago"
+        h > 1 -> "$h hours $m mins ago"
         m == 1L -> "$m minute ago"
         m > 0 -> "$m minutes ago"
         else -> "$s seconds ago"
