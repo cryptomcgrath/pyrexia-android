@@ -167,6 +167,10 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
             }
     }
 
+    fun shutdown(): Completable {
+        return client.shutdown()
+    }
+
     companion object {
         val tokenMap = mutableMapOf<Int, String>()
     }

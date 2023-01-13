@@ -8,6 +8,7 @@ import com.cryptomcgrath.pyrexia.db.PyrexiaDb
 import com.cryptomcgrath.pyrexia.db.toDevice
 import com.cryptomcgrath.pyrexia.db.toPyDeviceList
 import com.cryptomcgrath.pyrexia.model.PyDevice
+import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.cryptomcgrath.pyrexia.statlist.StatListEvent
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.EventQueue

@@ -125,4 +125,10 @@ internal interface PyrexiaApi {
         "Content-Type: application/json")
     @POST("/users/login")
     fun login(@Body loginRequestDto: LoginRequestDto): Single<LoginResponseDto>
+
+    @Headers(
+        "Accept: application/json",
+        "Content-Type: application/json")
+    @POST("/setup/shutdown")
+    fun shutdown(): Completable
 }

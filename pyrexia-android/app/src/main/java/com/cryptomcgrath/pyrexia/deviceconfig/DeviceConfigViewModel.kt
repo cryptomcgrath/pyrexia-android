@@ -52,6 +52,7 @@ internal class DeviceConfigViewModel(application: Application,
                     when (event) {
                         is DeviceConfigEvent.GoToSensorDelete -> deleteSensor(event.sensor)
                         is DeviceConfigEvent.GoToControlDelete -> deleteControl(event.control)
+                        is DeviceConfigEvent.ShutdownDevice -> shutdownDevice()
                     }
                     // relay event to fragment
                     eventQueue.post(event)
@@ -140,6 +141,20 @@ internal class DeviceConfigViewModel(application: Application,
                     }
                 }
         ).addTo(disposables)
+    }
+
+    private fun shutdownDevice() {
+        pyrexiaService.shutdown()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+
+                },
+                onError = {
+                    dispatcher.post(DeviceConfigEvent.NetworkError(it, false))
+                }
+            ).addTo(disposables)
     }
 
     override fun onCleared() {

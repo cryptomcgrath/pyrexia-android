@@ -24,4 +24,5 @@ internal sealed class DeviceConfigEvent: Event {
 
     data class OnComponentAddSelected(val component: Component): DeviceConfigEvent()
     object GoToLogin: DeviceConfigEvent()
+    object ShutdownDevice: DeviceConfigEvent()
 }

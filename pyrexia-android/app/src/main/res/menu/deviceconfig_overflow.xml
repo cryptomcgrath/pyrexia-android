@@ -13,4 +13,6 @@
         android:title="@string/component_delete"
         android:icon="@drawable/ic_outline_delete_24"
         />
+
+
 </menu>

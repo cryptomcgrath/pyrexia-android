@@ -3,7 +3,7 @@
     <data>
         <variable
             name="model"
-            type="com.cryptomcgrath.pyrexia.devicelist.PyDeviceDiffableItem" />
+            type="com.cryptomcgrath.pyrexia.deviceconfig.DeviceHeaderDiffableItem" />
         <import type="android.view.View" />
     </data>
 
@@ -26,8 +26,7 @@
             android:layout_height="63dp"
             android:layout_marginStart="16dp"
             android:src="@drawable/pisnip2"
-            android:scaleType="centerInside"
-            android:onClick="@{()->model.onClickImage()}" />
+            android:scaleType="centerInside" />
 
         </com.facebook.shimmer.ShimmerFrameLayout>
 
@@ -38,10 +37,19 @@
             android:layout_marginStart="16dp"
             android:src="@drawable/pisnip2"
             android:scaleType="centerInside"
-            android:onClick="@{()->model.onClickImage()}"
             android:visibility="@{model.loading ? View.GONE : View.VISIBLE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="16dp"
+            android:src="@drawable/ic_overflow_32"
+            android:onClick="@{(v)->model.onClickOverflow(v)}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/pi_image"
+            app:layout_constraintBottom_toBottomOf="@id/pi_image" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

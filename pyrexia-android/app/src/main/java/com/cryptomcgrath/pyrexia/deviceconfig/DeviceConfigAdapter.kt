@@ -20,7 +20,7 @@ internal class DeviceConfigAdapter(private val context: Context,
                                    private val dispatcher: Dispatcher) : RxStoreAdapter<DeviceConfigState>(store) {
     override val viewTypes: List<Class<out DiffableItem>> =
         listOf(
-            PyDeviceDiffableItem::class.java,
+            DeviceHeaderDiffableItem::class.java,
             SensorDiffableItem::class.java,
             ControlDiffableItem::class.java,
             VStatDiffableItem::class.java
@@ -32,9 +32,8 @@ internal class DeviceConfigAdapter(private val context: Context,
     override fun buildList(state: DeviceConfigState): List<DiffableItem> {
         val items = mutableListOf<DiffableItem>()
         state.pyDevice?.let {
-            items += PyDeviceDiffableItem(dispatcher = dispatcher,
+            items += DeviceHeaderDiffableItem(dispatcher = dispatcher,
                 pyDevice = state.pyDevice,
-                isEditMode = false,
                 isLoading = state.loading)
 
             state.stats.forEach {
@@ -63,10 +62,10 @@ internal class DeviceConfigAdapter(private val context: Context,
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindFunViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewTypes[viewType]) {
-            PyDeviceDiffableItem::class.java -> {
+            DeviceHeaderDiffableItem::class.java -> {
                 val binding = DeviceConfigItemBinding.inflate(inflater, parent, false)
                 BindFunViewHolder(binding) {
-                    binding.model = it as PyDeviceDiffableItem
+                    binding.model = it as DeviceHeaderDiffableItem
                 }
             }
 

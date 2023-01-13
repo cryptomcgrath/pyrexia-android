@@ -97,6 +97,16 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
                     true
                 }
 
+                R.id.shutdown -> {
+                    AlertDialog.Builder(view.context)
+                        .setMessage(view.context.getString(R.string.forget_are_you_sure, pyDevice.name))
+                        .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceListEvent.ForgetDevice(pyDevice)) }
+                        .setNegativeButton(R.string.no) { _, _ -> }
+                        .setIcon(R.drawable.ic_baseline_power_settings_new_24)
+                        .show()
+                    true
+                }
+
                 else -> false
             }
         }
