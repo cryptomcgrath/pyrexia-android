@@ -38,9 +38,11 @@ internal class SensorDiffableItem(private val context: Context,
                 when (it.itemId) {
                     R.id.component_delete -> {
                         AlertDialog.Builder(view.context)
-                            .setMessage(view.context.getString(R.string.component_delete_confirm))
-                        .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.GoToSensorDelete(sensor)) }
+                            .setTitle(R.string.delete_dialog_title)
+                            .setMessage(view.context.getString(R.string.component_delete_confirm, sensor.name))
+                            .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.GoToSensorDelete(sensor)) }
                             .setNegativeButton(R.string.no) { _, _ -> }
+                            .setIcon(R.drawable.ic_outline_delete_24)
                             .show()
                         true
                     }

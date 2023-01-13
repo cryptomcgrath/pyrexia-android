@@ -34,6 +34,7 @@
     <string name="low">low</string>
     <string name="control_gpio_text">gpio %d on %s</string>
     <string name="sensor_gpio_text">gpio %s</string>
+    <string name="delete_dialog_title">Delete?</string>
 
     <!-- SensorBottomSheetFragment -->
     <string name="sensor_name">Name:</string>
@@ -75,7 +76,7 @@
     <!-- DeviceConfig Overflow Menu -->
     <string name="component_edit">Edit</string>
     <string name="component_delete">Delete</string>
-    <string name="component_delete_confirm">Are you sure?</string>
+    <string name="component_delete_confirm">Are you sure you want to delete %s?</string>
 
     <!-- Network Error Messages -->
     <string name="network_error_socket_timeout">Check your network connection</string>

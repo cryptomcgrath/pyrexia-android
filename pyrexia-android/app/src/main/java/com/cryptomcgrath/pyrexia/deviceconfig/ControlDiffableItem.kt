@@ -29,9 +29,11 @@ internal class ControlDiffableItem(context: Context,
                 when (it.itemId) {
                     R.id.component_delete -> {
                         AlertDialog.Builder(view.context)
-                            .setMessage(view.context.getString(R.string.component_delete_confirm))
+                            .setTitle(R.string.delete_dialog_title)
+                            .setMessage(view.context.getString(R.string.component_delete_confirm, control.name))
                             .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.GoToControlDelete(control)) }
                             .setNegativeButton(R.string.no) { _, _ -> }
+                            .setIcon(R.drawable.ic_outline_delete_24)
                             .show()
                         true
                     }

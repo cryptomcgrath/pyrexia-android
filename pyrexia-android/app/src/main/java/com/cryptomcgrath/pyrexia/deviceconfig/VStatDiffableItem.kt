@@ -36,10 +36,12 @@ internal class VStatDiffableItem(val stat: VirtualStat,
                 when (it.itemId) {
                     R.id.component_delete -> {
                         AlertDialog.Builder(view.context)
-                            .setMessage(view.context.getString(R.string.component_delete_confirm))
+                            .setTitle(R.string.delete_dialog_title)
+                            .setMessage(view.context.getString(R.string.component_delete_confirm, stat.program.name))
                             .setPositiveButton(R.string.yes) { _, _ ->
-                                //dispatcher.post(DeviceConfigEvent.GoToSensorDelete(sensor))
+                                dispatcher.post(DeviceConfigEvent.GoToStatDelete(stat))
                             }
+                            .setIcon(R.drawable.ic_outline_delete_24)
                             .setNegativeButton(R.string.no) { _, _ -> }
                             .show()
                         true
