@@ -10,7 +10,6 @@ import com.cryptomcgrath.pyrexia.databinding.ControlItemBinding
 import com.cryptomcgrath.pyrexia.databinding.DeviceConfigItemBinding
 import com.cryptomcgrath.pyrexia.databinding.SensorItemBinding
 import com.cryptomcgrath.pyrexia.databinding.VstatItemBinding
-import com.cryptomcgrath.pyrexia.devicelist.PyDeviceDiffableItem
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.RxStore

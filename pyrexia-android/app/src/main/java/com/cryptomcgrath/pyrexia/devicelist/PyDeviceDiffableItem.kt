@@ -4,12 +4,10 @@ package com.cryptomcgrath.pyrexia.devicelist
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.ObservableField
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.deviceconfig.hideKeyboard
@@ -94,16 +92,6 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
 
                 R.id.configure -> {
                     dispatcher.post(DeviceListEvent.GoToDeviceConfig(pyDevice))
-                    true
-                }
-
-                R.id.shutdown -> {
-                    AlertDialog.Builder(view.context)
-                        .setMessage(view.context.getString(R.string.forget_are_you_sure, pyDevice.name))
-                        .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceListEvent.ForgetDevice(pyDevice)) }
-                        .setNegativeButton(R.string.no) { _, _ -> }
-                        .setIcon(R.drawable.ic_baseline_power_settings_new_24)
-                        .show()
                     true
                 }
 
