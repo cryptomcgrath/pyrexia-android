@@ -11,6 +11,7 @@ import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
+import com.cryptomcgrath.pyrexia.service.isUnauthorized
 import com.cryptomcgrath.pyrexia.statlist.StatListEvent
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.Event
@@ -125,7 +126,11 @@ internal class ThermostatViewModel(application: Application,
                     dispatcher.post(ThermostatEvent.NewStatList(it))
                 },
                 onError = {
-                    dispatcher.post(ThermostatEvent.ConnectionError(it))
+                    if (it.isUnauthorized()) {
+                        eventQueue.post(UiEvent.GoToLogin)
+                    } else {
+                        dispatcher.post(ThermostatEvent.ConnectionError(it))
+                    }
                 }
             ).addTo(disposables)
     }
@@ -287,6 +292,7 @@ internal class ThermostatViewModel(application: Application,
     sealed class UiEvent: Event {
         data class ServiceError(val throwable: Throwable): UiEvent()
         data class StatEnable(val id: Int, val enable: Boolean): UiEvent()
+        object GoToLogin: UiEvent()
     }
 }
 

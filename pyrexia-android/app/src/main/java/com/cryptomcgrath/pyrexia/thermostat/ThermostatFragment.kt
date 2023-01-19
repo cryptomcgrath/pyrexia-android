@@ -13,6 +13,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentThermostatBinding
+import com.cryptomcgrath.pyrexia.login.LoginActivity
+import com.cryptomcgrath.pyrexia.login.RESULT_CODE_LOGIN
 
 
 internal class ThermostatFragment: Fragment() {
@@ -30,6 +32,12 @@ internal class ThermostatFragment: Fragment() {
 
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
+                ThermostatViewModel.UiEvent.GoToLogin -> {
+                    requireActivity().startActivityForResult(
+                        LoginActivity.createLoginIntent(requireActivity(), args.pydevice),
+                        RESULT_CODE_LOGIN
+                    )
+                }
                 is ThermostatViewModel.UiEvent.ServiceError -> {
                     showServicesError(event.throwable)
                 }
