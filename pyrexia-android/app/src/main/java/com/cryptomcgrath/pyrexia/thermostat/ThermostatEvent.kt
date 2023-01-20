@@ -12,4 +12,5 @@ internal sealed class ThermostatEvent: Event {
     data class NewHistory(val offset: Int, val historyList: List<History>): ThermostatEvent()
     data class RequestMoreHistory(val timeStamp: Long): ThermostatEvent()
     object OnClickRefill: ThermostatEvent()
+    data class SetUpdating(val updating: Boolean): ThermostatEvent()
 }

@@ -28,7 +28,7 @@ internal class StatListAdapter(store: RxStore<StatListState>,
         val items = mutableListOf<DiffableItem>()
 
         state.statList.forEach {
-            items += StatDiffableItem(it, dispatcher)
+            items += StatDiffableItem(it, dispatcher, false)
         }
         if (state.statList.isEmpty() && state.isLoading) {
             items += StatLoadingDiffableItem()

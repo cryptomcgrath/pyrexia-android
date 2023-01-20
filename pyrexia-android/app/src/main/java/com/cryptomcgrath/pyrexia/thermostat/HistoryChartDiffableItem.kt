@@ -89,3 +89,5 @@ internal fun List<History>.toSeries(mode: Program.Mode?): List<PointsChart.Serie
     ))
     return result
 }
+
+private const val TAG="HistoryChartDiffableItem"

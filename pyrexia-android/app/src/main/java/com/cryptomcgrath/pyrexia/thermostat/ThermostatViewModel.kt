@@ -228,6 +228,7 @@ internal class ThermostatViewModel(application: Application,
     private fun increaseTemp() {
         current?.let {
             if (it.program.enabled) {
+                dispatcher.post(ThermostatEvent.SetUpdating(true))
                 pyrexiaService.statIncrease(it.program.id)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -296,9 +297,9 @@ internal class ThermostatViewModel(application: Application,
     }
 }
 
-const val AUTO_REFRESH_INTERVAL = 15L
-const val TAG="ThermostatViewModel"
-const val HISTORY_FETCH_LIMIT = 500
+internal const val AUTO_REFRESH_INTERVAL = 15L
+private const val TAG="ThermostatViewModel"
+private const val HISTORY_FETCH_LIMIT = 500
 
 fun String.sentenceCase(): String {
     return this.lowercase(Locale.getDefault()).replaceFirstChar {

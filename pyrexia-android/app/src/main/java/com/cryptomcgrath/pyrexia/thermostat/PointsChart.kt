@@ -605,4 +605,5 @@ private fun Double.toTempLabel(): String {
     return "%3.2f°".format(this)
 }
 
+private const val TAG="PointsChart"
 

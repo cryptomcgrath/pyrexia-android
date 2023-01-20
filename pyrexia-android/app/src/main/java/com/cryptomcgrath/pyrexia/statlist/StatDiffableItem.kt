@@ -13,7 +13,8 @@ import com.edwardmcgrath.blueflux.core.Dispatcher
 import java.util.*
 
 internal class StatDiffableItem(private val stat: VirtualStat,
-                                private val dispatcher: Dispatcher) : DiffableItem {
+                                private val dispatcher: Dispatcher,
+                                val updating: Boolean): DiffableItem {
 
     val name = stat.program.name
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
@@ -61,7 +62,8 @@ internal class StatDiffableItem(private val stat: VirtualStat,
 
     override fun areContentsTheSame(other: DiffableItem): Boolean {
         return other is StatDiffableItem &&
-                other.stat == stat
+                other.stat == stat &&
+                other.updating == updating
     }
 
     override fun areItemsTheSame(other: DiffableItem): Boolean {

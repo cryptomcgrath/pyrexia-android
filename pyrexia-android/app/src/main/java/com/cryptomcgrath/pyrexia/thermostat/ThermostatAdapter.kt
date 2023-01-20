@@ -79,14 +79,18 @@ internal class ThermostatAdapter(private val context: Context,
             items += StatLoadingDiffableItem()
         } else {
             state.current?.let {
-                items += StatDiffableItem(state.current, dispatcher)
+                items += StatDiffableItem(state.current, dispatcher, state.isUpdating)
                 items += StatModeDiffableItem(mode = state.current.program.mode)
                 items += PropaneDiffableItem(
                     dispatcher = dispatcher,
                     totalRun = state.current.control.totalRun,
                     runCapacity = state.current.control.runCapacity
                 )
-                items += StatEnabledDiffableItem(dispatcher, state.current.program.enabled, state.current.program.id)
+                items += StatEnabledDiffableItem(
+                    dispatcher,
+                    state.current.program.enabled,
+                    state.current.program.id
+                )
 
                 items += HistoryChartDiffableItem(store)
 
@@ -173,3 +177,5 @@ internal class ThermostatAdapter(private val context: Context,
         }
     }
 }
+
+private const val TAG="ThermostatAdapter"

@@ -10,14 +10,16 @@ internal val thermostatReducerFun: ReducerFun<ThermostatState> = { inState, even
             state.copy(
                 statList = event.statList,
                 connectionError = null,
-                isLoading = false
+                isLoading = false,
+                isUpdating = false
             )
         }
 
         is ThermostatEvent.ConnectionError -> {
             state.copy(
                 connectionError = event.throwable,
-                isLoading = false
+                isLoading = false,
+                isUpdating = false
             )
         }
 
@@ -41,6 +43,12 @@ internal val thermostatReducerFun: ReducerFun<ThermostatState> = { inState, even
             state.copy(
                 history = newHistory,
                 historyOffset = event.offset
+            )
+        }
+
+        is ThermostatEvent.SetUpdating -> {
+            state.copy(
+                isUpdating = event.updating
             )
         }
 

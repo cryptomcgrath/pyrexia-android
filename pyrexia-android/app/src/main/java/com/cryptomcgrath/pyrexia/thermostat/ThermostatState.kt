@@ -14,7 +14,8 @@ internal data class ThermostatState(
     val connectionError: Throwable? = null,
     val isLoading: Boolean = false,
     val historyOffset: Int = 0,
-    val history: Map<Int, History> = emptyMap()
+    val history: Map<Int, History> = emptyMap(),
+    val isUpdating: Boolean = false
 ): State {
     val current = statList.firstOrNull {
         it.program.id == selectedStatId

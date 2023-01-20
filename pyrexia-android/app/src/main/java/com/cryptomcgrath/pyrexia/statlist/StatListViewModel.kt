@@ -10,7 +10,6 @@ import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.cryptomcgrath.pyrexia.service.isUnauthorized
 import com.cryptomcgrath.pyrexia.thermostat.AUTO_REFRESH_INTERVAL
-import com.cryptomcgrath.pyrexia.thermostat.TAG
 import com.cryptomcgrath.pyrexia.thermostat.ThermostatEvent
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.EventQueue
@@ -174,3 +173,5 @@ internal class StatListViewModel(application: Application,
         autoRefreshDisposable?.dispose()
     }
 }
+
+private const val TAG="StatListViewModel"

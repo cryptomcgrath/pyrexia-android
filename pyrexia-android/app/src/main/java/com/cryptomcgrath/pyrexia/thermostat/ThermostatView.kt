@@ -10,18 +10,20 @@ import android.graphics.RectF
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.cryptomcgrath.pyrexia.R
-import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+
+private const val TAG="ThermostatView"
 
 class ThermostatView @JvmOverloads constructor(
     context: Context,
@@ -231,6 +233,7 @@ class ThermostatView @JvmOverloads constructor(
 
         // draw set point tick
         val setPointAngle = setPointFloat.temperatureToDegrees()
+        Log.d(TAG, "sePointAngle = $setPointAngle")
         val p1 = computeDestPoint(xCenter, yCenter, setPointAngle, centerRadius - markLength)
         val p2 = computeDestPoint(xCenter, yCenter, setPointAngle, rimRadius)
         val p3 = computeDestPoint(xCenter, yCenter, setPointAngle, centerRadius - setPointTextSize)
@@ -262,8 +265,14 @@ class ThermostatView @JvmOverloads constructor(
                 downEvent?.let {
                     val dist = it.distanceFrom(xCenter.toInt(), yCenter.toInt())
                     when {
+                        // is the touch point on the rim?
                         dist > centerRadius && dist < rimRadius -> {
+                            touchTheta -= 90f
+                            if (touchTheta < 0f) {
+                                touchTheta += 360f
+                            }
                             val touchTemperature = touchTheta.degreesToTemperature()
+                            Log.d(TAG, "touchTheta = $touchTheta, touchTemp=$touchTemperature")
                             if (touchTemperature > setPointFloat) {
                                 onClickIncreaseListener?.onClickIncrease()
                             } else if (touchTemperature < setPointFloat) {
@@ -291,6 +300,7 @@ class ThermostatView @JvmOverloads constructor(
                 when {
                     dist < rimRadius && dist > centerRadius -> {
                         touchTheta = event.angleAroundCenter(xCenter.toInt(), yCenter.toInt()).toFloat()
+                        Log.d(TAG, "touchTheta = $touchTheta")
                         downEvent = event
                     }
                     dist < centerRadius -> {
@@ -332,7 +342,7 @@ class ThermostatView @JvmOverloads constructor(
     private fun MotionEvent.angleAroundCenter(x: Int, y: Int): Double {
         val dx = this.x - x
         val dy = this.y - y
-        var theta = Math.toDegrees(atan2(dy, dx).toDouble())
+        var theta = Math.toDegrees(atan2(dy, dx).toDouble()) + 90
         if (theta < 0) theta += 360
         if (theta > 360) theta -= 360
         return theta
@@ -370,6 +380,9 @@ private const val DIAL_BUTTON_2_DEG = DIAL_END_DEG
 private const val DIAL_SWEEP_PER_ONE_DEGREE = DIAL_TOTAL_DEG / (DIAL_END_TEMP - DIAL_START_TEMP)
 
 fun Float.degreesToTemperature(): Float {
+    var d = this
+    if (d < 0f) d += 360f
+    if (d > 360f) d -= 360f
     return ((this - DIAL_START_DEG) / DIAL_SWEEP_PER_ONE_DEGREE) + DIAL_START_TEMP
 }
 
