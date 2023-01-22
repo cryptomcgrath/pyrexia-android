@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.databinding.ObservableField
+import com.cryptomcgrath.pyrexia.CentralEvent
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.deviceconfig.hideKeyboard
 import com.cryptomcgrath.pyrexia.model.PyDevice
@@ -38,7 +39,7 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
         if (event?.action == KeyEvent.ACTION_DOWN || actionId == EditorInfo.IME_ACTION_DONE) {
             if (!checkErrors()) {
                 dispatcher.post(
-                    DeviceListEvent.AddDevice(PyDevice(name = name, baseUrl = url))
+                    CentralEvent.AddDevice(PyDevice(name = name, baseUrl = url))
                 )
                 return true
             }
@@ -68,7 +69,7 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
 
     fun onClickCancel(view: View?) {
         view?.hideKeyboard()
-        dispatcher.post(DeviceListEvent.CancelEmptyItem)
+        dispatcher.post(CentralEvent.CancelEmptyItem)
     }
 
     fun onClickOverflow(view: View?) {
@@ -84,7 +85,7 @@ internal class PyDeviceDiffableItem(private val dispatcher: Dispatcher,
                 R.id.forget -> {
                     AlertDialog.Builder(view.context)
                         .setMessage(view.context.getString(R.string.forget_are_you_sure, pyDevice.name))
-                        .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceListEvent.ForgetDevice(pyDevice)) }
+                        .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(CentralEvent.ForgetDevice(pyDevice)) }
                         .setNegativeButton(R.string.no) { _, _ -> }
                         .show()
                     true

@@ -4,14 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
+import com.cryptomcgrath.pyrexia.CentralState
 import com.cryptomcgrath.pyrexia.RxStoreAdapter
 import com.cryptomcgrath.pyrexia.databinding.DeviceItemBinding
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.RxStore
 
-internal class DeviceListAdapter(store: RxStore<DeviceListState>,
-                        private val dispatcher: Dispatcher) : RxStoreAdapter<DeviceListState>(store) {
+internal class DeviceListAdapter(store: RxStore<CentralState>,
+                                 private val dispatcher: Dispatcher) : RxStoreAdapter<CentralState>(store) {
     override val viewTypes: List<Class<out DiffableItem>> =
         listOf(
             PyDeviceDiffableItem::class.java
@@ -20,7 +21,7 @@ internal class DeviceListAdapter(store: RxStore<DeviceListState>,
     override val differ: AsyncListDiffer<DiffableItem> =
         AsyncListDiffer(this, DIFF_CALLBACK)
 
-    override fun buildList(state: DeviceListState): List<DiffableItem> {
+    override fun buildList(state: CentralState): List<DiffableItem> {
         val items = mutableListOf<DiffableItem>()
 
         state.deviceList.forEach {

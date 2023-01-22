@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.cryptomcgrath.pyrexia.CentralStore
 import com.cryptomcgrath.pyrexia.databinding.FragmentDeviceListBinding
 import com.cryptomcgrath.pyrexia.model.PyDevice
 
 internal class DeviceListFragment : Fragment() {
-    private val viewModel: DeviceListViewModel by viewModels()
+    private val viewModel: DeviceListViewModel by viewModels {
+        DeviceListViewModel.Factory(CentralStore.getInstance(requireActivity().application))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +38,7 @@ internal class DeviceListFragment : Fragment() {
     ): View? {
         val binding = FragmentDeviceListBinding.inflate(inflater, container, false)
         binding.model = viewModel
-        binding.recyclerView.adapter = DeviceListAdapter(viewModel.store, viewModel.dispatcher)
+        binding.recyclerView.adapter = DeviceListAdapter(viewModel.central.store, viewModel.dispatcher)
         binding.fab.setOnClickListener {
             viewModel.onClickAdd()
         }
