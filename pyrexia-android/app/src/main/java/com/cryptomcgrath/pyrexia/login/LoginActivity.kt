@@ -18,11 +18,11 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.cryptomcgrath.pyrexia.CentralStore
 import com.cryptomcgrath.pyrexia.databinding.ActivityLoginBinding
 import com.cryptomcgrath.pyrexia.deviceconfig.createNetworkErrorAlertDialog
 import com.cryptomcgrath.pyrexia.deviceconfig.hideKeyboard
 import com.cryptomcgrath.pyrexia.model.PyDevice
-import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -37,6 +37,7 @@ class LoginActivity: FragmentActivity() {
     internal val viewModel: LoginViewModel by viewModels {
         LoginViewModel.Factory(
             application = application,
+            central = CentralStore.getInstance(application),
             pyDevice = intent.extras?.getParcelable(EXTRA_PYDEVICE)!!)
     }
 
@@ -79,18 +80,20 @@ class LoginActivity: FragmentActivity() {
 
 private const val EXTRA_PYDEVICE = "extra_pydevice"
 
-internal class LoginViewModel(application: Application, pyDevice: PyDevice) : AndroidViewModel(application) {
+internal class LoginViewModel(application: Application,
+                              private val central: CentralStore,
+                              private val pyDevice: PyDevice) : AndroidViewModel(application) {
 
     class Factory(private val application: Application,
+                  private val central: CentralStore,
                   private val pyDevice: PyDevice) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return LoginViewModel(application, pyDevice) as T
+            return LoginViewModel(application, central, pyDevice) as T
         }
     }
 
     val eventQueue = EventQueue.create()
-    private val pyrexiaService = PyrexiaService(application, pyDevice)
 
     val name = pyDevice.name
     val url = pyDevice.baseUrl
@@ -125,8 +128,11 @@ internal class LoginViewModel(application: Application, pyDevice: PyDevice) : An
         view?.hideKeyboard()
 
         if (!checkErrors()) {
-            pyrexiaService.login(email, password)
-                .subscribeOn(Schedulers.io())
+            central.loginToDevice(
+                pyDevice,
+                email,
+                password
+            ).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     loading.set(true)

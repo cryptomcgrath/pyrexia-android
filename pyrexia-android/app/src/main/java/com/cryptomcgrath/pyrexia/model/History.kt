@@ -28,3 +28,15 @@ internal data class History(
         }
     }
 }
+
+internal data class HistoryPage(
+    val offset: Int,
+    val limit: Int,
+    val statId: Int,
+    val startTs: Int?,
+    val endTs: Int?,
+    val minTs: Int?,
+    val maxTs: Int?,
+    val points: List<History>,
+    val pageend: Boolean
+)

@@ -2,35 +2,9 @@ package com.cryptomcgrath.pyrexia.thermostat
 
 import com.cryptomcgrath.pyrexia.model.History
 import com.cryptomcgrath.pyrexia.model.Program
-import com.cryptomcgrath.pyrexia.model.VirtualStat
-import com.edwardmcgrath.blueflux.core.State
 import java.lang.Float.min
 import kotlin.math.abs
 import kotlin.math.max
-
-internal data class ThermostatState(
-    val statList: List<VirtualStat> = emptyList(),
-    val selectedStatId: Int? = null,
-    val connectionError: Throwable? = null,
-    val isLoading: Boolean = false,
-    val historyOffset: Int = 0,
-    val history: Map<Int, History> = emptyMap(),
-    val isUpdating: Boolean = false
-): State {
-    val current = statList.firstOrNull {
-        it.program.id == selectedStatId
-    }
-
-    val historyOldtoNew get() = history.values.sortedBy {
-        it.actionTs
-    }
-
-    val minHistoryTs get() = history.values.minByOrNull {
-        it.actionTs
-    }?.actionTs
-
-    val nextHistoryOffset = history.values.size+1
-}
 
 internal data class Cycle(
     val data: List<History>,

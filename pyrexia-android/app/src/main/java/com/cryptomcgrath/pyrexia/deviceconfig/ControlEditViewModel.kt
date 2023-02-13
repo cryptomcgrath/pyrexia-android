@@ -6,10 +6,11 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.cryptomcgrath.pyrexia.DevicesRepo
+import com.cryptomcgrath.pyrexia.PyrexiaApplication
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
-import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -18,24 +19,27 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
+
 internal class ControlEditViewModel(application: Application,
-                                    pyDevice: PyDevice,
+                                    private val repo: DevicesRepo,
+                                    private val pyDevice: PyDevice,
                                     private val control: Control) : AndroidViewModel(application) {
 
     class Factory(private val application: Application,
+                  private val repo: DevicesRepo,
                   private val pyDevice: PyDevice,
                   private val control: Control
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ControlEditViewModel(application, pyDevice, control) as T
+            return ControlEditViewModel(application, repo, pyDevice, control) as T
         }
     }
 
-    private val pyrexiaService = PyrexiaService(application, pyDevice)
-
     val eventQueue = EventQueue.create()
     private val disposables = CompositeDisposable()
+
+    private val app get() = getApplication<PyrexiaApplication>()
 
     var name = control.name
     val nameError = ObservableField<String>()
@@ -78,11 +82,8 @@ internal class ControlEditViewModel(application: Application,
     }
 
     private fun saveControl(control: Control) {
-        if (control.id == 0) {
-            pyrexiaService.addControl(control)
-        } else {
-            pyrexiaService.updateControl(control)
-        }.subscribeOn(Schedulers.io())
+        repo.saveControl(pyDevice, control)
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
@@ -102,19 +103,19 @@ internal class ControlEditViewModel(application: Application,
         gpioError.set(null)
 
         if (name.isEmpty()) {
-            nameError.set(getApplication<Application>().getString(R.string.control_name_error))
+            nameError.set(app.getString(R.string.control_name_error))
             error = true
         }
         if (minRun.toIntOrNull() == null || (minRun.toIntOrNull() ?:0) < 0) {
-            minRunError.set(getApplication<Application>().getString(R.string.control_min_run_error))
+            minRunError.set(app.getString(R.string.control_min_run_error))
             error = true
         }
         if (!minRest.isPositiveInt()) {
-            minRestError.set(getApplication<Application>().getString(R.string.control_min_rest_error))
+            minRestError.set(app.getString(R.string.control_min_rest_error))
             error = true
         }
         if (!gpio.isValidGpioPin()) {
-            gpioError.set(getApplication<Application>().getString(R.string.control_gpio_error))
+            gpioError.set(app.getString(R.string.control_gpio_error))
             error = true
         }
         return error
@@ -130,4 +131,3 @@ internal class ControlEditViewModel(application: Application,
         data class ShowNetworkError(val throwable: Throwable): ControlEditUiEvent()
     }
 }
-

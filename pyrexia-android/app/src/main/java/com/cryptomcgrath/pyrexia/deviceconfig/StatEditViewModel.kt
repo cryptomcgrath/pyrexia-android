@@ -1,21 +1,20 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
-import android.app.Application
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.databinding.InverseMethod
 import androidx.databinding.ObservableField
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.cryptomcgrath.pyrexia.CentralState
+import com.cryptomcgrath.pyrexia.DevicesRepo
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
 import com.cryptomcgrath.pyrexia.model.VirtualStat
-import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
@@ -26,23 +25,22 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-internal class StatEditViewModel(application: Application,
-                                 pyDevice: PyDevice,
-                                 private val stat: VirtualStat,
-                                 private val store: RxStore<DeviceConfigState>) : AndroidViewModel(application) {
+internal class StatEditViewModel(private val repo: DevicesRepo,
+                                 private val store: RxStore<CentralState>,
+                                 private val pyDevice: PyDevice,
+                                 private val stat: VirtualStat) : ViewModel() {
 
-    class Factory(private val application: Application,
+    class Factory(private val repo: DevicesRepo,
+                  private val store: RxStore<CentralState>,
                   private val pyDevice: PyDevice,
-                  private val stat: VirtualStat,
-                  private val store: RxStore<DeviceConfigState>
+                  private val stat: VirtualStat
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return StatEditViewModel(application, pyDevice, stat, store) as T
+            return StatEditViewModel(repo, store, pyDevice, stat) as T
         }
     }
 
-    private val pyrexiaService = PyrexiaService(application, pyDevice)
     private val disposables = CompositeDisposable()
     val eventQueue = EventQueue.create()
     var name = stat.program.name
@@ -56,12 +54,12 @@ internal class StatEditViewModel(application: Application,
     var controlId = stat.program.control_id
     var controlError = ObservableField<String>()
     val controls: List<Control> get() {
-        return store.state.controls
+        return store.state.getDeviceState(pyDevice).controls
     }
     var sensorId = stat.program.sensor_id
     val sensorError = ObservableField<String>()
     val sensors: List<Sensor> get() {
-        return store.state.sensors
+        return store.state.getDeviceState(pyDevice).sensors
     }
     val sensorDrawableInt = ObservableField<Int>()
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
@@ -139,11 +137,10 @@ internal class StatEditViewModel(application: Application,
     }
 
     private fun saveStat(program: Program) {
-        if (program.id == 0) {
-            pyrexiaService.addStat(program)
-        } else {
-            pyrexiaService.updateStat(program)
-        }.subscribeOn(Schedulers.io())
+        repo.saveStat(
+            pyDevice = pyDevice,
+            program = program
+        ).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {

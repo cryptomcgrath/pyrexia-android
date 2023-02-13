@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.cryptomcgrath.pyrexia.thermostat.sentenceCase
 import com.cryptomcgrath.pyrexia.util.DiffableItem
@@ -12,6 +13,7 @@ import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Dispatcher
 
 internal class VStatDiffableItem(val stat: VirtualStat,
+                                 private val pyDevice: PyDevice,
                                  private val dispatcher: Dispatcher): DiffableItem {
     val name = stat.program.name
     val setPointText = stat.program.setPoint.toFormattedTemperatureString()
@@ -39,7 +41,7 @@ internal class VStatDiffableItem(val stat: VirtualStat,
                             .setTitle(R.string.delete_dialog_title)
                             .setMessage(view.context.getString(R.string.component_delete_confirm, stat.program.name))
                             .setPositiveButton(R.string.yes) { _, _ ->
-                                dispatcher.post(DeviceConfigEvent.GoToStatDelete(stat))
+                                dispatcher.post(DeviceConfigEvent.RequestStatDelete(pyDevice, stat))
                             }
                             .setIcon(R.drawable.ic_outline_delete_24)
                             .setNegativeButton(R.string.no) { _, _ -> }

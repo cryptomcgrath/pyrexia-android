@@ -3,12 +3,15 @@ package com.cryptomcgrath.pyrexia.thermostat
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.cryptomcgrath.pyrexia.R
-import com.cryptomcgrath.pyrexia.deviceconfig.DeviceConfigEvent
+import com.cryptomcgrath.pyrexia.model.PyDevice
+import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import kotlin.math.max
 
 internal class PropaneDiffableItem(private val dispatcher: Dispatcher,
+                                   private val pyDevice: PyDevice,
+                                   private val stat: VirtualStat,
                                    totalRun: Int,
                                    runCapacity: Int) : DiffableItem {
     val showPropane = runCapacity > 0
@@ -24,7 +27,7 @@ internal class PropaneDiffableItem(private val dispatcher: Dispatcher,
         view?.let {
             AlertDialog.Builder(view.context)
                 .setMessage(view.context.getString(R.string.control_refill_confirm))
-                .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(ThermostatEvent.OnClickRefill) }
+                .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(ThermostatEvent.OnClickRefill(pyDevice, stat.control.id)) }
                 .setNegativeButton(R.string.no) { _, _ -> }
                 .show()
         }

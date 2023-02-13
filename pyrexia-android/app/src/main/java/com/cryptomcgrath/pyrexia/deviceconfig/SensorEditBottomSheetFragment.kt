@@ -5,9 +5,9 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.cryptomcgrath.pyrexia.CentralStore
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentSensorEditBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -16,14 +16,9 @@ internal class SensorEditBottomSheetFragment: BottomSheetDialogFragment() {
     private val args: SensorEditBottomSheetFragmentArgs by navArgs()
     private val viewModel: SensorEditViewModel by viewModels {
         SensorEditViewModel.Factory(
-            application = requireActivity().application,
+            repo = CentralStore.getInstance(requireActivity().application),
             pyDevice = args.pydevice,
             sensor = args.sensor)
-    }
-    private val deviceConfigViewModel: DeviceConfigViewModel by activityViewModels {
-        DeviceConfigViewModel.Factory(
-            application = requireActivity().application,
-            pyDevice = args.pydevice)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +28,6 @@ internal class SensorEditBottomSheetFragment: BottomSheetDialogFragment() {
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
                 SensorEditViewModel.SensorEditUiEvent.SaveSensorSuccess -> {
-                    deviceConfigViewModel.refreshData()
                     dismiss()
                 }
                 is SensorEditViewModel.SensorEditUiEvent.ShowNetworkError -> {

@@ -5,7 +5,7 @@ import com.cryptomcgrath.pyrexia.db.PyrexiaDb
 import com.cryptomcgrath.pyrexia.db.toDevice
 import com.cryptomcgrath.pyrexia.db.toPyDevice
 import com.cryptomcgrath.pyrexia.model.Control
-import com.cryptomcgrath.pyrexia.model.History
+import com.cryptomcgrath.pyrexia.model.HistoryPage
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.cryptomcgrath.pyrexia.model.PyDevice
@@ -16,6 +16,7 @@ import com.cryptomcgrath.pyrexia.model.toControlsList
 import com.cryptomcgrath.pyrexia.model.toHistoryList
 import com.cryptomcgrath.pyrexia.model.toSensorList
 import com.cryptomcgrath.pyrexia.model.toSensorUpdateDto
+import com.cryptomcgrath.pyrexia.model.toStat
 import com.cryptomcgrath.pyrexia.model.toStatList
 import com.facebook.flipper.android.AndroidFlipperClient
 import com.facebook.flipper.plugins.network.FlipperOkhttpInterceptor
@@ -59,6 +60,12 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
             .build()
     private val client = retrofit.create(PyrexiaApi::class.java)
 
+    init {
+        pyDevice.token.nullIfEmpty()?.let {
+            tokenMap[pyDevice.uid] = it
+        }
+    }
+
     fun getStatList(): Single<List<VirtualStat>> {
         return client.getStatList()
             .map {
@@ -76,30 +83,55 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
         return client.updateStat(program.id, program.toAddStatDto())
     }
 
-    fun statIncrease(id: Int): Completable {
+    fun statIncrease(id: Int): Single<VirtualStat> {
         return client.statIncrease(id)
+            .map {
+                it.data.toStat()
+            }
     }
 
-    fun statDecrease(id: Int): Completable {
+    fun statDecrease(id: Int): Single<VirtualStat> {
         return client.statDecrease(id)
+            .map {
+                it.data.toStat()
+            }
     }
 
-    fun statEnable(id: Int): Completable {
+    fun statEnable(id: Int): Single<VirtualStat> {
         return client.statEnable(id)
+            .map {
+                it.data.toStat()
+            }
     }
 
-    fun statDisable(id: Int): Completable {
+    fun statDisable(id: Int): Single<VirtualStat> {
         return client.statDisable(id)
+            .map {
+                it.data.toStat()
+            }
     }
 
     fun refill(id: Int): Completable {
         return client.refill(id)
     }
 
-    fun getHistory(offset: Int, limit: Int, programId: Int?): Single<List<History>> {
-        return client.getHistory(offset, limit, programId)
+    fun getHistoryPage(offset: Int, limit: Int, statId: Int, startTs: Int?, endTs: Int?): Single<HistoryPage> {
+        return client.getHistory(offset, limit, statId, startTs, endTs)
             .map {
-                it.toHistoryList()
+                val points = it.toHistoryList()
+                HistoryPage(
+                    offset = offset,
+                    limit = limit,
+                    statId = statId,
+                    startTs = startTs,
+                    endTs = endTs,
+                    minTs = points.minByOrNull { it.actionTs }?.actionTs?.toInt(),
+                    maxTs = points.maxByOrNull { it.actionTs }?.actionTs?.toInt(),
+                    points = points.sortedBy {
+                         it.actionTs
+                    },
+                    pageend = points.size < limit
+                )
             }
     }
 
@@ -180,4 +212,8 @@ private const val HEADER_TOKEN = "x-access-token"
 
 internal  fun Throwable.isUnauthorized(): Boolean {
     return this is HttpException && setOf(401,403).contains(this.code())
+}
+
+private fun String?.nullIfEmpty(): String? {
+    return if (this?.isEmpty() == true) null else this
 }

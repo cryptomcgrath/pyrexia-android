@@ -7,45 +7,50 @@ import com.cryptomcgrath.pyrexia.service.GetHistoryDto
 import com.cryptomcgrath.pyrexia.service.GetSensorsDto
 import com.cryptomcgrath.pyrexia.service.GetStatListDto
 import com.cryptomcgrath.pyrexia.service.SensorUpdateDto
+import com.cryptomcgrath.pyrexia.service.StatDto
 import java.util.*
 
 internal fun GetStatListDto.toStatList(): List<VirtualStat> {
     return this.data.map {
-        val program = Program(
-            id = it.program_id,
-            name = it.program_name,
-            setPoint = it.set_point,
-            enabled = it.enabled == 1,
-            control_id = it.control_id,
-            sensor_id = it.sensor_id,
-            mode = Program.Mode.fromString(it.mode)
-        )
-        val control = Control(
-            id = it.control_id,
-            name = it.control_name,
-            lastOnTime = it.last_on_time,
-            lastOffTime = it.last_off_time,
-            minRun = it.min_run,
-            minRest = it.min_rest,
-            gpio = it.gpio,
-            gpioOnHigh = it.gpio_on_high == 1,
-            controlOn = it.control_on == 1,
-            totalRun = it.total_run,
-            runCapacity = it.run_capacity
-        )
-        val sensor = Sensor(
-            id = it.sensor_id,
-            name = it.sensor_name,
-            value = it.sensor_value,
-            lastUpdatedTs = it.sensor_update_time
-        )
-        VirtualStat(
-            program = program,
-            control = control,
-            sensor = sensor,
-            currentTimeSecs = current_time
-        )
+        it.toStat(this.current_time)
     }
+}
+
+fun StatDto.toStat(currentTime: Long? = null): VirtualStat {
+    val program = Program(
+        id = program_id,
+        name = program_name,
+        setPoint = set_point,
+        enabled = enabled == 1,
+        control_id = control_id,
+        sensor_id = sensor_id,
+        mode = Program.Mode.fromString(mode)
+    )
+    val control = Control(
+        id = control_id,
+        name = control_name,
+        lastOnTime = last_on_time,
+        lastOffTime = last_off_time,
+        minRun = min_run,
+        minRest = min_rest,
+        gpio = gpio,
+        gpioOnHigh = gpio_on_high == 1,
+        controlOn = control_on == 1,
+        totalRun = total_run,
+        runCapacity = run_capacity
+    )
+    val sensor = Sensor(
+        id = sensor_id,
+        name = sensor_name,
+        value = sensor_value,
+        lastUpdatedTs = sensor_update_time
+    )
+    return VirtualStat(
+        program = program,
+        control = control,
+        sensor = sensor,
+        currentTimeSecs = current_time ?: currentTime
+    )
 }
 
 internal fun GetHistoryDto.toHistoryList(): List<History> {

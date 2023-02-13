@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.AsyncListDiffer
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
+import com.cryptomcgrath.pyrexia.CentralStore
 import com.cryptomcgrath.pyrexia.DiffableItemAdapter
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.ComponentItemBinding
@@ -19,13 +19,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 internal class AddComponentBottomSheetFragment: BottomSheetDialogFragment() {
     private val args: AddComponentBottomSheetFragmentArgs by navArgs()
-
-    private val viewModel: DeviceConfigViewModel by activityViewModels {
-        DeviceConfigViewModel.Factory(
-            application = requireActivity().application,
-            pyDevice = args.pydevice)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogTheme)
@@ -41,10 +34,11 @@ internal class AddComponentBottomSheetFragment: BottomSheetDialogFragment() {
             dialog.setContentView(root)
             recyclerView.adapter = ComponentAdapter {
                 dismiss()
-                viewModel.dispatcher.post(DeviceConfigEvent.OnComponentAddSelected(it))
+                CentralStore.getInstance(requireActivity().application).dispatcher.post(
+                    DeviceConfigEvent.OnComponentAddSelected(it)
+                )
             }
         }
-
     }
 }
 

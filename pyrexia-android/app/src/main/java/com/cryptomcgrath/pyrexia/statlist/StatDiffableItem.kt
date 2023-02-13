@@ -5,14 +5,16 @@ import android.util.Log
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.deviceconfig.secsToLastUpdatedTimeString
-import com.cryptomcgrath.pyrexia.deviceconfig.toLastUpdatedTimeString
 import com.cryptomcgrath.pyrexia.model.Program
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.VirtualStat
+import com.cryptomcgrath.pyrexia.thermostat.ThermostatEvent
 import com.cryptomcgrath.pyrexia.util.toFormattedTemperatureString
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import java.util.*
 
 internal class StatDiffableItem(private val stat: VirtualStat,
+                                private val pyDevice: PyDevice,
                                 private val dispatcher: Dispatcher,
                                 val updating: Boolean): DiffableItem {
 
@@ -43,20 +45,20 @@ internal class StatDiffableItem(private val stat: VirtualStat,
     }
 
     fun onClickStat() {
-        dispatcher.post(StatListEvent.OnStatSelected(stat.program.id, stat.program.name))
+        dispatcher.post(StatListEvent.OnStatSelected(stat, stat.program.name))
     }
 
     fun onClickIncrease() {
         Log.d("StatDiffableItem", "onClickIncrease")
         if (isEnabled) {
-            dispatcher.post(StatListEvent.OnClickIncreaseTemp(stat.program.id))
+            dispatcher.post(ThermostatEvent.RequestIncreaseTemp(pyDevice, stat.program.id))
         }
     }
 
     fun onClickDecrease() {
         Log.d("StatDiffableItem", "onClickDecrease")
         if (isEnabled) {
-            dispatcher.post(StatListEvent.OnClickDecreaseTemp(stat.program.id))
+            dispatcher.post(ThermostatEvent.RequestDecreaseTemp(pyDevice, stat.program.id))
         }
     }
 

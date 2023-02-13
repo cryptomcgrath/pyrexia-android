@@ -7,11 +7,13 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.databinding.ObservableField
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Control
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 
 internal class ControlDiffableItem(context: Context,
                                    private val dispatcher: Dispatcher,
+                                   private val pyDevice: PyDevice,
                                    val control: Control,
                                    val isEditMode: Boolean): DiffableItem {
     var name = control.name
@@ -31,7 +33,7 @@ internal class ControlDiffableItem(context: Context,
                         AlertDialog.Builder(view.context)
                             .setTitle(R.string.delete_dialog_title)
                             .setMessage(view.context.getString(R.string.component_delete_confirm, control.name))
-                            .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.GoToControlDelete(control)) }
+                            .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.RequestControlDelete(pyDevice, control)) }
                             .setNegativeButton(R.string.no) { _, _ -> }
                             .setIcon(R.drawable.ic_outline_delete_24)
                             .show()

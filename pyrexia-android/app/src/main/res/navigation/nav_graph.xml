@@ -23,8 +23,8 @@
         android:name="com.cryptomcgrath.pyrexia.thermostat.ThermostatFragment"
         android:label="{name}" >
         <argument
-            android:name="id"
-            app:argType="integer" />
+            android:name="stat"
+            app:argType="com.cryptomcgrath.pyrexia.model.VirtualStat" />
         <argument
             android:name="name"
             app:argType="string" />

@@ -5,18 +5,21 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
+import com.cryptomcgrath.pyrexia.CentralState
 import com.cryptomcgrath.pyrexia.RxStoreAdapter
 import com.cryptomcgrath.pyrexia.databinding.ControlItemBinding
 import com.cryptomcgrath.pyrexia.databinding.DeviceConfigItemBinding
 import com.cryptomcgrath.pyrexia.databinding.SensorItemBinding
 import com.cryptomcgrath.pyrexia.databinding.VstatItemBinding
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.RxStore
 
 internal class DeviceConfigAdapter(private val context: Context,
-                                   store: RxStore<DeviceConfigState>,
-                                   private val dispatcher: Dispatcher) : RxStoreAdapter<DeviceConfigState>(store) {
+                                   private val pyDevice: PyDevice,
+                                   store: RxStore<CentralState>,
+                                   private val dispatcher: Dispatcher) : RxStoreAdapter<CentralState>(store) {
     override val viewTypes: List<Class<out DiffableItem>> =
         listOf(
             DeviceHeaderDiffableItem::class.java,
@@ -28,28 +31,38 @@ internal class DeviceConfigAdapter(private val context: Context,
     override val differ: AsyncListDiffer<DiffableItem> =
         AsyncListDiffer(this, DIFF_CALLBACK)
 
-    override fun buildList(state: DeviceConfigState): List<DiffableItem> {
+    override fun buildList(state: CentralState): List<DiffableItem> {
         val items = mutableListOf<DiffableItem>()
-        state.pyDevice?.let {
-            items += DeviceHeaderDiffableItem(dispatcher = dispatcher,
-                pyDevice = state.pyDevice,
-                isLoading = state.loading)
+        val deviceState = state.getDeviceState(pyDevice)
 
-            state.stats.forEach {
-                items += VStatDiffableItem(it, dispatcher)
+        if (pyDevice != null && deviceState != null) {
+
+            items += DeviceHeaderDiffableItem(
+                dispatcher = dispatcher,
+                pyDevice = pyDevice,
+                isLoading = false)
+
+            deviceState.stats.forEach {
+                items += VStatDiffableItem(
+                    stat = it,
+                    dispatcher = dispatcher,
+                    pyDevice = pyDevice)
             }
 
-            state.sensors.forEach {
+            deviceState.sensors.forEach {
                 items += SensorDiffableItem(
                     context = context,
-                    dispatcher = dispatcher,
-                    sensor = it)
+                    sensor = it,
+                    pyDevice = pyDevice,
+                    dispatcher = dispatcher
+                )
             }
 
-            state.controls.forEach {
+            deviceState.controls.forEach {
                 items += ControlDiffableItem(
                     dispatcher = dispatcher,
                     context = context,
+                    pyDevice = pyDevice,
                     isEditMode = false,
                     control = it
                 )

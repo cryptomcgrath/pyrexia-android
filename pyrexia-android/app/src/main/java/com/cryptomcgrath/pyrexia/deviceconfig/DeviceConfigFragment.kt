@@ -6,15 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.cryptomcgrath.pyrexia.CentralStore
 import com.cryptomcgrath.pyrexia.databinding.FragmentDeviceConfigBinding
-import com.cryptomcgrath.pyrexia.login.LoginActivity
-import com.cryptomcgrath.pyrexia.login.RESULT_CODE_LOGIN
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
@@ -22,10 +20,13 @@ import com.cryptomcgrath.pyrexia.model.VirtualStat
 
 internal class DeviceConfigFragment: Fragment() {
     private val args: DeviceConfigFragmentArgs by navArgs()
+    private val central: CentralStore get() = CentralStore.getInstance(requireActivity().application)
 
-    private val viewModel: DeviceConfigViewModel by activityViewModels {
+    private val viewModel: DeviceConfigViewModel by viewModels {
         DeviceConfigViewModel.Factory(
-            application = requireActivity().application,
+            repo = central,
+            store = central.store,
+            dispatcher = central.dispatcher,
             pyDevice = args.pyDevice
         )
     }
@@ -34,11 +35,15 @@ internal class DeviceConfigFragment: Fragment() {
         super.onCreate(savedInstanceState)
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
-                DeviceConfigEvent.GoToLogin -> {
-                    requireActivity().startActivityForResult(
-                        LoginActivity.createLoginIntent(requireActivity(), args.pyDevice),
-                        RESULT_CODE_LOGIN)
+                is DeviceConfigEvent.ShowNetworkError -> {
+                    createNetworkErrorAlertDialog(requireContext(), event.throwable) {
+                    }
                 }
+
+                is DeviceConfigEvent.OnShutdownCompleted -> {
+                    findNavController().popBackStack()
+                }
+
                 is DeviceConfigEvent.GoToSensorEdit -> {
                     goToSensorEditDialog(args.pyDevice, event.sensor)
                 }
@@ -49,10 +54,6 @@ internal class DeviceConfigFragment: Fragment() {
 
                 is DeviceConfigEvent.GoToStatEdit -> {
                     goToStatEditDialog(args.pyDevice, event.stat)
-                }
-
-                is DeviceConfigEvent.NetworkError -> {
-                    showNetworkError(event.throwable, event.finish)
                 }
 
                 is DeviceConfigEvent.OnComponentAddSelected -> {
@@ -87,6 +88,7 @@ internal class DeviceConfigFragment: Fragment() {
                         }
                     }
                 }
+
             }
         }
     }
@@ -100,6 +102,7 @@ internal class DeviceConfigFragment: Fragment() {
         binding.model = viewModel
         binding.recyclerView.adapter = DeviceConfigAdapter(
             context = requireContext(),
+            pyDevice = viewModel.pyDevice,
             store = viewModel.store,
             dispatcher = viewModel.dispatcher
         )
@@ -114,7 +117,12 @@ internal class DeviceConfigFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshData(args.pyDevice)
+        central.setupAutoRefresh(viewModel.pyDevice)
+    }
+
+    override fun onPause() {
+        central.cancelAutoRefresh()
+        super.onPause()
     }
 
     private fun goToSensorEditDialog(pyDevice: PyDevice,
@@ -127,12 +135,6 @@ internal class DeviceConfigFragment: Fragment() {
                                       control: Control) {
         val action = DeviceConfigFragmentDirections.actionDeviceConfigFragmentToControlEditBottomSheetFragment(pyDevice, control)
         findNavController().navigate(action)
-    }
-
-    private fun showNetworkError(throwable: Throwable, finish: Boolean) {
-        createNetworkErrorAlertDialog(requireContext(), throwable) {
-            if (finish) findNavController().popBackStack()
-        }.show()
     }
 
     private fun goToAddComponent(pyDevice: PyDevice) {

@@ -1,16 +1,18 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
-import com.cryptomcgrath.pyrexia.model.History
-import com.cryptomcgrath.pyrexia.model.VirtualStat
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.edwardmcgrath.blueflux.core.Event
 
 internal sealed class ThermostatEvent: Event {
-    data class Init(val id:Int) : ThermostatEvent()
-    data class NewStatList(val statList: List<VirtualStat>): ThermostatEvent()
-    data class ConnectionError(val throwable: Throwable): ThermostatEvent()
-    data class SetLoading(val isLoading: Boolean): ThermostatEvent()
-    data class NewHistory(val offset: Int, val historyList: List<History>): ThermostatEvent()
-    data class RequestMoreHistory(val timeStamp: Long): ThermostatEvent()
-    object OnClickRefill: ThermostatEvent()
-    data class SetUpdating(val updating: Boolean): ThermostatEvent()
+    data class OnClickRefill(val pyDevice: PyDevice, val controlId: Int): ThermostatEvent()
+    data class NetworkError(val throwable: Throwable, val finish: Boolean) : ThermostatEvent()
+
+    data class RequestEnableStat(val pyDevice: PyDevice, val statId: Int): ThermostatEvent()
+    data class RequestDisableStat(val pyDevice: PyDevice, val statId: Int): ThermostatEvent()
+
+    data class RequestIncreaseTemp(val pyDevice: PyDevice, val statId: Int): ThermostatEvent()
+    data class RequestDecreaseTemp(val pyDevice: PyDevice, val statId: Int): ThermostatEvent()
+
+    data class RequestHistoryBefore(val pyDevice: PyDevice, val statId: Int, val beforeTs: Int): ThermostatEvent()
+
 }

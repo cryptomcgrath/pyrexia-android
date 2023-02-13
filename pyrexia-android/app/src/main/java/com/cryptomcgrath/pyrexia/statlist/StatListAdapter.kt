@@ -3,18 +3,20 @@ package com.cryptomcgrath.pyrexia.statlist
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
-import com.cryptomcgrath.pyrexia.BindFun
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
+import com.cryptomcgrath.pyrexia.CentralState
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.cryptomcgrath.pyrexia.RxStoreAdapter
 import com.cryptomcgrath.pyrexia.databinding.StatItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatItemLoadingBinding
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.RxStore
 
-internal class StatListAdapter(store: RxStore<StatListState>,
+internal class StatListAdapter(store: RxStore<CentralState>,
+                               private val pyDevice: PyDevice,
                                private val dispatcher: Dispatcher
-): RxStoreAdapter<StatListState>(store) {
+): RxStoreAdapter<CentralState>(store) {
     override val viewTypes: List<Class<out DiffableItem>> =
         listOf(
             StatDiffableItem::class.java,
@@ -24,14 +26,16 @@ internal class StatListAdapter(store: RxStore<StatListState>,
     override val differ: AsyncListDiffer<DiffableItem> =
         AsyncListDiffer(this, DIFF_CALLBACK)
 
-    override fun buildList(state: StatListState): List<DiffableItem> {
+    override fun buildList(state: CentralState): List<DiffableItem> {
         val items = mutableListOf<DiffableItem>()
 
-        state.statList.forEach {
-            items += StatDiffableItem(it, dispatcher, false)
-        }
-        if (state.statList.isEmpty() && state.isLoading) {
-            items += StatLoadingDiffableItem()
+        state.getDeviceState(pyDevice).let { deviceState ->
+            deviceState.stats.forEach {
+                items += StatDiffableItem(it, pyDevice, dispatcher, false)
+            }
+            if (deviceState.stats.isEmpty() && deviceState.loading) {
+                items += StatLoadingDiffableItem()
+            }
         }
 
         return items

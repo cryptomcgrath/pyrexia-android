@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import com.cryptomcgrath.pyrexia.BindFunViewHolder
+import com.cryptomcgrath.pyrexia.CentralState
 import com.cryptomcgrath.pyrexia.RxStoreAdapter
 import com.cryptomcgrath.pyrexia.databinding.CycleInfoItemBinding
 import com.cryptomcgrath.pyrexia.databinding.HistoryChartItemBinding
@@ -15,6 +16,7 @@ import com.cryptomcgrath.pyrexia.databinding.StatEnabledItemBinding
 import com.cryptomcgrath.pyrexia.databinding.StatModeItemBinding
 import com.cryptomcgrath.pyrexia.databinding.ThermostatItemBinding
 import com.cryptomcgrath.pyrexia.databinding.ThermostatItemLoadingBinding
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.statlist.StatDiffableItem
 import com.cryptomcgrath.pyrexia.statlist.StatLoadingDiffableItem
 import com.cryptomcgrath.pyrexia.util.DiffableItem
@@ -23,11 +25,14 @@ import com.edwardmcgrath.blueflux.core.RxStore
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 
 internal class ThermostatAdapter(private val context: Context,
-                                 store: RxStore<ThermostatState>,
-                                 private val dispatcher: Dispatcher
-): RxStoreAdapter<ThermostatState>(store) {
+                                 store: RxStore<CentralState>,
+                                 private val dispatcher: Dispatcher,
+                                 private val pyDevice: PyDevice,
+                                 private val statId: Int
+): RxStoreAdapter<CentralState>(store) {
     override val viewTypes: List<Class<out DiffableItem>> =
         listOf(
             StatDiffableItem::class.java,
@@ -49,19 +54,27 @@ internal class ThermostatAdapter(private val context: Context,
         if (holder.binding is HistoryChartItemBinding) {
             holder.binding.model?.let { model ->
                 historyDisposable = model.store.stateStream.map {
-                    it.historyOldtoNew
-                }.observeOn(AndroidSchedulers.mainThread())
-
-                    .subscribeBy(
+                    it.getDeviceState(pyDevice).historyPages.sortedBy { page ->
+                        page.points.firstOrNull()?.actionTs
+                    }.filter { page ->
+                        page.statId == statId
+                    }.map { page ->
+                        page.points
+                    }.flatten().distinctBy {
+                        it.actionTs
+                    }
+                }.distinctUntilChanged().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
                     onNext = {
-                        holder.binding.pointsChart.setSeriesData(it.toSeries(store.state.current?.program?.mode))
+                        holder.binding.pointsChart.setSeriesData(it.toSeries(store.state.getDeviceState(pyDevice).stats.firstOrNull {
+                            it.program.id == statId
+                        }?.program?.mode))
                         Log.d(TAG, "addSeries ${it.size}")
                     }, onError = {
                         // ignore
                     }
                 )
             }
-
         }
     }
 
@@ -73,35 +86,43 @@ internal class ThermostatAdapter(private val context: Context,
         }
     }
 
-    override fun buildList(state: ThermostatState): List<DiffableItem> {
+    override fun buildList(state: CentralState): List<DiffableItem> {
         val items = mutableListOf<DiffableItem>()
-        if (state.isLoading) {
-            items += StatLoadingDiffableItem()
-        } else {
-            state.current?.let {
-                items += StatDiffableItem(state.current, dispatcher, state.isUpdating)
-                items += StatModeDiffableItem(mode = state.current.program.mode)
-                items += PropaneDiffableItem(
-                    dispatcher = dispatcher,
-                    totalRun = state.current.control.totalRun,
-                    runCapacity = state.current.control.runCapacity
-                )
-                items += StatEnabledDiffableItem(
-                    dispatcher,
-                    state.current.program.enabled,
-                    state.current.program.id
-                )
+        state.getDeviceState(pyDevice)?.let { deviceState ->
+            if (deviceState.loading) {
+                items += StatLoadingDiffableItem()
+            } else {
+                deviceState.stats.firstOrNull {
+                    it.program.id == statId
+                }?.let { stat ->
+                    items += StatDiffableItem(stat, pyDevice, dispatcher, deviceState.updating)
+                    items += StatModeDiffableItem(mode = stat.program.mode)
+                    items += PropaneDiffableItem(
+                        dispatcher = dispatcher,
+                        pyDevice = pyDevice,
+                        stat = stat,
+                        totalRun = stat.control.totalRun,
+                        runCapacity = stat.control.runCapacity
+                    )
+                    items += StatEnabledDiffableItem(
+                        dispatcher = dispatcher,
+                        enabled = stat.program.enabled,
+                        pyDevice = pyDevice,
+                        statId = stat.program.id
+                    )
 
-                items += HistoryChartDiffableItem(store)
+                    items += HistoryChartDiffableItem(store)
 
-                items += HistoryInfoDiffableItem(state.historyOldtoNew)
+                    //items += HistoryInfoDiffableItem(state.historyOldtoNew)
 
-                items += createCycleInfoItems(
-                    context = context,
-                    history = state.historyOldtoNew,
-                    mode = it.program.mode)
+                    //items += createCycleInfoItems(
+                    //    context = context,
+                    //    history = state.historyOldtoNew,
+                    //    mode = it.program.mode)
+                }
             }
         }
+
         return items
     }
 
@@ -152,7 +173,7 @@ internal class ThermostatAdapter(private val context: Context,
                     binding.pointsChart.apply {
                         listener = object: PointsChart.Listener {
                             override fun onMoreDataRequest(timeStamp: Long) {
-                                dispatcher.post(ThermostatEvent.RequestMoreHistory(timeStamp))
+                                dispatcher.post(ThermostatEvent.RequestHistoryBefore(pyDevice, statId, timeStamp.toInt()))
                             }
                         }
                     }

@@ -1,158 +1,91 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
-import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.cryptomcgrath.pyrexia.CentralEvent
+import com.cryptomcgrath.pyrexia.CentralState
+import com.cryptomcgrath.pyrexia.DevicesRepo
 import com.cryptomcgrath.pyrexia.model.Control
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
-import com.cryptomcgrath.pyrexia.service.PyrexiaService
+import com.cryptomcgrath.pyrexia.model.VirtualStat
 import com.cryptomcgrath.pyrexia.service.isUnauthorized
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.EventQueue
 import com.edwardmcgrath.blueflux.core.RxStore
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-internal class DeviceConfigViewModel(application: Application,
-                                     pyDevice: PyDevice) : AndroidViewModel(application) {
+internal class DeviceConfigViewModel(
+    private val repo: DevicesRepo,
+    internal val store: RxStore<CentralState>,
+    internal val dispatcher: Dispatcher,
+    internal val pyDevice: PyDevice) : ViewModel() {
 
-    class Factory(private val application: Application,
+    class Factory(private val repo: DevicesRepo,
+                  private val store: RxStore<CentralState>,
+                  private val dispatcher: Dispatcher,
                   private val pyDevice: PyDevice) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return DeviceConfigViewModel(application, pyDevice) as T
+            return DeviceConfigViewModel(repo, store, dispatcher, pyDevice) as T
         }
     }
 
     private val disposables = CompositeDisposable()
-    val store = RxStore.create(deviceConfigReducerFun)
-    val dispatcher = Dispatcher.create(store)
-    val eventQueue = EventQueue.create()
 
-    private var pyrexiaService = PyrexiaService(application, pyDevice)
+    val eventQueue = EventQueue.create()
+    val loading = ObservableBoolean()
 
     init {
-        reactToEvents()
-        dispatcher.post(DeviceConfigEvent.Init(pyDevice))
+        relayEventsToFragment()
+        reactToStateChange()
     }
 
-    private fun reactToEvents() {
+    private fun relayEventsToFragment() {
         dispatcher.getEventBus()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { event ->
                     when (event) {
-                        is DeviceConfigEvent.GoToSensorDelete -> deleteSensor(event.sensor)
-                        is DeviceConfigEvent.GoToControlDelete -> deleteControl(event.control)
-                        is DeviceConfigEvent.ShutdownDevice -> shutdownDevice()
+                        is DeviceConfigEvent.OnShutdownDevice -> {
+                            shutdownDevice(event.pyDevice)
+                        }
+
+                        is DeviceConfigEvent.RequestSensorDelete -> {
+                            deleteSensor(event.pyDevice, event.sensor)
+                        }
+
+                        is DeviceConfigEvent.RequestControlDelete -> {
+                            deleteControl(event.pyDevice, event.control)
+                        }
+
+                        is DeviceConfigEvent.RequestStatDelete -> {
+                            deleteStat(event.pyDevice, event.stat)
+                        }
                     }
-                    // relay event to fragment
+
                     eventQueue.post(event)
                 },
                 onError = {
-                    Log.e(TAG, "error reacting to event "+it.stackTraceToString())
+                    // ignore
                 }
             ).addTo(disposables)
     }
 
-    fun refreshData(pyDevice: PyDevice? = null) {
-        if (pyDevice != null && pyrexiaService.pyDevice.baseUrl != pyDevice.baseUrl) {
-            pyrexiaService = PyrexiaService(getApplication(), pyDevice)
-        }
-
-        pyrexiaService.isLoggedIn()
+    private fun reactToStateChange() {
+        store.stateStream
+            .map { it.getDeviceState(pyDevice.uid).loading }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = {
-                    if (it) {
-                        fetchDeviceConfig()
-                    } else {
-                        dispatcher.post(DeviceConfigEvent.GoToLogin)
-                    }
-                }, onError = {
-
-                }
-            ).addTo(disposables)
-    }
-
-    private fun deleteSensor(sensor: Sensor) {
-        if (sensor.id > 0) {
-            pyrexiaService.deleteSensor(sensor)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = {
-                        refreshData()
-                    },
-                    onError = {
-                        dispatcher.post(DeviceConfigEvent.NetworkError(it, false))
-                    }
-                ).addTo(disposables)
-        } else {
-            refreshData()
-        }
-    }
-
-    private fun deleteControl(control: Control) {
-        if (control.id > 0) {
-            pyrexiaService.deleteControl(control)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = {
-                        refreshData()
-                    },
-                    onError = {
-                        dispatcher.post(DeviceConfigEvent.NetworkError(it, false))
-                    }
-                ).addTo(disposables)
-        } else {
-            refreshData()
-        }
-    }
-
-    private fun fetchDeviceConfig() {
-        Singles.zip(
-            pyrexiaService.getStatList(),
-            pyrexiaService.getSensors(),
-            pyrexiaService.getControls()
-        ).doOnSubscribe {
-            dispatcher.post(DeviceConfigEvent.SetLoading(true))
-        }.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { (stats, sensors, controls) ->
-                    dispatcher.post(DeviceConfigEvent.NewDeviceConfig(stats, sensors, controls))
-                },
-                onError = {
-                    if (it.isUnauthorized()) {
-                        dispatcher.post(DeviceConfigEvent.GoToLogin)
-                    } else {
-                        dispatcher.post(DeviceConfigEvent.NetworkError(it, true))
-                    }
-                }
-        ).addTo(disposables)
-    }
-
-    private fun shutdownDevice() {
-        pyrexiaService.shutdown()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-
-                },
-                onError = {
-                    dispatcher.post(DeviceConfigEvent.NetworkError(it, false))
+                onNext = {
+                    loading.set(it)
                 }
             ).addTo(disposables)
     }
@@ -160,6 +93,56 @@ internal class DeviceConfigViewModel(application: Application,
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+    }
+
+    private fun shutdownDevice(pyDevice: PyDevice) {
+        repo.shutdownDevice(pyDevice)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    eventQueue.post(DeviceConfigEvent.OnShutdownCompleted)
+                },
+                onError = {
+                    if (it.isUnauthorized()) {
+                        dispatcher.post(CentralEvent.GoToLogin(pyDevice))
+                    } else {
+                        eventQueue.post(DeviceConfigEvent.ShowNetworkError(it))
+                    }
+                }
+            ).addTo(disposables)
+    }
+
+    private fun deleteSensor(pyDevice: PyDevice, sensor: Sensor) {
+        repo.deleteSensor(pyDevice, sensor)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    // ignore
+                },
+                onError = {
+                    eventQueue.post(DeviceConfigEvent.ShowNetworkError(it))
+                }
+            ).addTo(disposables)
+    }
+
+    private fun deleteControl(pyDevice: PyDevice, control: Control) {
+        repo.deleteControl(pyDevice, control)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    // ignore
+                },
+                onError = {
+                    eventQueue.post(DeviceConfigEvent.ShowNetworkError(it))
+                }
+            ).addTo(disposables)
+    }
+
+    private fun deleteStat(pyDevice: PyDevice, stat: VirtualStat) {
+
     }
 
 }

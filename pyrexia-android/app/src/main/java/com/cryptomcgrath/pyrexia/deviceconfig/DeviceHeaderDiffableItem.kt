@@ -27,7 +27,7 @@ internal class DeviceHeaderDiffableItem(
                     AlertDialog.Builder(view.context)
                         .setTitle(R.string.shutdown_title)
                         .setMessage(view.context.getString(R.string.shutdown_are_you_sure, pyDevice.name))
-                        .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.ShutdownDevice) }
+                        .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.OnShutdownDevice(pyDevice)) }
                         .setNegativeButton(R.string.no) { _, _ -> }
                         .setIcon(R.drawable.ic_baseline_power_settings_new_24)
                         .show()

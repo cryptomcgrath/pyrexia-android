@@ -1,6 +1,5 @@
 package com.cryptomcgrath.pyrexia.thermostat
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,42 +10,31 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import com.cryptomcgrath.pyrexia.R
+import com.cryptomcgrath.pyrexia.CentralStore
 import com.cryptomcgrath.pyrexia.databinding.FragmentThermostatBinding
-import com.cryptomcgrath.pyrexia.login.LoginActivity
-import com.cryptomcgrath.pyrexia.login.RESULT_CODE_LOGIN
+import com.cryptomcgrath.pyrexia.deviceconfig.createNetworkErrorAlertDialog
 
 
 internal class ThermostatFragment: Fragment() {
     private val args: ThermostatFragmentArgs by navArgs()
+    private val central get() = CentralStore.getInstance(requireActivity().application)
 
     private val viewModel: ThermostatViewModel by viewModels {
         ThermostatViewModel.Factory(
-            application = requireActivity().application,
+            repo = central,
+            dispatcher = central.dispatcher,
+            store = central.store,
             pyDevice = args.pydevice,
-            id = args.id)
+            stat = args.stat)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         viewModel.eventQueue.handleEvents(this) { event ->
-            when (event) {
-                ThermostatViewModel.UiEvent.GoToLogin -> {
-                    requireActivity().startActivityForResult(
-                        LoginActivity.createLoginIntent(requireActivity(), args.pydevice),
-                        RESULT_CODE_LOGIN
-                    )
-                }
-                is ThermostatViewModel.UiEvent.ServiceError -> {
-                    showServicesError(event.throwable)
-                }
-                is ThermostatViewModel.UiEvent.StatEnable -> {
-                    if (event.enable) {
-                        viewModel.enableStat(event.id)
-                    } else {
-                        viewModel.disableStat(event.id)
-                    }
+            when(event) {
+                is ThermostatEvent.NetworkError -> {
+                    showNetworkError(event.throwable, event.finish)
                 }
             }
         }
@@ -61,8 +49,10 @@ internal class ThermostatFragment: Fragment() {
             model = viewModel
             recyclerView.adapter = ThermostatAdapter(
                 context = requireContext(),
-                dispatcher = viewModel.dispatcher,
-                store = viewModel.store
+                dispatcher = central.dispatcher,
+                pyDevice = viewModel.pyDevice,
+                store = central.store,
+                statId = viewModel.stat.program.id
             )
         }
         val appBarConfiguration = AppBarConfiguration(findNavController().graph)
@@ -73,19 +63,21 @@ internal class ThermostatFragment: Fragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.cancelAutoRefresh()
+        central.cancelAutoRefresh()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.setupAutoRefresh()
+        central.setupAutoRefresh(viewModel.pyDevice)
+        val elapsed = viewModel.stat.lastRefreshTimeSecs - (System.currentTimeMillis() / 1000)
+        central.dispatcher.post(
+            ThermostatEvent.RequestHistoryBefore(
+                viewModel.pyDevice, viewModel.stat.program.id, (viewModel.stat.currentTimeSecs ?: 0 + elapsed).toInt() ))
     }
 
-    private fun showServicesError(throwable: Throwable) {
-        AlertDialog.Builder(requireActivity())
-            .setPositiveButton(R.string.ok, null)
-            .setTitle("Service Error")
-            .setMessage(throwable.toString())
-            .create().show()
+    private fun showNetworkError(throwable: Throwable, finish: Boolean) {
+        createNetworkErrorAlertDialog(requireContext(), throwable) {
+            if (finish) findNavController().popBackStack()
+        }.show()
     }
 }

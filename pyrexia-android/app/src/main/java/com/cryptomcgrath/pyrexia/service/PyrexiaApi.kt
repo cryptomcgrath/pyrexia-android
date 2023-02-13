@@ -36,25 +36,25 @@ internal interface PyrexiaApi {
         "Accept: application/json",
         "Content-Type: application/json")
     @POST("/stat/{id}/increase")
-    fun statIncrease(@Path("id") id: Int): Completable
+    fun statIncrease(@Path("id") id: Int): Single<GetStatDto>
 
     @Headers(
         "Accept: application/json",
         "Content-Type: application/json")
     @POST("/stat/{id}/decrease")
-    fun statDecrease(@Path("id") id: Int): Completable
+    fun statDecrease(@Path("id") id: Int): Single<GetStatDto>
 
     @Headers(
         "Accept: application/json",
         "Content-Type: application/json")
     @POST("/stat/{id}/enable")
-    fun statEnable(@Path("id") id: Int): Completable
+    fun statEnable(@Path("id") id: Int): Single<GetStatDto>
 
     @Headers(
         "Accept: application/json",
         "Content-Type: application/json")
     @POST("/stat/{id}/disable")
-    fun statDisable(@Path("id") id: Int): Completable
+    fun statDisable(@Path("id") id: Int): Single<GetStatDto>
 
     @Headers(
         "Accept: application/json",
@@ -62,7 +62,9 @@ internal interface PyrexiaApi {
     @GET("/history")
     fun getHistory(@Query("offset") offset: Int,
                    @Query("limit") limit: Int,
-                   @Query("program_id") program_id: Int?): Single<GetHistoryDto>
+                   @Query("program_id") program_id: Int?,
+                   @Query("start_ts") startTs: Int?,
+                   @Query("end_ts") endTs: Int?): Single<GetHistoryDto>
 
     @Headers(
         "Accept: application/json",

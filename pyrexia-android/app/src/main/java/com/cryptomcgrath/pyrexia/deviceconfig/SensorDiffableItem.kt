@@ -8,14 +8,16 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.databinding.BindingAdapter
 import androidx.databinding.ObservableField
 import com.cryptomcgrath.pyrexia.R
+import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
 import com.cryptomcgrath.pyrexia.util.DiffableItem
 import com.edwardmcgrath.blueflux.core.Dispatcher
 
 
-internal class SensorDiffableItem(private val context: Context,
-                                  val dispatcher: Dispatcher,
-                                  val sensor: Sensor): DiffableItem {
+internal class SensorDiffableItem(context: Context,
+                                  private val pyDevice: PyDevice,
+                                  val sensor: Sensor,
+                                  private val dispatcher: Dispatcher): DiffableItem {
 
     val name = sensor.name
     val addr = if (sensor.sensorType == Sensor.SensorType.DHT22) {
@@ -40,7 +42,8 @@ internal class SensorDiffableItem(private val context: Context,
                         AlertDialog.Builder(view.context)
                             .setTitle(R.string.delete_dialog_title)
                             .setMessage(view.context.getString(R.string.component_delete_confirm, sensor.name))
-                            .setPositiveButton(R.string.yes) { _, _ -> dispatcher.post(DeviceConfigEvent.GoToSensorDelete(sensor)) }
+                            .setPositiveButton(R.string.yes) { _, _ ->
+                                dispatcher.post(DeviceConfigEvent.RequestSensorDelete(pyDevice, sensor)) }
                             .setNegativeButton(R.string.no) { _, _ -> }
                             .setIcon(R.drawable.ic_outline_delete_24)
                             .show()

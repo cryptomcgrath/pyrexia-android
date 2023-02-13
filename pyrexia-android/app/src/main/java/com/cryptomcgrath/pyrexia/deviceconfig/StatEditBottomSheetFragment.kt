@@ -8,9 +8,9 @@ import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import android.widget.Filter
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.cryptomcgrath.pyrexia.CentralStore
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.databinding.FragmentStatEditBinding
 import com.cryptomcgrath.pyrexia.model.Program
@@ -18,17 +18,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 internal class StatEditBottomSheetFragment: BottomSheetDialogFragment() {
     private val args: StatEditBottomSheetFragmentArgs by navArgs()
+    private val deviceId get() = args.pydevice.uid
+    private val central get() = CentralStore.getInstance(requireActivity().application)
     private val viewModel: StatEditViewModel by viewModels {
         StatEditViewModel.Factory(
-            application = requireActivity().application,
+            repo = central,
+            store = central.store,
             pyDevice = args.pydevice,
-            stat = args.stat,
-            store = deviceConfigViewModel.store)
-    }
-    private val deviceConfigViewModel: DeviceConfigViewModel by activityViewModels {
-        DeviceConfigViewModel.Factory(
-            application = requireActivity().application,
-            pyDevice = args.pydevice)
+            stat = args.stat)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +35,6 @@ internal class StatEditBottomSheetFragment: BottomSheetDialogFragment() {
         viewModel.eventQueue.handleEvents(this) { event ->
             when (event) {
                 StatEditViewModel.StatEditUiEvent.SaveStatSuccess -> {
-                    deviceConfigViewModel.refreshData()
                     dismiss()
                 }
 
@@ -71,7 +67,7 @@ internal class StatEditBottomSheetFragment: BottomSheetDialogFragment() {
             val controlAdapter = NoFilterAdapter(
                 requireContext(),
                 R.layout.mode_dropdown_item,
-                deviceConfigViewModel.store.state.controls.map {
+                central.store.state.deviceStateMap[deviceId]?.controls.orEmpty().map {
                     it.name
                 }
             )
@@ -79,7 +75,7 @@ internal class StatEditBottomSheetFragment: BottomSheetDialogFragment() {
             val sensorsAdapter = NoFilterAdapter(
                 requireContext(),
                 R.layout.mode_dropdown_item,
-                deviceConfigViewModel.store.state.sensors.map {
+                central.store.state.deviceStateMap[deviceId]?.sensors.orEmpty().map {
                     it.name
                 }
             )

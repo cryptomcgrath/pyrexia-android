@@ -11,17 +11,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.cryptomcgrath.pyrexia.CentralStore
 import com.cryptomcgrath.pyrexia.databinding.FragmentStatListBinding
-import com.cryptomcgrath.pyrexia.deviceconfig.createNetworkErrorAlertDialog
-import com.cryptomcgrath.pyrexia.login.LoginActivity
-import com.cryptomcgrath.pyrexia.login.RESULT_CODE_LOGIN
 import com.cryptomcgrath.pyrexia.thermostat.ThermostatFragmentDirections
 
 internal class StatListFragment: Fragment() {
     private val args: StatListFragmentArgs by navArgs()
+    private val central get() = CentralStore.getInstance(requireActivity().application)
 
     private val viewModel: StatListViewModel by viewModels {
-        StatListViewModel.Factory(requireActivity().application, args.pydevice)
+        StatListViewModel.Factory(central = central, pyDevice = args.pydevice)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,19 +29,10 @@ internal class StatListFragment: Fragment() {
             when (event) {
                 is StatListEvent.OnStatSelected -> {
                     val action = ThermostatFragmentDirections.actionGlobalThermostatFragment(
-                        id = event.id,
+                        stat = event.stat,
                         name = event.name,
                         pydevice = args.pydevice)
                     findNavController().navigate(action)
-                }
-                is StatListEvent.NetworkError -> {
-                    showNetworkError(event.throwable)
-                }
-                StatListEvent.GoToLogin -> {
-                    requireActivity().startActivityForResult(
-                        LoginActivity.createLoginIntent(requireActivity(), args.pydevice),
-                        RESULT_CODE_LOGIN
-                    )
                 }
             }
         }
@@ -55,7 +45,7 @@ internal class StatListFragment: Fragment() {
     ): View? {
         val binding = FragmentStatListBinding.inflate(inflater, container, false).apply {
             model = viewModel
-            recyclerView.adapter = StatListAdapter(viewModel.store, viewModel.dispatcher)
+            recyclerView.adapter = StatListAdapter(central.store, viewModel.pyDevice, central.dispatcher)
         }
 
         val appBarConfiguration = AppBarConfiguration(findNavController().graph)
@@ -72,18 +62,12 @@ internal class StatListFragment: Fragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.cancelAutoRefresh()
+        central.cancelAutoRefresh()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.setupAutoRefresh()
-    }
-
-    private fun showNetworkError(throwable: Throwable) {
-        createNetworkErrorAlertDialog(requireContext(), throwable) {
-            findNavController().popBackStack()
-        }.show()
+        central.setupAutoRefresh(viewModel.pyDevice)
     }
 }
 

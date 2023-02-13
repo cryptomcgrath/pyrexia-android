@@ -1,15 +1,13 @@
 package com.cryptomcgrath.pyrexia.deviceconfig
 
-import android.app.Application
 import android.view.View
 import androidx.databinding.ObservableField
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.cryptomcgrath.pyrexia.DevicesRepo
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.Sensor
-import com.cryptomcgrath.pyrexia.service.PyrexiaService
 import com.edwardmcgrath.blueflux.core.Event
 import com.edwardmcgrath.blueflux.core.EventQueue
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -18,20 +16,19 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-internal class SensorEditViewModel(application: Application,
-                                   pyDevice: PyDevice,
-                                   private val sensor: Sensor): AndroidViewModel(application) {
+internal class SensorEditViewModel(
+    private val repo: DevicesRepo,
+    private val pyDevice: PyDevice,
+    private val sensor: Sensor): ViewModel() {
 
-    class Factory(private val application: Application,
+    class Factory(private val repo: DevicesRepo,
                   private val pyDevice: PyDevice,
                   private val sensor: Sensor) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return SensorEditViewModel(application, pyDevice, sensor) as T
+            return SensorEditViewModel(repo, pyDevice, sensor) as T
         }
     }
-
-    private val pyrexiaService = PyrexiaService(application, pyDevice)
 
     val eventQueue = EventQueue.create()
     private val disposables = CompositeDisposable()
@@ -62,11 +59,8 @@ internal class SensorEditViewModel(application: Application,
     }
 
     private fun saveSensor(sensor: Sensor) {
-        if (sensor.id == 0) {
-            pyrexiaService.addSensor(sensor)
-        } else {
-            pyrexiaService.updateSensor(sensor)
-        }.subscribeOn(Schedulers.io())
+        repo.saveSensor(pyDevice, sensor)
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
