@@ -16,7 +16,7 @@ internal sealed class DeviceConfigEvent: Event {
 
     data class OnShutdownDevice(val pyDevice: PyDevice): DeviceConfigEvent()
 
-    data class ShowNetworkError(val throwable: Throwable): DeviceConfigEvent()
+    data class ShowNetworkError(val throwable: Throwable, val finish: Boolean = false): DeviceConfigEvent()
 
     object OnShutdownCompleted: DeviceConfigEvent()
 

@@ -5,23 +5,29 @@ import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableInt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.cryptomcgrath.pyrexia.AUTO_REFRESH_INTERVAL
+import com.cryptomcgrath.pyrexia.CentralEvent
 import com.cryptomcgrath.pyrexia.CentralState
 import com.cryptomcgrath.pyrexia.DevicesRepo
 import com.cryptomcgrath.pyrexia.R
 import com.cryptomcgrath.pyrexia.model.Program
 import com.cryptomcgrath.pyrexia.model.PyDevice
 import com.cryptomcgrath.pyrexia.model.VirtualStat
+import com.cryptomcgrath.pyrexia.service.isUnauthorized
 import com.edwardmcgrath.blueflux.core.Dispatcher
 import com.edwardmcgrath.blueflux.core.EventQueue
 import com.edwardmcgrath.blueflux.core.RxStore
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 internal class ThermostatViewModel(
     private val repo: DevicesRepo,
@@ -42,6 +48,7 @@ internal class ThermostatViewModel(
     }
     internal val eventQueue = EventQueue.create()
     private val disposables = CompositeDisposable()
+    private var autoRefreshDisposable: Disposable? = null
     private val statId = stat.program.id
     val backgroundColor = ObservableInt(R.color.black)
     val showError = ObservableBoolean(false)
@@ -101,6 +108,44 @@ internal class ThermostatViewModel(
             )
         }
     }
+
+    fun refreshStats() {
+        repo.refreshStats(pyDevice)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    if (autoRefreshDisposable == null) {
+                        setupAutoRefresh()
+                    }
+                },
+                onError = {
+                    if (it.isUnauthorized()) {
+                        dispatcher.post(CentralEvent.GoToLogin(pyDevice))
+                    } else {
+                        eventQueue.post(ThermostatEvent.ShowNetworkError(it, true))
+                    }
+                }
+            ).addTo(disposables)
+    }
+
+    private fun setupAutoRefresh() {
+        autoRefreshDisposable = Observable.interval(AUTO_REFRESH_INTERVAL, TimeUnit.SECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    refreshStats()
+                },
+                onError = {
+                    // ignore
+                }
+            )
+    }
+    fun cancelAutoRefresh() {
+        autoRefreshDisposable?.dispose()
+    }
+
     private fun fetchMoreHistoryIfNeeded(pyDevice: PyDevice, statId: Int, timeStamp: Long) {
         Single.create {
             val pages = store.state.getDeviceState(pyDevice).historyPages.filter {
@@ -162,7 +207,7 @@ internal class ThermostatViewModel(
                     // ignore
                 },
                 onError = {
-                    eventQueue.post(ThermostatEvent.NetworkError(it, false))
+                    eventQueue.post(ThermostatEvent.ShowNetworkError(it, false))
                 }
             ).addTo(disposables)
     }
@@ -175,7 +220,7 @@ internal class ThermostatViewModel(
                     // ignore
                 },
                 onError = {
-                    eventQueue.post(ThermostatEvent.NetworkError(it, false))
+                    eventQueue.post(ThermostatEvent.ShowNetworkError(it, false))
                 }
             ).addTo(disposables)
     }
@@ -189,7 +234,7 @@ internal class ThermostatViewModel(
                     // ignore
                 },
                 onError = {
-                    eventQueue.post(ThermostatEvent.NetworkError(it, false))
+                    eventQueue.post(ThermostatEvent.ShowNetworkError(it, false))
                 }
             ).addTo(disposables)
     }
@@ -203,7 +248,7 @@ internal class ThermostatViewModel(
                     // ignore
                 },
                 onError = {
-                    eventQueue.post(ThermostatEvent.NetworkError(it, false))
+                    eventQueue.post(ThermostatEvent.ShowNetworkError(it, false))
                 }
             ).addTo(disposables)
     }
@@ -217,7 +262,7 @@ internal class ThermostatViewModel(
                     // ignore
                 },
                 onError = {
-                    eventQueue.post(ThermostatEvent.NetworkError(it, false))
+                    eventQueue.post(ThermostatEvent.ShowNetworkError(it, false))
                 }
             ).addTo(disposables)
     }

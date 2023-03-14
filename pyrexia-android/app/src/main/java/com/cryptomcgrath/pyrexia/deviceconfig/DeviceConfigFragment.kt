@@ -37,7 +37,10 @@ internal class DeviceConfigFragment: Fragment() {
             when (event) {
                 is DeviceConfigEvent.ShowNetworkError -> {
                     createNetworkErrorAlertDialog(requireContext(), event.throwable) {
-                    }
+                        if (event.finish) {
+                            findNavController().popBackStack()
+                        }
+                    }.show()
                 }
 
                 is DeviceConfigEvent.OnShutdownCompleted -> {
@@ -117,12 +120,7 @@ internal class DeviceConfigFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        central.setupAutoRefresh(viewModel.pyDevice)
-    }
-
-    override fun onPause() {
-        central.cancelAutoRefresh()
-        super.onPause()
+        viewModel.refreshDeviceConfig()
     }
 
     private fun goToSensorEditDialog(pyDevice: PyDevice,

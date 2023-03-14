@@ -33,7 +33,7 @@ internal class ThermostatFragment: Fragment() {
 
         viewModel.eventQueue.handleEvents(this) { event ->
             when(event) {
-                is ThermostatEvent.NetworkError -> {
+                is ThermostatEvent.ShowNetworkError -> {
                     showNetworkError(event.throwable, event.finish)
                 }
             }
@@ -63,12 +63,12 @@ internal class ThermostatFragment: Fragment() {
 
     override fun onPause() {
         super.onPause()
-        central.cancelAutoRefresh()
+        viewModel.cancelAutoRefresh()
     }
 
     override fun onResume() {
         super.onResume()
-        central.setupAutoRefresh(viewModel.pyDevice)
+        viewModel.refreshStats()
         val elapsed = viewModel.stat.lastRefreshTimeSecs - (System.currentTimeMillis() / 1000)
         central.dispatcher.post(
             ThermostatEvent.RequestHistoryBefore(

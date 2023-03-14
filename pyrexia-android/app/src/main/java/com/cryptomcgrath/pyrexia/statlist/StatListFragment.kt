@@ -13,6 +13,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.cryptomcgrath.pyrexia.CentralStore
 import com.cryptomcgrath.pyrexia.databinding.FragmentStatListBinding
+import com.cryptomcgrath.pyrexia.deviceconfig.createNetworkErrorAlertDialog
 import com.cryptomcgrath.pyrexia.thermostat.ThermostatFragmentDirections
 
 internal class StatListFragment: Fragment() {
@@ -20,7 +21,7 @@ internal class StatListFragment: Fragment() {
     private val central get() = CentralStore.getInstance(requireActivity().application)
 
     private val viewModel: StatListViewModel by viewModels {
-        StatListViewModel.Factory(central = central, pyDevice = args.pydevice)
+        StatListViewModel.Factory(repo = central, dispatcher = central.dispatcher, pyDevice = args.pydevice)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +34,12 @@ internal class StatListFragment: Fragment() {
                         name = event.name,
                         pydevice = args.pydevice)
                     findNavController().navigate(action)
+                }
+
+                is StatListEvent.ShowNetworkError -> {
+                    createNetworkErrorAlertDialog(requireContext(), event.throwable) {
+                        if (event.finish) findNavController().popBackStack()
+                    }.show()
                 }
             }
         }
@@ -62,12 +69,12 @@ internal class StatListFragment: Fragment() {
 
     override fun onPause() {
         super.onPause()
-        central.cancelAutoRefresh()
+        viewModel.cancelAutoRefresh()
     }
 
     override fun onResume() {
         super.onResume()
-        central.setupAutoRefresh(viewModel.pyDevice)
+        viewModel.refreshStats()
     }
 }
 

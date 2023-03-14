@@ -95,6 +95,24 @@ internal class DeviceConfigViewModel(
         disposables.clear()
     }
 
+    fun refreshDeviceConfig() {
+        repo.refreshDeviceConfig(pyDevice)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {},
+                onError = {
+                    dispatcher.post(CentralEvent.SetLoading(pyDevice.uid, false))
+                    if (it.isUnauthorized()) {
+                        dispatcher.post(CentralEvent.GoToLogin(pyDevice))
+                    } else {
+                        eventQueue.post(DeviceConfigEvent.ShowNetworkError(it, true))
+                    }
+                }
+            )
+            .addTo(disposables)
+    }
+
     private fun shutdownDevice(pyDevice: PyDevice) {
         repo.shutdownDevice(pyDevice)
             .subscribeOn(Schedulers.io())

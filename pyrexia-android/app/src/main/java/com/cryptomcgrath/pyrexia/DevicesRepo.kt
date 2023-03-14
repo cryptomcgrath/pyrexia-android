@@ -12,6 +12,10 @@ internal interface DevicesRepo {
 
     fun shutdownDevice(pyDevice: PyDevice): Completable
 
+    fun refreshDeviceConfig(pyDevice: PyDevice): Completable
+
+    fun refreshStats(pyDevice: PyDevice): Completable
+
     fun increaseTemp(pyDevice: PyDevice, statId: Int): Completable
 
     fun decreaseTemp(pyDevice: PyDevice, statId: Int): Completable

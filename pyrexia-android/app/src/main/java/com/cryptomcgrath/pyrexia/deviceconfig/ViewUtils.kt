@@ -6,6 +6,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.cryptomcgrath.pyrexia.R
+import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import java.util.*
 
@@ -61,19 +62,25 @@ internal fun String.isValidGpioPin(): Boolean {
 internal fun createNetworkErrorAlertDialog(context: Context,
                                            throwable: Throwable,
                                            buttonActionFun: () -> Unit): AlertDialog {
+    val message = throwable.toUserFriendlyMessage(context)
     return AlertDialog.Builder(context)
         .setPositiveButton(R.string.ok) { di, _ ->
             di.dismiss()
             buttonActionFun.invoke()
         }
         .setTitle(context.getString(R.string.network_error_title))
-        .setMessage(throwable.toString())
+        .setMessage(message)
         .create()
 }
 
-internal fun Throwable.toUserFriendlyMessageResId(): Int? {
+internal fun Throwable.toUserFriendlyMessage(context: Context): String {
     return when {
-        this is SocketTimeoutException -> R.string.network_error_socket_timeout
-        else -> null
+        this is SocketTimeoutException -> context.getString(R.string.network_error_socket_timeout)
+
+        this is HttpException -> {
+            this.message()
+        }
+
+        else -> this.toString()
     }
 }

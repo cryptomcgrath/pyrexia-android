@@ -41,7 +41,6 @@ internal class CentralStore private constructor(val app: Application): DevicesRe
 
     private val db = PyrexiaDb.getDatabase(app)
     private val disposables = CompositeDisposable()
-    private var autoRefreshDisposable: Disposable? = null
 
     init {
         reactToDispatchedEvents()
@@ -195,16 +194,6 @@ internal class CentralStore private constructor(val app: Application): DevicesRe
         }
     }
 
-    private fun Completable.handleLoading(pyDevice: PyDevice): Completable {
-        return this.doOnSubscribe {
-            dispatcher.post(CentralEvent.SetLoading(pyDevice.uid, true))
-        }.doOnComplete {
-            refreshDeviceData(pyDevice)
-        }.doOnError {
-            dispatcher.post(CentralEvent.SetLoading(pyDevice.uid, false))
-        }
-    }
-
     override fun saveStat(pyDevice: PyDevice, program: Program): Completable {
         val pyrexiaService = getPyrexiaService(pyDevice)
         return if (program.id == 0) {
@@ -256,28 +245,32 @@ internal class CentralStore private constructor(val app: Application): DevicesRe
             ).addTo(disposables)
     }
 
+    override fun refreshDeviceConfig(pyDevice: PyDevice): Completable {
+        val pyrexiaService = getPyrexiaService(pyDevice)
+        val deviceId = pyDevice.uid
+        return Singles.zip(
+            pyrexiaService.getStatList(),
+            pyrexiaService.getSensors(),
+            pyrexiaService.getControls()
+        ).doOnSubscribe {
+            dispatcher.post(CentralEvent.SetLoading(deviceId, true))
+        }.flatMapCompletable { (stats, sensors, controls) ->
+            dispatcher.post(CentralEvent.NewDeviceConfig(deviceId, stats, sensors, controls))
+            Completable.complete()
+        }
+    }
+
     fun refreshDeviceData(pyDevice: PyDevice) {
         fetchDeviceConfig(pyDevice)
     }
 
-    fun setupAutoRefresh(pyDevice: PyDevice) {
-        refreshDeviceData(pyDevice)
-        autoRefreshDisposable = Observable.interval(AUTO_REFRESH_INTERVAL, TimeUnit.SECONDS)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    Log.d(TAG, "refreshing data")
-                    refreshDeviceData(pyDevice)
-                },
-                onError = {
-                    // ignore
-                }
-            )
-    }
-
-    fun cancelAutoRefresh() {
-        autoRefreshDisposable?.dispose()
+    override fun refreshStats(pyDevice: PyDevice): Completable {
+        return getPyrexiaService(pyDevice)
+            .getStatList()
+            .flatMapCompletable {
+                dispatcher.post(CentralEvent.NewStatList(pyDevice.uid, it))
+                Completable.complete()
+            }
     }
 
     override fun shutdownDevice(pyDevice: PyDevice): Completable {
@@ -449,6 +442,20 @@ internal val centralReducerFun: ReducerFun<CentralState> = { inState, event ->
             )
         }
 
+        is CentralEvent.NewStatList -> {
+            val newDeviceStateMap = state.deviceStateMap.toMutableMap()
+
+            newDeviceStateMap[event.deviceId] = (newDeviceStateMap[event.deviceId] ?: CentralState.DeviceState()).copy(
+                loading = false,
+                updating = false,
+                stats = event.stats,
+                connectionError = null
+            )
+            state.copy(
+                deviceStateMap = newDeviceStateMap
+            )
+        }
+
         is CentralEvent.NetworkError -> {
             val newDeviceMap = state.deviceStateMap.toMutableMap()
             newDeviceMap[event.deviceId]?.copy(
@@ -560,6 +567,8 @@ internal sealed class CentralEvent : Event {
                            val stats: List<VirtualStat>,
                            val sensors: List<Sensor>,
                            val controls: List<Control>): CentralEvent()
+
+    data class NewStatList(val deviceId: Int, val stats: List<VirtualStat>): CentralEvent()
     data class SetLoading(val deviceId: Int, val loading: Boolean): CentralEvent()
     data class SetUpdating(val deviceId: Int, val updating: Boolean): CentralEvent()
 

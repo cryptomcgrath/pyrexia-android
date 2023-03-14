@@ -5,7 +5,7 @@ import com.edwardmcgrath.blueflux.core.Event
 
 internal sealed class ThermostatEvent: Event {
     data class OnClickRefill(val pyDevice: PyDevice, val controlId: Int): ThermostatEvent()
-    data class NetworkError(val throwable: Throwable, val finish: Boolean) : ThermostatEvent()
+    data class ShowNetworkError(val throwable: Throwable, val finish: Boolean) : ThermostatEvent()
 
     data class RequestEnableStat(val pyDevice: PyDevice, val statId: Int): ThermostatEvent()
     data class RequestDisableStat(val pyDevice: PyDevice, val statId: Int): ThermostatEvent()
