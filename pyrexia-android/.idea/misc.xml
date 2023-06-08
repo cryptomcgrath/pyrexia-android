@@ -1,23 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DesignSurface">
-    <option name="filePathToZoomLevelMap">
-      <map>
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.268" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/drawable/ic_arrow_down_48.xml" value="0.1015" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/drawable/ic_arrow_up_48.xml" value="0.1015" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/drawable/ic_baseline_add_circle_24.xml" value="0.1035" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/drawable/ic_relay.xml" value="0.1215" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/layout/activity_main.xml" value="0.22327898550724637" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/layout/device_item.xml" value="0.268" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/layout/fragment_device_list.xml" value="0.21739130434782608" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/layout/fragment_stat_list.xml" value="0.1" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/layout/fragment_thermostat.xml" value="0.1" />
-        <entry key="..\:/Users/edwar/p/pyrexia-android/pyrexia-android/app/src/main/res/layout/stat_item.xml" value="0.3" />
-      </map>
-    </option>
-  </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_12" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="jbr-17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

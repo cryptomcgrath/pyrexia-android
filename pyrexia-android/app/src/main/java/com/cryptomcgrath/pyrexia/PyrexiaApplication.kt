@@ -1,6 +1,7 @@
 package com.cryptomcgrath.pyrexia
 
 import android.app.Application
+import com.edwardmcgrath.blueflux.core.BuildConfig
 import com.facebook.flipper.android.AndroidFlipperClient
 import com.facebook.flipper.android.utils.FlipperUtils
 import com.facebook.flipper.plugins.inspector.DescriptorMapping
