@@ -18,9 +18,6 @@ import com.cryptomcgrath.pyrexia.model.toSensorList
 import com.cryptomcgrath.pyrexia.model.toSensorUpdateDto
 import com.cryptomcgrath.pyrexia.model.toStat
 import com.cryptomcgrath.pyrexia.model.toStatList
-import com.facebook.flipper.android.AndroidFlipperClient
-import com.facebook.flipper.plugins.network.FlipperOkhttpInterceptor
-import com.facebook.flipper.plugins.network.NetworkFlipperPlugin
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.Interceptor
@@ -33,9 +30,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 internal class PyrexiaService(application: Application, var pyDevice: PyDevice) {
     private val db = PyrexiaDb.getDatabase(application)
 
-    private val networkFlipperPlugin = AndroidFlipperClient.getInstance(application)
-        .getPlugin<NetworkFlipperPlugin>(NetworkFlipperPlugin.ID)
-
     private val httpClient = OkHttpClient.Builder()
         .addNetworkInterceptor(Interceptor { chain ->
             val original = chain.request()
@@ -45,12 +39,7 @@ internal class PyrexiaService(application: Application, var pyDevice: PyDevice) 
                 }
             }.addHeader("Platform", "android")
             chain.proceed(newRequest.build())
-        }).apply {
-            if (networkFlipperPlugin != null) {
-                val flipperInterceptor = FlipperOkhttpInterceptor(networkFlipperPlugin)
-                this.addNetworkInterceptor(flipperInterceptor)
-            }
-        }.build()
+        }).build()
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(pyDevice.baseUrl)

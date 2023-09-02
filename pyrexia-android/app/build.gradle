@@ -83,11 +83,6 @@ dependencies {
     implementation files('libs/blueflux-core-debug.aar')
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
 
-    // Flipper
-    implementation 'com.facebook.flipper:flipper:0.174.0'
-    implementation 'com.facebook.soloader:soloader:0.10.4'
-    implementation 'com.facebook.flipper:flipper-network-plugin:0.174.0'
-
     // tests
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
