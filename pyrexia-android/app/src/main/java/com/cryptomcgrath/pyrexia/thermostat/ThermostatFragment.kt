@@ -69,10 +69,11 @@ internal class ThermostatFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshStats()
-        val elapsed = viewModel.stat.lastRefreshTimeSecs - (System.currentTimeMillis() / 1000)
-        central.dispatcher.post(
-            ThermostatEvent.RequestHistoryBefore(
-                viewModel.pyDevice, viewModel.stat.program.id, (viewModel.stat.currentTimeSecs ?: 0 + elapsed).toInt() ))
+        // TODO: causing network error
+        //val elapsed = viewModel.stat.lastRefreshTimeSecs - (System.currentTimeMillis() / 1000)
+        //central.dispatcher.post(
+        //    ThermostatEvent.RequestHistoryBefore(
+        //       viewModel.pyDevice, viewModel.stat.program.id, (viewModel.stat.currentTimeSecs ?: 0 + elapsed).toInt() ))
     }
 
     private fun showNetworkError(throwable: Throwable, finish: Boolean) {
